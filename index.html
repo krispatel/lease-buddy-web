@@ -4,803 +4,726 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lease Buddy — Know the math before you sign.</title>
-
-  <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
   <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            bg:      "#0f1117",
-            surface: "#1a1d27",
-            border:  "#2a2d3a",
-            indigo:  { DEFAULT: "#6366f1" },
-            success: "#22c55e",
-            warning: "#f59e0b",
-            primary: "#f1f5f9",
-            muted:   "#64748b",
-          },
-          fontFamily: { sans: ["Inter", "sans-serif"] },
-        },
-      },
-    };
+    tailwind.config = { darkMode:"class", theme:{ extend:{ fontFamily:{ sans:["Inter","sans-serif"] } } } };
   </script>
-
   <style>
-    body { background-color: #0f1117; color: #f1f5f9; font-family: "Inter", sans-serif; }
-    .card { background-color: #1a1d27; border: 1px solid #2a2d3a; border-radius: 0.75rem; }
-
-    /* Range sliders */
-    input[type=range] { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #2a2d3a; outline: none; cursor: pointer; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #6366f1; cursor: pointer; border: 2px solid #0f1117; }
-    input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #6366f1; cursor: pointer; border: 2px solid #0f1117; }
-    input[type=range]:focus::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(99,102,241,0.3); }
-
-    /* Number inputs */
-    .num-input { background: #0f1117; border: 1px solid #2a2d3a; border-radius: 0.375rem; color: #f1f5f9; padding: 0.375rem 0.5rem; font-family: "Inter", sans-serif; font-size: 0.875rem; width: 100%; }
-    .num-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }
-
-    /* Term buttons */
-    .term-btn { background: #0f1117; border: 1px solid #2a2d3a; color: #64748b; border-radius: 0.375rem; padding: 0.375rem 0.75rem; cursor: pointer; font-size: 0.875rem; transition: all 0.15s; }
-    .term-btn.active { background: #6366f1; border-color: #6366f1; color: #fff; }
-
-    /* Worksheet */
-    .worksheet-line { font-family: "ui-monospace", "SFMono-Regular", monospace; font-size: 0.8rem; color: #94a3b8; line-height: 1.7; }
-    .worksheet-line.result  { color: #f1f5f9; font-weight: 600; }
-    .worksheet-line.section { color: #6366f1; font-weight: 600; margin-top: 0.75rem; font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; }
-    .worksheet-line.warning { color: #f59e0b; font-style: italic; }
-
-    /* Details/summary */
-    details > summary { cursor: pointer; list-style: none; }
-    details > summary::-webkit-details-marker { display: none; }
-
-    /* Hero payment */
-    .hero-payment { font-size: clamp(3rem, 8vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-    @keyframes pulse-once { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
-    .pulse { animation: pulse-once 0.3s ease; }
-
-    /* ── Tooltips ─────────────────────────────────────────────────── */
-    .tip-btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: transparent; border: 1px solid #2a2d3a;
-      color: #64748b; font-size: 10px; line-height: 1;
-      cursor: pointer; flex-shrink: 0; vertical-align: middle;
-      margin-left: 4px; transition: border-color 0.15s, color 0.15s;
-      font-family: "Inter", sans-serif; font-weight: 600;
-    }
-    .tip-btn:hover { border-color: #6366f1; color: #6366f1; }
-
-    .tooltip-box {
-      position: absolute; z-index: 50;
-      background: #1a1d27; border: 1px solid #6366f1;
-      border-radius: 0.5rem; padding: 0.75rem 1rem;
-      max-width: 280px; min-width: 200px;
-      font-size: 0.78rem; line-height: 1.5; color: #f1f5f9;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-      pointer-events: auto;
-    }
-    .tooltip-box.hidden { display: none; }
+    body{background:#0f1117;color:#f1f5f9;font-family:"Inter",sans-serif;}
+    .card{background:#1a1d27;border:1px solid #2a2d3a;border-radius:.75rem;}
+    input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:#2a2d3a;outline:none;cursor:pointer;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:#6366f1;cursor:pointer;border:2px solid #0f1117;}
+    input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#6366f1;cursor:pointer;border:2px solid #0f1117;}
+    input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(99,102,241,.3);}
+    .num-input{background:#0f1117;border:1px solid #2a2d3a;border-radius:.375rem;color:#f1f5f9;padding:.375rem .5rem;font-size:.875rem;width:100%;}
+    .num-input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.2);}
+    .term-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.875rem;transition:all .15s;}
+    .term-btn.active{background:#6366f1;border-color:#6366f1;color:#fff;}
+    .seg-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.3rem .5rem;cursor:pointer;font-size:.78rem;transition:all .15s;flex:1;text-align:center;}
+    .seg-btn.active{background:#6366f1;border-color:#6366f1;color:#fff;}
+    .worksheet-line{font-family:"ui-monospace","SFMono-Regular",monospace;font-size:.8rem;color:#94a3b8;line-height:1.7;}
+    .worksheet-line.result{color:#f1f5f9;font-weight:600;}
+    .worksheet-line.section{color:#6366f1;font-weight:600;margin-top:.75rem;font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;}
+    .worksheet-line.warn{color:#f59e0b;font-style:italic;}
+    details>summary{cursor:pointer;list-style:none;}
+    details>summary::-webkit-details-marker{display:none;}
+    .hero-payment{font-size:clamp(3rem,8vw,5rem);font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;}
+    @keyframes pulse-once{0%,100%{opacity:1;}50%{opacity:.5;}}
+    .pulse{animation:pulse-once .3s ease;}
+    .tip-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid #2a2d3a;color:#64748b;font-size:10px;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:border-color .15s,color .15s;font-weight:600;}
+    .tip-btn:hover{border-color:#6366f1;color:#6366f1;}
+    .tooltip-box{position:absolute;z-index:50;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;padding:.75rem 1rem;max-width:280px;min-width:200px;font-size:.78rem;line-height:1.5;color:#f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,.5);}
+    .zip-status{font-size:.75rem;margin-top:.25rem;min-height:1rem;}
   </style>
 </head>
-
 <body class="min-h-screen">
+<div id="tooltip-portal"></div>
 
-  <!-- ── TOOLTIP CONTAINER (portal-style, appended to body) ──────── -->
-  <div id="tooltip-portal"></div>
+<!-- HEADER -->
+<header class="border-b border-[#2a2d3a] px-6 py-4">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold text-[#f1f5f9] tracking-tight">Lease Buddy</h1>
+      <p class="text-xs text-[#64748b] mt-0.5">Know the math before you sign.</p>
+    </div>
+    <div class="text-xs text-[#64748b] text-right hidden sm:block">All calculations run locally.<br/>No data is sent anywhere.</div>
+  </div>
+</header>
 
-  <!-- ── HEADER ─────────────────────────────────────────────────── -->
-  <header class="border-b border-[#2a2d3a] px-6 py-4">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
+<main class="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
+
+  <!-- LEFT: INPUTS -->
+  <section class="space-y-4">
+    <div class="card p-5 space-y-5">
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Deal Inputs</h2>
+
+      <!-- MSRP -->
       <div>
-        <h1 class="text-xl font-bold text-[#f1f5f9] tracking-tight">Lease Buddy</h1>
-        <p class="text-xs text-[#64748b] mt-0.5">Know the math before you sign.</p>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-[#f1f5f9]">MSRP</label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="msrp" value="45000" min="10000" max="200000" step="500" class="num-input w-28 text-right" />
+          </div>
+        </div>
+        <input type="range" id="msrp-slider" min="10000" max="200000" step="500" value="45000" class="w-full" />
+        <div class="flex justify-between text-xs text-[#64748b] mt-1"><span>$10k</span><span>$200k</span></div>
       </div>
-      <div class="text-xs text-[#64748b] text-right hidden sm:block">
-        All calculations run locally.<br/>No data is sent anywhere.
+
+      <!-- Cap Cost -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Negotiated Cap Cost <button class="tip-btn" data-tip="capCost">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="capCost" value="43200" min="5000" max="200000" step="100" class="num-input w-28 text-right" />
+          </div>
+        </div>
+        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="43200" class="w-full" />
+        <p class="text-xs text-[#64748b] mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
+      </div>
+
+      <!-- Residual % -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Residual % <button class="tip-btn" data-tip="residualPct">i</button></label>
+          <div class="flex items-center gap-1">
+            <input type="number" id="residualPct" value="55" min="20" max="80" step="0.5" class="num-input w-20 text-right" />
+            <span class="text-xs text-[#64748b]">%</span>
+          </div>
+        </div>
+        <input type="range" id="residualPct-slider" min="20" max="80" step="0.5" value="55" class="w-full" />
+        <p class="text-xs text-[#64748b] mt-1" id="residual-dollars">Set by lender — higher is better for you</p>
+      </div>
+
+      <!-- Money Factor -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Money Factor <button class="tip-btn" data-tip="moneyFactor">i</button></label>
+          <div class="flex items-center gap-1">
+            <input type="number" id="moneyFactor" value="0.00125" min="0.00001" max="0.005" step="0.00001" class="num-input w-24 text-right font-mono" />
+          </div>
+        </div>
+        <input type="range" id="moneyFactor-slider" min="1" max="500" step="1" value="125" class="w-full" />
+        <p class="text-xs text-[#64748b] mt-1">&#x2248; <span id="mf-apr-val">3.00</span>% APR &mdash; ask your dealer for the buy-rate MF</p>
+        <div class="flex justify-between text-xs text-[#64748b]"><span>0.00001</span><span>0.00500</span></div>
+      </div>
+
+      <!-- Term -->
+      <div>
+        <label class="text-sm font-medium text-[#f1f5f9] flex items-center mb-2">Term <button class="tip-btn" data-tip="term">i</button></label>
+        <div class="flex gap-2" id="term-btns">
+          <button class="term-btn" data-term="24">24 mo</button>
+          <button class="term-btn active" data-term="36">36 mo</button>
+          <button class="term-btn" data-term="39">39 mo</button>
+          <button class="term-btn" data-term="48">48 mo</button>
+        </div>
+      </div>
+
+      <!-- Tax Rate + Zip + Method -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <label class="text-sm font-medium text-[#f1f5f9]">Sales Tax Rate</label>
+          <div class="flex items-center gap-1">
+            <input type="number" id="taxRate" value="8.75" min="0" max="15" step="0.25" class="num-input w-20 text-right" />
+            <span class="text-xs text-[#64748b]">%</span>
+          </div>
+        </div>
+        <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
+
+        <!-- ZIP lookup -->
+        <div>
+          <div class="flex items-center gap-2">
+            <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" class="num-input w-28" style="letter-spacing:.1em;" />
+            <button id="zip-lookup-btn" style="background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.8rem;white-space:nowrap;">Look up</button>
+          </div>
+          <p class="zip-status text-[#64748b]" id="zip-status">Enter ZIP to auto-detect state tax rate</p>
+        </div>
+
+        <!-- Tax method -->
+        <div>
+          <label class="text-xs text-[#64748b] uppercase tracking-wider mb-1 block">Tax Method</label>
+          <div class="flex gap-1" id="tax-method-btns">
+            <button class="seg-btn active" data-tax-method="monthly">Monthly</button>
+            <button class="seg-btn" data-tax-method="fullsale">Full Sale Price</button>
+            <button class="seg-btn" data-tax-method="upfront">Upfront Total</button>
+          </div>
+          <p class="text-xs text-[#64748b] mt-1" id="tax-method-hint">Tax applied to each monthly payment (most states)</p>
+        </div>
       </div>
     </div>
-  </header>
 
-  <!-- ── MAIN ───────────────────────────────────────────────────── -->
-  <main class="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
+    <!-- Advanced / Fees -->
+    <details class="card p-5">
+      <summary class="flex justify-between items-center">
+        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Advanced / Fees</h2>
+        <span class="text-xs text-[#6366f1]">tap to expand</span>
+      </summary>
+      <div class="mt-4 space-y-4">
 
-    <!-- ════ LEFT: INPUTS ════ -->
-    <section class="space-y-4">
-
-      <!-- Core inputs card -->
-      <div class="card p-5 space-y-5">
-        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Deal Inputs</h2>
-
-        <!-- MSRP -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-medium text-[#f1f5f9]">MSRP</label>
-            <div class="flex items-center gap-1">
-              <span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="msrp" value="45000" min="10000" max="200000" step="500" class="num-input w-28 text-right" />
-            </div>
-          </div>
-          <input type="range" id="msrp-slider" min="10000" max="200000" step="500" value="45000" class="w-full" />
-          <div class="flex justify-between text-xs text-[#64748b] mt-1"><span>$10k</span><span>$200k</span></div>
-        </div>
-
-        <!-- Cap Cost -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-medium text-[#f1f5f9] flex items-center">
-              Negotiated Cap Cost
-              <button class="tip-btn" data-tip="capCost">i</button>
-            </label>
-            <div class="flex items-center gap-1">
-              <span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="capCost" value="43200" min="5000" max="200000" step="100" class="num-input w-28 text-right" />
-            </div>
-          </div>
-          <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="43200" class="w-full" />
-          <p class="text-xs text-[#64748b] mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
-        </div>
-
-        <!-- Residual % -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-medium text-[#f1f5f9] flex items-center">
-              Residual %
-              <button class="tip-btn" data-tip="residualPct">i</button>
-            </label>
-            <div class="flex items-center gap-1">
-              <input type="number" id="residualPct" value="55" min="20" max="80" step="0.5" class="num-input w-20 text-right" />
-              <span class="text-xs text-[#64748b]">%</span>
-            </div>
-          </div>
-          <input type="range" id="residualPct-slider" min="20" max="80" step="0.5" value="55" class="w-full" />
-          <p class="text-xs text-[#64748b] mt-1" id="residual-dollars">Set by lender — higher is better for you</p>
-        </div>
-
-        <!-- Money Factor -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-medium text-[#f1f5f9] flex items-center">
-              Money Factor
-              <button class="tip-btn" data-tip="moneyFactor">i</button>
-            </label>
-            <div class="flex items-center gap-1">
-              <input type="number" id="moneyFactor" value="0.00125" min="0.00001" max="0.005" step="0.00001" class="num-input w-24 text-right font-mono" />
-            </div>
-          </div>
-          <input type="range" id="moneyFactor-slider" min="1" max="500" step="1" value="125" class="w-full" />
-          <p class="text-xs text-[#64748b] mt-1">&#x2248; <span id="mf-apr-val">3.00</span>% APR — ask your dealer for the buy-rate MF</p>
-          <div class="flex justify-between text-xs text-[#64748b]"><span>0.00001</span><span>0.00500</span></div>
-        </div>
-
-        <!-- Term -->
-        <div>
-          <label class="text-sm font-medium text-[#f1f5f9] flex items-center mb-2">
-            Term
-            <button class="tip-btn" data-tip="term">i</button>
-          </label>
-          <div class="flex gap-2" id="term-btns">
-            <button class="term-btn" data-term="24">24 mo</button>
-            <button class="term-btn active" data-term="36">36 mo</button>
-            <button class="term-btn" data-term="39">39 mo</button>
-            <button class="term-btn" data-term="48">48 mo</button>
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
           </div>
         </div>
 
-        <!-- Tax Rate -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-sm font-medium text-[#f1f5f9]">Sales Tax Rate</label>
-            <div class="flex items-center gap-1">
-              <input type="number" id="taxRate" value="8.75" min="0" max="15" step="0.25" class="num-input w-20 text-right" />
-              <span class="text-xs text-[#64748b]">%</span>
-            </div>
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9] flex items-center">Down Payment <button class="tip-btn" data-tip="downPayment">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
           </div>
-          <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
         </div>
-      </div>
+        <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
 
-      <!-- Advanced fees (collapsible) -->
-      <details class="card p-5">
-        <summary class="flex justify-between items-center">
-          <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Advanced / Fees</h2>
-          <span class="text-xs text-[#6366f1]">tap to expand</span>
-        </summary>
-        <div class="mt-4 space-y-4">
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
+          </div>
+        </div>
 
-          <!-- Acquisition Fee -->
+        <!-- Rebates + taxable toggle -->
+        <div>
           <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">
-              Acquisition Fee
-              <button class="tip-btn" data-tip="acqFee">i</button>
-            </label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
-            </div>
-          </div>
-
-          <!-- Down Payment -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">
-              Down Payment
-              <button class="tip-btn" data-tip="downPayment">i</button>
-            </label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
-            </div>
-          </div>
-          <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
-
-          <!-- Trade-in -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
-            </div>
-          </div>
-
-          <!-- Rebates -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">
-              Manufacturer Rebates
-              <button class="tip-btn" data-tip="rebates">i</button>
-            </label>
+            <label class="text-sm text-[#f1f5f9] flex items-center">Manufacturer Rebates <button class="tip-btn" data-tip="rebates">i</button></label>
             <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
               <input type="number" id="rebates" value="0" min="0" max="20000" step="100" class="num-input w-24 text-right" />
             </div>
           </div>
-
-          <!-- Doc Fee -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
-            </div>
+          <div class="flex items-center gap-2 mt-2">
+            <input type="checkbox" id="rebateTaxable" class="w-4 h-4 accent-[#6366f1] cursor-pointer" />
+            <label for="rebateTaxable" class="text-xs text-[#64748b] cursor-pointer">Taxable rebate &mdash; some states tax manufacturer rebates. Check your state&rsquo;s rules.</label>
           </div>
-
-          <!-- Disposition Fee -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">
-              Disposition Fee
-              <button class="tip-btn" data-tip="dispFee">i</button>
-            </label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
-            </div>
-          </div>
-
-          <!-- Capitalize acq fee -->
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
-            <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
-          </div>
-
         </div>
-      </details>
 
-    </section>
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
+          </div>
+        </div>
 
-    <!-- ════ RIGHT: OUTPUTS ════ -->
-    <section class="space-y-4 mt-4 lg:mt-0">
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
+          </div>
+        </div>
 
-      <!-- Hero payment card -->
-      <div class="card p-6 text-center">
-        <p class="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">Monthly Payment</p>
-        <div class="hero-payment text-[#6366f1]" id="hero-payment">$&#x2014;</div>
-        <p class="text-xs text-[#64748b] mt-2">pre-tax: <span id="hero-pretax" class="font-mono">&#x2014;</span> &nbsp;|&nbsp; due at signing: <span id="hero-signing" class="font-mono text-[#f59e0b]">&#x2014;</span></p>
-        <p class="text-sm text-[#64748b] mt-3">Total cost of lease: <span id="hero-total" class="font-semibold text-[#f1f5f9] font-mono">&#x2014;</span></p>
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
+          <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
+        </div>
+
       </div>
+    </details>
+  </section>
 
-      <!-- Budget-to-Deal card -->
-      <div class="card p-5">
-        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Budget-to-Deal</h2>
-        <p class="text-xs text-[#64748b] mb-3">Set a target payment — see the max cap cost you should accept.</p>
+  <!-- RIGHT: OUTPUTS -->
+  <section class="space-y-4 mt-4 lg:mt-0">
 
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm font-medium text-[#f1f5f9]">Target Payment</label>
-          <div class="flex items-center gap-1">
-            <span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="targetPayment" value="600" min="100" max="2000" step="10" class="num-input w-24 text-right font-mono" />
-            <span class="text-xs text-[#64748b]">/mo</span>
-          </div>
-        </div>
-        <input type="range" id="targetPayment-slider" min="100" max="2000" step="10" value="600" class="w-full mb-4" />
+    <!-- Hero -->
+    <div class="card p-6 text-center">
+      <p class="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">Monthly Payment</p>
+      <div class="hero-payment text-[#6366f1]" id="hero-payment">$&mdash;</div>
+      <p class="text-xs text-[#64748b] mt-2">pre-tax: <span id="hero-pretax" class="font-mono">&mdash;</span> &nbsp;|&nbsp; due at signing: <span id="hero-signing" class="font-mono text-[#f59e0b]">&mdash;</span></p>
+      <p class="text-sm text-[#64748b] mt-3">Total cost of lease: <span id="hero-total" class="font-semibold text-[#f1f5f9] font-mono">&mdash;</span></p>
+    </div>
 
-        <div class="bg-[#0f1117] rounded-lg p-4 space-y-2" id="backsolve-result">
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-[#64748b]">Max cap cost</span>
-            <span class="font-mono font-semibold text-[#22c55e]" id="bs-maxcap">&#x2014;</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-[#64748b]">Discount from MSRP</span>
-            <span class="font-mono text-sm text-[#f1f5f9]" id="bs-discount">&#x2014;</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-[#64748b]">Verified payment</span>
-            <span class="font-mono text-sm text-[#f1f5f9]" id="bs-verified">&#x2014;</span>
-          </div>
-          <div class="border-t border-[#2a2d3a] pt-2 mt-2">
-            <p class="text-xs text-[#64748b]" id="bs-walkaway">&#x2014;</p>
-          </div>
+    <!-- Budget-to-Deal -->
+    <div class="card p-5">
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Budget-to-Deal</h2>
+      <p class="text-xs text-[#64748b] mb-3">Set a target payment &mdash; see the max cap cost you should accept.</p>
+      <div class="flex justify-between items-center mb-2">
+        <label class="text-sm font-medium text-[#f1f5f9]">Target Payment</label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="targetPayment" value="600" min="100" max="2000" step="10" class="num-input w-24 text-right font-mono" />
+          <span class="text-xs text-[#64748b]">/mo</span>
         </div>
       </div>
-
-      <!-- Cost Driver card -->
-      <div class="card p-5">
-        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Cost Driver Breakdown</h2>
-
-        <!-- Stacked bar -->
-        <div class="relative h-10 rounded-lg overflow-hidden flex mb-4" id="cost-bar">
-          <div id="bar-dep" class="h-full transition-all duration-300" style="background:#6366f1"></div>
-          <div id="bar-fin" class="h-full transition-all duration-300" style="background:#f59e0b"></div>
-          <div id="bar-tax" class="h-full transition-all duration-300" style="background:#475569"></div>
-        </div>
-
-        <!-- Legend -->
-        <div class="grid grid-cols-3 gap-3 mb-4">
-          <div class="bg-[#0f1117] rounded-lg p-3 text-center">
-            <div class="w-3 h-3 rounded-full bg-[#6366f1] mx-auto mb-1"></div>
-            <p class="text-xs text-[#64748b]">Depreciation</p>
-            <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="dep-dollars">&#x2014;</p>
-            <p class="text-xs text-[#64748b]" id="dep-pct">&#x2014;</p>
-          </div>
-          <div class="bg-[#0f1117] rounded-lg p-3 text-center">
-            <div class="w-3 h-3 rounded-full bg-[#f59e0b] mx-auto mb-1"></div>
-            <p class="text-xs text-[#64748b]">Finance Fee</p>
-            <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="fin-dollars">&#x2014;</p>
-            <p class="text-xs text-[#64748b]" id="fin-pct">&#x2014;</p>
-          </div>
-          <div class="bg-[#0f1117] rounded-lg p-3 text-center">
-            <div class="w-3 h-3 rounded-full bg-[#475569] mx-auto mb-1"></div>
-            <p class="text-xs text-[#64748b]">Tax</p>
-            <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="tax-dollars">&#x2014;</p>
-            <p class="text-xs text-[#64748b]" id="tax-pct">&#x2014;</p>
-          </div>
-        </div>
-
-        <p class="text-xs text-[#64748b]" id="cost-insight">&#x2014;</p>
+      <input type="range" id="targetPayment-slider" min="100" max="2000" step="10" value="600" class="w-full mb-4" />
+      <div class="bg-[#0f1117] rounded-lg p-4 space-y-2">
+        <div class="flex justify-between"><span class="text-sm text-[#64748b]">Max cap cost</span><span class="font-mono font-semibold text-[#22c55e]" id="bs-maxcap">&mdash;</span></div>
+        <div class="flex justify-between"><span class="text-sm text-[#64748b]">Discount from MSRP</span><span class="font-mono text-sm text-[#f1f5f9]" id="bs-discount">&mdash;</span></div>
+        <div class="flex justify-between"><span class="text-sm text-[#64748b]">Verified payment</span><span class="font-mono text-sm text-[#f1f5f9]" id="bs-verified">&mdash;</span></div>
+        <div class="border-t border-[#2a2d3a] pt-2 mt-2"><p class="text-xs text-[#64748b]" id="bs-walkaway">&mdash;</p></div>
       </div>
+    </div>
 
-      <!-- Verification Worksheet (collapsed) -->
-      <details class="card p-5" id="worksheet-details">
-        <summary class="flex justify-between items-center">
-          <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Verification Worksheet</h2>
-          <span class="text-xs text-[#6366f1]">tap to expand</span>
-        </summary>
-        <div class="mt-4 space-y-1" id="worksheet-content">
-          <!-- Populated by JS -->
+    <!-- Cost Driver -->
+    <div class="card p-5">
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Cost Driver Breakdown</h2>
+      <div class="relative h-10 rounded-lg overflow-hidden flex mb-4">
+        <div id="bar-dep" class="h-full transition-all duration-300" style="background:#6366f1;width:80%"></div>
+        <div id="bar-fin" class="h-full transition-all duration-300" style="background:#f59e0b;width:14%"></div>
+        <div id="bar-tax" class="h-full transition-all duration-300" style="background:#475569;width:6%"></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="bg-[#0f1117] rounded-lg p-3 text-center">
+          <div class="w-3 h-3 rounded-full bg-[#6366f1] mx-auto mb-1"></div>
+          <p class="text-xs text-[#64748b]">Depreciation</p>
+          <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="dep-dollars">&mdash;</p>
+          <p class="text-xs text-[#64748b]" id="dep-pct">&mdash;</p>
         </div>
-      </details>
+        <div class="bg-[#0f1117] rounded-lg p-3 text-center">
+          <div class="w-3 h-3 rounded-full bg-[#f59e0b] mx-auto mb-1"></div>
+          <p class="text-xs text-[#64748b]">Finance Fee</p>
+          <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="fin-dollars">&mdash;</p>
+          <p class="text-xs text-[#64748b]" id="fin-pct">&mdash;</p>
+        </div>
+        <div class="bg-[#0f1117] rounded-lg p-3 text-center">
+          <div class="w-3 h-3 rounded-full bg-[#475569] mx-auto mb-1"></div>
+          <p class="text-xs text-[#64748b]">Tax</p>
+          <p class="font-mono font-semibold text-[#f1f5f9] text-sm" id="tax-dollars">&mdash;</p>
+          <p class="text-xs text-[#64748b]" id="tax-pct">&mdash;</p>
+        </div>
+      </div>
+      <p class="text-xs text-[#64748b]" id="cost-insight">&mdash;</p>
+    </div>
 
-    </section>
-  </main>
+    <!-- Verification Worksheet -->
+    <details class="card p-5">
+      <summary class="flex justify-between items-center">
+        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Verification Worksheet</h2>
+        <span class="text-xs text-[#6366f1]">tap to expand</span>
+      </summary>
+      <div class="mt-4 space-y-1" id="worksheet-content"></div>
+    </details>
 
-  <footer class="text-center text-xs text-[#64748b] py-6 border-t border-[#2a2d3a] mt-4">
-    Lease Buddy — for informational purposes only. Always verify numbers with your lender.
-  </footer>
+    <!-- Tax Audit -->
+    <details class="card p-5">
+      <summary class="flex justify-between items-center">
+        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Tax Audit</h2>
+        <span class="text-xs text-[#6366f1]">tap to expand</span>
+      </summary>
+      <div class="mt-4 space-y-1" id="tax-audit-content"></div>
+    </details>
 
-  <!-- ════════════════════════════════════════════════════════════════ -->
-  <!-- JS                                                              -->
-  <!-- ════════════════════════════════════════════════════════════════ -->
-  <script>
-  "use strict";
+  </section>
+</main>
 
-  // ─── Tooltip copy ─────────────────────────────────────────────────
-  const TIPS = {
-    moneyFactor:  "The interest rate in disguise. Multiply by 2,400 to get the APR. Dealers mark this up — always ask for the \u2018buy rate\u2019 from the lender.",
-    residualPct:  "Set by the manufacturer, not the dealer. Non-negotiable. Higher residual = lower payment. Compare residuals across trim levels before choosing.",
-    capCost:      "This is your selling price. Negotiate it like a purchase — the lower this number, the lower every payment. Don\u2019t let the dealer anchor to MSRP.",
-    acqFee:       "Charged by the lender, not the dealer. Often $600\u2013$900. Ask if it can be waived or reduced — some lenders allow it.",
-    downPayment:  "In a lease, this is called a \u2018cap cost reduction.\u2019 Warning: if the car is totaled, you lose this money. GAP insurance does NOT cover it. Consider $0 down.",
-    dispFee:      "Charged at lease end if you don\u2019t buy or re-lease. Often $300\u2013$400. Some manufacturers waive it for loyal customers — ask before signing.",
-    rebates:      "Manufacturer cash, not dealer discount. Make sure the dealer shows it as a separate line — never let them claim it as part of their negotiation.",
-    term:         "Shorter terms = higher monthly, lower total interest. 36 months is the sweet spot for most — residuals drop sharply at 48+.",
-  };
+<footer class="text-center text-xs text-[#64748b] py-6 border-t border-[#2a2d3a] mt-4">
+  Lease Buddy &mdash; for informational purposes only. Always verify numbers with your lender.
+</footer>
 
-  // ─── Tooltip engine ───────────────────────────────────────────────
-  let activeTip = null;
+<script>
+"use strict";
 
-  function showTooltip(btn, key) {
-    // Toggle off if same button clicked again
-    if (activeTip && activeTip.key === key) {
-      closeTooltip();
-      return;
+// ── State tax table — state-level rates, Tax Foundation 2026 ──────────────
+const STATE_TAX = {
+  AL:4.0,AK:0.0,AZ:5.6,AR:6.5,CA:7.25,CO:2.9,CT:6.35,DE:0.0,
+  FL:6.0,GA:4.0,HI:4.0,ID:6.0,IL:6.25,IN:7.0,IA:6.0,KS:6.5,
+  KY:6.0,LA:5.0,ME:5.5,MD:6.0,MA:6.25,MI:6.0,MN:6.875,MS:7.0,
+  MO:4.225,MT:0.0,NE:5.5,NV:6.85,NH:0.0,NJ:6.625,NM:5.0,NY:4.0,
+  NC:4.75,ND:5.0,OH:5.75,OK:4.5,OR:0.0,PA:6.0,RI:7.0,SC:6.0,
+  SD:4.2,TN:7.0,TX:6.25,UT:4.85,VT:6.0,VA:5.3,WA:6.5,WV:6.0,
+  WI:5.0,WY:4.0,DC:6.0
+};
+const STATE_NAMES = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",
+  CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",
+  HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",
+  KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",
+  MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",
+  NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",
+  NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",
+  OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
+  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",
+  VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",
+  DC:"Washington D.C."
+};
+
+// ── Tooltip copy ─────────────────────────────────────────────────────────
+const TIPS = {
+  moneyFactor:"The interest rate in disguise. Multiply by 2,400 to get the APR. Dealers mark this up \u2014 always ask for the \u2018buy rate\u2019 from the lender.",
+  residualPct:"Set by the manufacturer, not the dealer. Non-negotiable. Higher residual = lower payment. Compare residuals across trim levels before choosing.",
+  capCost:"This is your selling price. Negotiate it like a purchase \u2014 the lower this number, the lower every payment. Don\u2019t let the dealer anchor to MSRP.",
+  acqFee:"Charged by the lender, not the dealer. Often $600\u2013$900. Ask if it can be waived or reduced \u2014 some lenders allow it.",
+  downPayment:"In a lease, this is called a \u2018cap cost reduction.\u2019 Warning: if the car is totaled, you lose this money. GAP insurance does NOT cover it. Consider $0 down.",
+  dispFee:"Charged at lease end if you don\u2019t buy or re-lease. Often $300\u2013$400. Some manufacturers waive it for loyal customers \u2014 ask before signing.",
+  rebates:"Manufacturer cash, not dealer discount. Make sure the dealer shows it as a separate line \u2014 never let them claim it as part of their negotiation.",
+  term:"Shorter terms = higher monthly, lower total interest. 36 months is the sweet spot for most \u2014 residuals drop sharply at 48+.",
+};
+
+// ── Tooltip engine ────────────────────────────────────────────────────────
+let activeTip = null;
+function showTooltip(btn, key) {
+  if (activeTip && activeTip.key === key) { closeTooltip(); return; }
+  closeTooltip();
+  const text = TIPS[key]; if (!text) return;
+  const box = document.createElement("div");
+  box.className = "tooltip-box";
+  box.textContent = text;
+  document.getElementById("tooltip-portal").appendChild(box);
+  const rect = btn.getBoundingClientRect();
+  const sy = window.scrollY||document.documentElement.scrollTop;
+  box.style.top  = (rect.bottom+sy+8)+"px";
+  box.style.left = Math.max(8,Math.min(rect.left+(window.scrollX||0),window.innerWidth-296))+"px";
+  activeTip = {key,box};
+}
+function closeTooltip() { if(activeTip){activeTip.box.remove();activeTip=null;} }
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("tip-btn")){e.stopPropagation();showTooltip(e.target,e.target.dataset.tip);return;}
+  if(activeTip&&!activeTip.box.contains(e.target)) closeTooltip();
+});
+
+// ── LeaseCalc ─────────────────────────────────────────────────────────────
+const LeaseCalc = {
+  /**
+   * calculate(inputs) -> breakdown
+   * Tax methods:
+   *   monthly  — tax on base_payment/mo (most states)
+   *   fullsale — tax on cap_cost upfront (TX/MN/IL)
+   *   upfront  — tax on total payments upfront
+   * rebateTaxable: if true, rebate included in taxable base
+   */
+  calculate(inputs) {
+    const {msrp,capCost,residualPct,moneyFactor,termMonths,
+           acqFee,capitalizeAcq,downPayment,tradeIn,rebates,
+           taxRate,docFee,dispFee,taxMethod,rebateTaxable} = inputs;
+
+    const nonRebateReductions = downPayment + tradeIn;
+    const totalReductions = nonRebateReductions + rebates;
+    const adjCapCost = capCost - totalReductions + docFee + (capitalizeAcq ? acqFee : 0);
+    const residualValue = msrp * (residualPct/100);
+
+    const depFee = (adjCapCost - residualValue) / termMonths;
+    const finFee = (adjCapCost + residualValue) * moneyFactor;
+    const basePayment = depFee + finFee;
+    const rate = taxRate/100;
+
+    let monthlyTax=0, upfrontTax=0, taxBase="", taxDesc="";
+
+    if (taxMethod==="monthly") {
+      const taxable = rebateTaxable ? basePayment+(rebates/termMonths) : basePayment;
+      monthlyTax = taxable*rate;
+      taxBase = rebateTaxable ? "base payment + rebate spread ($"+taxable.toFixed(2)+"/mo)" : "base payment ($"+basePayment.toFixed(2)+")";
+      taxDesc = "Tax applied to each monthly payment";
+    } else if (taxMethod==="fullsale") {
+      const taxable = rebateTaxable ? capCost : capCost-rebates;
+      upfrontTax = taxable*rate;
+      taxBase = rebateTaxable ? "full cap cost" : "cap cost less rebates";
+      taxDesc = "Tax on full sale price, collected upfront";
+    } else if (taxMethod==="upfront") {
+      const totalLease = basePayment*termMonths;
+      const taxable = rebateTaxable ? totalLease+rebates : totalLease;
+      upfrontTax = taxable*rate;
+      taxBase = rebateTaxable ? "total payments + rebates" : "total payments";
+      taxDesc = "Tax on total lease payments, collected upfront";
     }
-    closeTooltip();
 
-    const text = TIPS[key];
-    if (!text) return;
+    const monthlyPayment = basePayment + monthlyTax;
+    const upfrontAcq = capitalizeAcq ? 0 : acqFee;
+    const dueAtSigning = monthlyPayment + upfrontAcq + downPayment + upfrontTax;
+    const totalPayments = monthlyPayment * termMonths;
+    const totalCost = totalPayments + downPayment + upfrontAcq + dispFee + upfrontTax;
 
-    const box = document.createElement("div");
-    box.className = "tooltip-box";
-    box.textContent = text;
-    document.getElementById("tooltip-portal").appendChild(box);
+    const depPct = (depFee/monthlyPayment)*100;
+    const finPct = (finFee/monthlyPayment)*100;
+    const taxPct = (monthlyTax/monthlyPayment)*100;
 
-    // Position below the button
-    const rect = btn.getBoundingClientRect();
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const scrollX = window.scrollX || document.documentElement.scrollLeft;
-
-    box.style.top  = (rect.bottom + scrollY + 8) + "px";
-    box.style.left = Math.max(8, Math.min(
-      rect.left + scrollX,
-      window.innerWidth - 296
-    )) + "px";
-
-    activeTip = { key, box };
-  }
-
-  function closeTooltip() {
-    if (activeTip) {
-      activeTip.box.remove();
-      activeTip = null;
-    }
-  }
-
-  // Wire tooltip buttons (delegated — works for dynamically added elements too)
-  document.addEventListener("click", (e) => {
-    if (e.target.classList.contains("tip-btn")) {
-      e.stopPropagation();
-      showTooltip(e.target, e.target.dataset.tip);
-      return;
-    }
-    // Click outside closes tooltip
-    if (activeTip && !activeTip.box.contains(e.target)) {
-      closeTooltip();
-    }
-  });
-
-  // ─── LeaseCalc — pure math, no DOM ───────────────────────────────
-  const LeaseCalc = {
-
-    /**
-     * calculate(inputs) -> breakdown
-     * Ports the verified Python amortization.py formulas exactly.
-     *
-     * Key fix (td78c3e): rebates are tracked as a SEPARATE line item
-     * from other cap cost reductions so the worksheet can show:
-     *   Negotiated Cap Cost  $43,200   <- dealer number
-     *   Manufacturer Rebates  -$1,500  <- manufacturer money, separate
-     *   Adjusted Cap Cost    $41,700   <- what the math runs on
-     */
-    calculate(inputs) {
-      const {
-        msrp, capCost, residualPct, moneyFactor, termMonths,
-        acqFee, capitalizeAcq, downPayment, tradeIn, rebates,
-        taxRate, docFee, dispFee,
-      } = inputs;
-
-      // Non-rebate reductions (down + trade-in)
-      const nonRebateReductions = downPayment + tradeIn;
-      // All reductions combined (for adj cap cost math — unchanged)
-      const totalReductions = nonRebateReductions + rebates;
-
-      const adjCapCost = capCost - totalReductions + docFee + (capitalizeAcq ? acqFee : 0);
-      const residualValue = msrp * (residualPct / 100);
-
-      // Step 1: Depreciation
-      const depFee = (adjCapCost - residualValue) / termMonths;
-
-      // Step 2: Finance fee
-      const finFee = (adjCapCost + residualValue) * moneyFactor;
-
-      // Step 3: Base payment
-      const basePayment = depFee + finFee;
-
-      // Step 4: Tax
-      const taxAmount = basePayment * (taxRate / 100);
-      const monthlyPayment = basePayment + taxAmount;
-
-      // Step 5: Due at signing
-      const upfrontAcq = capitalizeAcq ? 0 : acqFee;
-      const dueAtSigning = monthlyPayment + upfrontAcq + downPayment;
-
-      // Step 6: Total cost
-      const totalPayments = monthlyPayment * termMonths;
-      const totalCost = totalPayments + downPayment + upfrontAcq + dispFee;
-
-      // Cost driver %s
-      const depPct = (depFee / monthlyPayment) * 100;
-      const finPct = (finFee / monthlyPayment) * 100;
-      const taxPct = (taxAmount / monthlyPayment) * 100;
-
-      return {
-        adjCapCost, residualValue,
-        nonRebateReductions, totalReductions, rebates,
-        depFee, finFee, basePayment, taxAmount,
-        monthlyPayment, dueAtSigning,
-        totalPayments, totalCost,
-        depPct, finPct, taxPct,
-        upfrontAcq, acqFee, capitalizeAcq,
-        // echo inputs
-        msrp, capCost, residualPct, moneyFactor, termMonths,
-        taxRate, docFee, dispFee, downPayment, tradeIn,
-      };
-    },
-
-    /**
-     * backsolve(targetPayment, inputs) -> { maxCapCost, ... }
-     * Algebraic inverse of calculate().
-     */
-    backsolve(targetPayment, inputs) {
-      const { msrp, residualPct, moneyFactor, termMonths,
-              acqFee, capitalizeAcq, downPayment, tradeIn, rebates,
-              taxRate, docFee } = inputs;
-
-      const residualValue = msrp * (residualPct / 100);
-      const mf   = moneyFactor;
-      const term = termMonths;
-
-      const preTaxPayment = targetPayment / (1 + taxRate / 100);
-
-      const numerator   = preTaxPayment - residualValue * (mf - 1 / term);
-      const denominator = 1 / term + mf;
-      const targetAdjCC = numerator / denominator;
-
-      const feeLoad    = docFee + (capitalizeAcq ? acqFee : 0);
-      const reductions = downPayment + tradeIn + rebates;
-      const maxCapCost = targetAdjCC + reductions - feeLoad;
-
-      if (maxCapCost <= 0) return null;
-
-      const verifyInputs = { ...inputs, capCost: maxCapCost };
-      const verified = this.calculate(verifyInputs);
-
-      const discountDollars = msrp - maxCapCost;
-      const discountPct     = (discountDollars / msrp) * 100;
-
-      return { maxCapCost, discountDollars, discountPct, verifiedPayment: verified.monthlyPayment };
-    },
-  };
-
-  // ─── Helpers ─────────────────────────────────────────────────────
-  const fmt = {
-    money: (n) => n == null ? "\u2014" : "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    pct:   (n) => n == null ? "\u2014" : n.toFixed(1) + "%",
-    mf:    (n) => n.toFixed(5),
-  };
-
-  // ─── Read inputs from DOM ─────────────────────────────────────────
-  function readInputs() {
     return {
-      msrp:          parseFloat(document.getElementById("msrp").value)         || 0,
-      capCost:       parseFloat(document.getElementById("capCost").value)       || 0,
-      residualPct:   parseFloat(document.getElementById("residualPct").value)   || 0,
-      moneyFactor:   parseFloat(document.getElementById("moneyFactor").value)   || 0,
-      termMonths:    parseInt(document.querySelector(".term-btn.active").dataset.term) || 36,
-      taxRate:       parseFloat(document.getElementById("taxRate").value)       || 0,
-      acqFee:        parseFloat(document.getElementById("acqFee").value)        || 0,
-      downPayment:   parseFloat(document.getElementById("downPayment").value)   || 0,
-      tradeIn:       parseFloat(document.getElementById("tradeIn").value)       || 0,
-      rebates:       parseFloat(document.getElementById("rebates").value)       || 0,
-      docFee:        parseFloat(document.getElementById("docFee").value)        || 0,
-      dispFee:       parseFloat(document.getElementById("dispFee").value)       || 0,
-      capitalizeAcq: document.getElementById("capitalizeAcq").checked,
-      targetPayment: parseFloat(document.getElementById("targetPayment").value) || 0,
+      adjCapCost,residualValue,nonRebateReductions,totalReductions,rebates,
+      depFee,finFee,basePayment,monthlyTax,upfrontTax,
+      monthlyPayment,dueAtSigning,totalPayments,totalCost,
+      depPct,finPct,taxPct,upfrontAcq,acqFee,capitalizeAcq,
+      taxMethod,taxBase,taxDesc,taxRate,rebateTaxable,
+      msrp,capCost,residualPct,moneyFactor,termMonths,docFee,dispFee,downPayment,tradeIn,
     };
-  }
+  },
 
-  // ─── Update hero ──────────────────────────────────────────────────
-  function updateHero(b) {
-    const el = document.getElementById("hero-payment");
-    el.textContent = fmt.money(b.monthlyPayment);
-    el.classList.remove("pulse");
-    void el.offsetWidth;
-    el.classList.add("pulse");
+  backsolve(targetPayment, inputs) {
+    const {msrp,residualPct,moneyFactor,termMonths,
+           acqFee,capitalizeAcq,downPayment,tradeIn,rebates,
+           taxRate,docFee,taxMethod} = inputs;
+    const residualValue = msrp*(residualPct/100);
+    const mf=moneyFactor,term=termMonths,rate=taxRate/100;
+    const taxMult = taxMethod==="monthly" ? 1+rate : 1;
+    const preTax = targetPayment/taxMult;
+    const num = preTax - residualValue*(mf-1/term);
+    const den = 1/term + mf;
+    const targetAdj = num/den;
+    const feeLoad = docFee+(capitalizeAcq?acqFee:0);
+    const reductions = downPayment+tradeIn+rebates;
+    const maxCap = targetAdj+reductions-feeLoad;
+    if(maxCap<=0) return null;
+    const verified = this.calculate({...inputs,capCost:maxCap});
+    return {
+      maxCapCost:maxCap,
+      discountDollars:msrp-maxCap,
+      discountPct:((msrp-maxCap)/msrp)*100,
+      verifiedPayment:verified.monthlyPayment
+    };
+  },
+};
 
-    document.getElementById("hero-pretax").textContent  = fmt.money(b.basePayment);
-    document.getElementById("hero-signing").textContent = fmt.money(b.dueAtSigning);
-    document.getElementById("hero-total").textContent   = fmt.money(b.totalCost);
+// ── Helpers ───────────────────────────────────────────────────────────────
+const fmt = {
+  money: n => n==null?"\u2014":"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}),
+  pct:   n => n==null?"\u2014":n.toFixed(2)+"%",
+  mf:    n => n.toFixed(5),
+};
 
-    const offMsrp = b.msrp - b.capCost;
-    const pctOff  = ((offMsrp / b.msrp) * 100).toFixed(1);
-    document.getElementById("cap-cost-pct").textContent =
-      offMsrp >= 0
-        ? `$${offMsrp.toLocaleString()} off MSRP (${pctOff}% discount)`
-        : `$${Math.abs(offMsrp).toLocaleString()} above MSRP`;
-
-    document.getElementById("residual-dollars").textContent =
-      `Residual value: ${fmt.money(b.residualValue)} \u2014 set by lender`;
-  }
-
-  // ─── Update backsolve panel ───────────────────────────────────────
-  function updateBacksolve(inputs) {
-    const result = LeaseCalc.backsolve(inputs.targetPayment, inputs);
-    if (!result) {
-      document.getElementById("bs-maxcap").textContent    = "Not achievable";
-      document.getElementById("bs-discount").textContent  = "\u2014";
-      document.getElementById("bs-verified").textContent  = "\u2014";
-      document.getElementById("bs-walkaway").textContent  = "Target payment is too low for these lease terms.";
-      return;
-    }
-    document.getElementById("bs-maxcap").textContent   = fmt.money(result.maxCapCost);
-    document.getElementById("bs-discount").textContent =
-      `${fmt.pct(result.discountPct)} off MSRP (${fmt.money(result.discountDollars)} off)`;
-    document.getElementById("bs-verified").textContent = fmt.money(result.verifiedPayment) + "/mo";
-    document.getElementById("bs-walkaway").textContent =
-      `Walk away from any offer above ${fmt.money(result.maxCapCost)}.`;
-  }
-
-  // ─── Update cost driver bar ───────────────────────────────────────
-  function updateCostBar(b) {
-    document.getElementById("bar-dep").style.width = b.depPct.toFixed(2) + "%";
-    document.getElementById("bar-fin").style.width = b.finPct.toFixed(2) + "%";
-    document.getElementById("bar-tax").style.width = b.taxPct.toFixed(2) + "%";
-
-    document.getElementById("dep-dollars").textContent = fmt.money(b.depFee);
-    document.getElementById("fin-dollars").textContent = fmt.money(b.finFee);
-    document.getElementById("tax-dollars").textContent = fmt.money(b.taxAmount);
-    document.getElementById("dep-pct").textContent = fmt.pct(b.depPct) + " of payment";
-    document.getElementById("fin-pct").textContent = fmt.pct(b.finPct) + " of payment";
-    document.getElementById("tax-pct").textContent = fmt.pct(b.taxPct) + " of payment";
-
-    const insight = b.depPct > 70
-      ? "Depreciation dominates \u2014 negotiate the cap cost down."
-      : b.finPct > 20
-      ? "Finance fee is high \u2014 ask for a lower money factor."
-      : b.taxPct > 15
-      ? "Tax is a significant cost \u2014 consider low-tax states for registration."
-      : "Well-balanced deal structure.";
-    document.getElementById("cost-insight").textContent = insight;
-  }
-
-  // ─── Update verification worksheet ───────────────────────────────
-  // td78c3e fix: rebates shown as distinct line AFTER negotiated cap cost
-  function updateWorksheet(b) {
-    const el = document.getElementById("worksheet-content");
-    const mfApr = (b.moneyFactor * 2400).toFixed(2);
-
-    const lines = [
-      { cls: "section", text: "INPUTS" },
-      { text: `MSRP                         ${fmt.money(b.msrp)}` },
-      { text: `Negotiated Cap Cost           ${fmt.money(b.capCost)}` },
-      // Rebates: explicit separate line with consumer warning
-      b.rebates > 0
-        ? { text: `Manufacturer Rebates          -${fmt.money(b.rebates).replace("$","")}   \u2190 applied after negotiation` }
-        : { text: `Manufacturer Rebates          $0.00` },
-      b.rebates > 0
-        ? { cls: "warning", text: `  \u26a0 Do not let the dealer fold this into their discount — it is manufacturer money, not their concession.` }
-        : null,
-      b.nonRebateReductions > 0
-        ? { text: `Down + Trade-in Reductions   -${fmt.money(b.nonRebateReductions).replace("$","")}` }
-        : null,
-      b.acqFee > 0 && b.capitalizeAcq
-        ? { text: `Acquisition Fee               +${fmt.money(b.acqFee).replace("$","")}   (capitalized)` }
-        : b.acqFee > 0
-        ? { text: `Acquisition Fee               ${fmt.money(b.acqFee)}   (due at signing)` }
-        : null,
-      b.docFee > 0
-        ? { text: `Doc Fee                       +${fmt.money(b.docFee).replace("$","")}` }
-        : null,
-      { cls: "result", text: `Adjusted Cap Cost             ${fmt.money(b.adjCapCost)}` },
-      { cls: "result", text: `Residual Value (${fmt.pct(b.residualPct)} of MSRP)  ${fmt.money(b.residualValue)}` },
-      { text: `Money Factor                  ${fmt.mf(b.moneyFactor)}  (~${mfApr}% APR)` },
-      { text: `Term                          ${b.termMonths} months` },
-      { text: `Tax Rate                      ${fmt.pct(b.taxRate)}` },
-
-      { cls: "section", text: "STEP 1 \u2014 DEPRECIATION FEE" },
-      { text: `(Adj Cap Cost - Residual) \u00f7 Term` },
-      { text: `(${fmt.money(b.adjCapCost)} - ${fmt.money(b.residualValue)}) \u00f7 ${b.termMonths}` },
-      { cls: "result", text: `= ${fmt.money(b.depFee)} /mo` },
-
-      { cls: "section", text: "STEP 2 \u2014 FINANCE FEE (RENT CHARGE)" },
-      { text: `(Adj Cap Cost + Residual) \u00d7 Money Factor` },
-      { text: `(${fmt.money(b.adjCapCost)} + ${fmt.money(b.residualValue)}) \u00d7 ${fmt.mf(b.moneyFactor)}` },
-      { cls: "result", text: `= ${fmt.money(b.finFee)} /mo` },
-
-      { cls: "section", text: "STEP 3 \u2014 BASE PAYMENT (PRE-TAX)" },
-      { text: `Depreciation + Finance Fee` },
-      { text: `${fmt.money(b.depFee)} + ${fmt.money(b.finFee)}` },
-      { cls: "result", text: `= ${fmt.money(b.basePayment)} /mo` },
-
-      { cls: "section", text: "STEP 4 \u2014 TAX" },
-      { text: `Base Payment \u00d7 Tax Rate` },
-      { text: `${fmt.money(b.basePayment)} \u00d7 ${fmt.pct(b.taxRate)}` },
-      { cls: "result", text: `= ${fmt.money(b.taxAmount)} /mo` },
-
-      { cls: "section", text: "MONTHLY PAYMENT" },
-      { cls: "result", text: `${fmt.money(b.basePayment)} + ${fmt.money(b.taxAmount)} = ${fmt.money(b.monthlyPayment)} /mo` },
-
-      { cls: "section", text: "DUE AT SIGNING" },
-      { text: `First Month                  ${fmt.money(b.monthlyPayment)}` },
-      b.upfrontAcq > 0 ? { text: `Acq Fee (upfront)            ${fmt.money(b.acqFee)}` } : null,
-      b.downPayment > 0 ? { text: `Down Payment                 ${fmt.money(b.downPayment)}` } : null,
-      { cls: "result", text: `Total Due at Signing         ${fmt.money(b.dueAtSigning)}` },
-
-      { cls: "section", text: "TOTAL COST OF LEASE" },
-      { text: `Monthly \u00d7 ${b.termMonths} months        ${fmt.money(b.totalPayments)}` },
-      b.dispFee > 0 ? { text: `Disposition Fee              ${fmt.money(b.dispFee)}` } : null,
-      { cls: "result", text: `Total Cost                   ${fmt.money(b.totalCost)}` },
-    ].filter(Boolean);
-
-    el.innerHTML = lines.map(l =>
-      `<p class="worksheet-line${l.cls ? " " + l.cls : ""}">${l.text}</p>`
-    ).join("");
-  }
-
-  // ─── Main update ──────────────────────────────────────────────────
-  function update() {
-    const inputs = readInputs();
-    if (inputs.msrp <= 0 || inputs.capCost <= 0 || inputs.moneyFactor <= 0 || inputs.termMonths <= 0) return;
-    if (inputs.residualPct <= 0 || inputs.residualPct >= 100) return;
-
-    const b = LeaseCalc.calculate(inputs);
-    updateHero(b);
-    updateBacksolve(inputs);
-    updateCostBar(b);
-    updateWorksheet(b);
-
-    document.getElementById("mf-apr-val").textContent = (inputs.moneyFactor * 2400).toFixed(2);
-  }
-
-  // ─── Slider sync ─────────────────────────────────────────────────
-  function syncSlider(sliderId, inputId) {
-    const slider = document.getElementById(sliderId);
-    const input  = document.getElementById(inputId);
-    slider.addEventListener("input", () => { input.value = slider.value; update(); });
-    input.addEventListener("input",  () => { slider.value = input.value; update(); });
-  }
-
-  function syncMFSlider() {
-    const slider = document.getElementById("moneyFactor-slider");
-    const input  = document.getElementById("moneyFactor");
-    slider.addEventListener("input", () => {
-      input.value = (parseInt(slider.value) / 100000).toFixed(5);
-      update();
-    });
-    input.addEventListener("input", () => {
-      slider.value = Math.round(parseFloat(input.value) * 100000);
-      update();
-    });
-  }
-
-  function syncTargetPayment() {
-    const slider = document.getElementById("targetPayment-slider");
-    const input  = document.getElementById("targetPayment");
-    slider.addEventListener("input", () => { input.value = slider.value; update(); });
-    input.addEventListener("input", () => { slider.value = input.value; update(); });
-  }
-
-  // ─── Wire inputs ──────────────────────────────────────────────────
-  function wireInputs() {
-    syncSlider("msrp-slider",        "msrp");
-    syncSlider("capCost-slider",     "capCost");
-    syncSlider("residualPct-slider", "residualPct");
-    syncSlider("taxRate-slider",     "taxRate");
-    syncMFSlider();
-    syncTargetPayment();
-
-    ["acqFee","downPayment","tradeIn","rebates","docFee","dispFee"].forEach(id => {
-      document.getElementById(id).addEventListener("input", update);
-    });
-
-    document.getElementById("capitalizeAcq").addEventListener("change", update);
-
-    document.querySelectorAll(".term-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".term-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        update();
-      });
-    });
-  }
-
-  // ─── Boot ─────────────────────────────────────────────────────────
-  document.addEventListener("DOMContentLoaded", () => {
-    wireInputs();
+// ── Zip lookup ────────────────────────────────────────────────────────────
+let detectedState = null;
+async function lookupZip(zip) {
+  const st = document.getElementById("zip-status");
+  if(!/^\d{5}$/.test(zip)){st.textContent="Enter a valid 5-digit ZIP";st.style.color="#f59e0b";return;}
+  st.textContent="Looking up\u2026";st.style.color="#64748b";
+  try {
+    const r = await fetch("https://api.zippopotam.us/us/"+zip);
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    const abbr = d.places[0]["state abbreviation"];
+    const name = STATE_NAMES[abbr]||abbr;
+    const rate = STATE_TAX[abbr];
+    if(rate===undefined) throw new Error();
+    detectedState = {abbr,name,rate};
+    document.getElementById("taxRate").value = rate;
+    document.getElementById("taxRate-slider").value = rate;
+    st.textContent = name+" \u2014 "+rate+"% state rate (auto-filled)";
+    st.style.color="#22c55e";
     update();
+  } catch(e) {
+    st.textContent="Could not detect state \u2014 enter rate manually";
+    st.style.color="#f59e0b";
+    detectedState=null;
+  }
+}
+
+// ── Read inputs ───────────────────────────────────────────────────────────
+function readInputs() {
+  return {
+    msrp:          parseFloat(document.getElementById("msrp").value)||0,
+    capCost:       parseFloat(document.getElementById("capCost").value)||0,
+    residualPct:   parseFloat(document.getElementById("residualPct").value)||0,
+    moneyFactor:   parseFloat(document.getElementById("moneyFactor").value)||0,
+    termMonths:    parseInt(document.querySelector(".term-btn.active").dataset.term)||36,
+    taxRate:       parseFloat(document.getElementById("taxRate").value)||0,
+    taxMethod:     document.querySelector(".seg-btn.active[data-tax-method]")?.dataset.taxMethod||"monthly",
+    rebateTaxable: document.getElementById("rebateTaxable").checked,
+    acqFee:        parseFloat(document.getElementById("acqFee").value)||0,
+    downPayment:   parseFloat(document.getElementById("downPayment").value)||0,
+    tradeIn:       parseFloat(document.getElementById("tradeIn").value)||0,
+    rebates:       parseFloat(document.getElementById("rebates").value)||0,
+    docFee:        parseFloat(document.getElementById("docFee").value)||0,
+    dispFee:       parseFloat(document.getElementById("dispFee").value)||0,
+    capitalizeAcq: document.getElementById("capitalizeAcq").checked,
+    targetPayment: parseFloat(document.getElementById("targetPayment").value)||0,
+  };
+}
+
+// ── Update functions ──────────────────────────────────────────────────────
+function updateHero(b) {
+  const el=document.getElementById("hero-payment");
+  el.textContent=fmt.money(b.monthlyPayment);
+  el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
+  document.getElementById("hero-pretax").textContent  = fmt.money(b.basePayment);
+  document.getElementById("hero-signing").textContent = fmt.money(b.dueAtSigning);
+  document.getElementById("hero-total").textContent   = fmt.money(b.totalCost);
+  const off=b.msrp-b.capCost;
+  document.getElementById("cap-cost-pct").textContent =
+    off>=0 ? "$"+off.toLocaleString()+" off MSRP ("+((off/b.msrp)*100).toFixed(1)+"% discount)"
+           : "$"+Math.abs(off).toLocaleString()+" above MSRP";
+  document.getElementById("residual-dollars").textContent =
+    "Residual value: "+fmt.money(b.residualValue)+" \u2014 set by lender";
+}
+
+function updateBacksolve(inputs) {
+  const r=LeaseCalc.backsolve(inputs.targetPayment,inputs);
+  if(!r){
+    document.getElementById("bs-maxcap").textContent="Not achievable";
+    document.getElementById("bs-discount").textContent="\u2014";
+    document.getElementById("bs-verified").textContent="\u2014";
+    document.getElementById("bs-walkaway").textContent="Target payment is too low for these lease terms.";
+    return;
+  }
+  document.getElementById("bs-maxcap").textContent=fmt.money(r.maxCapCost);
+  document.getElementById("bs-discount").textContent=fmt.pct(r.discountPct)+" off MSRP ("+fmt.money(r.discountDollars)+" off)";
+  document.getElementById("bs-verified").textContent=fmt.money(r.verifiedPayment)+"/mo";
+  document.getElementById("bs-walkaway").textContent="Walk away from any offer above "+fmt.money(r.maxCapCost)+".";
+}
+
+function updateCostBar(b) {
+  document.getElementById("bar-dep").style.width=b.depPct.toFixed(2)+"%";
+  document.getElementById("bar-fin").style.width=b.finPct.toFixed(2)+"%";
+  document.getElementById("bar-tax").style.width=b.taxPct.toFixed(2)+"%";
+  document.getElementById("dep-dollars").textContent=fmt.money(b.depFee);
+  document.getElementById("fin-dollars").textContent=fmt.money(b.finFee);
+  document.getElementById("tax-dollars").textContent=fmt.money(b.monthlyTax||0);
+  document.getElementById("dep-pct").textContent=fmt.pct(b.depPct)+" of payment";
+  document.getElementById("fin-pct").textContent=fmt.pct(b.finPct)+" of payment";
+  document.getElementById("tax-pct").textContent=b.monthlyTax>0?fmt.pct(b.taxPct)+" of payment":"collected upfront";
+  document.getElementById("cost-insight").textContent =
+    b.depPct>70?"Depreciation dominates \u2014 negotiate the cap cost down.":
+    b.finPct>20?"Finance fee is high \u2014 ask for a lower money factor.":
+    b.taxPct>15?"Tax is significant \u2014 consider low-tax states.":
+    "Well-balanced deal structure.";
+}
+
+function updateWorksheet(b) {
+  const mfApr=(b.moneyFactor*2400).toFixed(2);
+  const lines=[
+    {cls:"section",text:"INPUTS"},
+    {text:"MSRP                         "+fmt.money(b.msrp)},
+    {text:"Negotiated Cap Cost           "+fmt.money(b.capCost)},
+    b.rebates>0
+      ?{text:"Manufacturer Rebates          -"+fmt.money(b.rebates).replace("$","")+"   \u2190 applied after negotiation"}
+      :{text:"Manufacturer Rebates          $0.00"},
+    b.rebates>0
+      ?{cls:"warn",text:"  \u26a0 Do not let the dealer fold rebates into their discount \u2014 this is manufacturer money."}
+      :null,
+    b.nonRebateReductions>0?{text:"Down + Trade-in               -"+fmt.money(b.nonRebateReductions).replace("$","")}:null,
+    b.acqFee>0&&b.capitalizeAcq?{text:"Acquisition Fee               +"+fmt.money(b.acqFee).replace("$","")+"   (capitalized)"}
+      :b.acqFee>0?{text:"Acquisition Fee               "+fmt.money(b.acqFee)+"   (due at signing)"}:null,
+    b.docFee>0?{text:"Doc Fee                       +"+fmt.money(b.docFee).replace("$","")}:null,
+    {cls:"result",text:"Adjusted Cap Cost             "+fmt.money(b.adjCapCost)},
+    {cls:"result",text:"Residual Value ("+b.residualPct+"% of MSRP)   "+fmt.money(b.residualValue)},
+    {text:"Money Factor                  "+fmt.mf(b.moneyFactor)+"  (~"+mfApr+"% APR)"},
+    {text:"Term                          "+b.termMonths+" months"},
+    {text:"Tax Rate                      "+b.taxRate+"%  ["+b.taxMethod+"]"},
+
+    {cls:"section",text:"STEP 1 \u2014 DEPRECIATION FEE"},
+    {text:"(Adj Cap Cost - Residual) \u00f7 Term"},
+    {text:"("+fmt.money(b.adjCapCost)+" - "+fmt.money(b.residualValue)+") \u00f7 "+b.termMonths},
+    {cls:"result",text:"= "+fmt.money(b.depFee)+" /mo"},
+
+    {cls:"section",text:"STEP 2 \u2014 FINANCE FEE (RENT CHARGE)"},
+    {text:"(Adj Cap Cost + Residual) \u00d7 Money Factor"},
+    {text:"("+fmt.money(b.adjCapCost)+" + "+fmt.money(b.residualValue)+") \u00d7 "+fmt.mf(b.moneyFactor)},
+    {cls:"result",text:"= "+fmt.money(b.finFee)+" /mo"},
+
+    {cls:"section",text:"STEP 3 \u2014 BASE PAYMENT (PRE-TAX)"},
+    {text:fmt.money(b.depFee)+" + "+fmt.money(b.finFee)},
+    {cls:"result",text:"= "+fmt.money(b.basePayment)+" /mo"},
+
+    {cls:"section",text:"STEP 4 \u2014 TAX  ["+b.taxMethod+"]"},
+    b.monthlyTax>0
+      ?{text:fmt.money(b.basePayment)+" \u00d7 "+b.taxRate+"% = "+fmt.money(b.monthlyTax)+" /mo"}
+      :{text:fmt.money(b.upfrontTax)+" collected upfront (see Tax Audit)"},
+    {cls:"result",text:"Monthly tax: "+fmt.money(b.monthlyTax)},
+
+    {cls:"section",text:"MONTHLY PAYMENT"},
+    {cls:"result",text:fmt.money(b.basePayment)+" + "+fmt.money(b.monthlyTax)+" = "+fmt.money(b.monthlyPayment)+" /mo"},
+
+    {cls:"section",text:"DUE AT SIGNING"},
+    {text:"First Month                  "+fmt.money(b.monthlyPayment)},
+    b.upfrontAcq>0?{text:"Acq Fee (upfront)            "+fmt.money(b.acqFee)}:null,
+    b.downPayment>0?{text:"Down Payment                 "+fmt.money(b.downPayment)}:null,
+    b.upfrontTax>0?{cls:"warn",text:"Tax (upfront)                "+fmt.money(b.upfrontTax)}:null,
+    {cls:"result",text:"Total Due at Signing         "+fmt.money(b.dueAtSigning)},
+
+    {cls:"section",text:"TOTAL COST OF LEASE"},
+    {text:"Monthly \u00d7 "+b.termMonths+" months        "+fmt.money(b.totalPayments)},
+    b.dispFee>0?{text:"Disposition Fee              "+fmt.money(b.dispFee)}:null,
+    {cls:"result",text:"Total Cost                   "+fmt.money(b.totalCost)},
+  ].filter(Boolean);
+  document.getElementById("worksheet-content").innerHTML=
+    lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+}
+
+function updateTaxAudit(b) {
+  const stateLine = detectedState
+    ? "State: "+detectedState.name+" ("+detectedState.rate+"% state-level rate)"
+    : "State: not detected \u2014 manual rate "+b.taxRate+"%";
+  const totalTax = b.monthlyTax>0 ? b.monthlyTax*b.termMonths : b.upfrontTax;
+  const rebateLine = b.rebateTaxable
+    ? "Rebates: included in taxable base (taxable rebate ON)"
+    : "Rebates: excluded from taxable base (taxable rebate OFF)";
+  const lines=[
+    {cls:"section",text:"TAX METHOD"},
+    {cls:"result",text:b.taxDesc},
+    {text:stateLine},
+    {text:"Tax rate: "+b.taxRate+"%"},
+    {cls:"section",text:"TAX CALCULATION"},
+    {text:"Taxable base: "+b.taxBase},
+    b.monthlyTax>0?{text:"Tax per month: "+fmt.money(b.monthlyTax)}:{text:"Upfront tax: "+fmt.money(b.upfrontTax)},
+    {cls:"result",text:"Total tax over lease: "+fmt.money(totalTax)},
+    {cls:"section",text:"REBATE TAX STATUS"},
+    {text:rebateLine},
+    b.rebates>0&&!b.rebateTaxable
+      ?{text:"Rebate of "+fmt.money(b.rebates)+" reduces cap cost before tax"}
+      :b.rebates>0&&b.rebateTaxable
+      ?{cls:"warn",text:"\u26a0 Rebate of "+fmt.money(b.rebates)+" is in taxable base \u2014 verify for your state"}
+      :{text:"No rebates entered"},
+  ];
+  document.getElementById("tax-audit-content").innerHTML=
+    lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+}
+
+// ── Main update ───────────────────────────────────────────────────────────
+function update() {
+  const inputs=readInputs();
+  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0||inputs.termMonths<=0) return;
+  if(inputs.residualPct<=0||inputs.residualPct>=100) return;
+  const b=LeaseCalc.calculate(inputs);
+  updateHero(b);updateBacksolve(inputs);updateCostBar(b);updateWorksheet(b);updateTaxAudit(b);
+  document.getElementById("mf-apr-val").textContent=(inputs.moneyFactor*2400).toFixed(2);
+}
+
+const TAX_HINTS={
+  monthly:"Tax applied to each monthly payment (most states)",
+  fullsale:"Tax on full cap cost, collected upfront at signing (TX, MN, IL style)",
+  upfront:"Tax on total of all lease payments, collected upfront at signing",
+};
+
+// ── Slider sync ────────────────────────────────────────────────────────────
+function syncSlider(sid,nid){
+  const s=document.getElementById(sid),n=document.getElementById(nid);
+  s.addEventListener("input",()=>{n.value=s.value;update();});
+  n.addEventListener("input",()=>{s.value=n.value;update();});
+}
+function syncMF(){
+  const s=document.getElementById("moneyFactor-slider"),n=document.getElementById("moneyFactor");
+  s.addEventListener("input",()=>{n.value=(parseInt(s.value)/100000).toFixed(5);update();});
+  n.addEventListener("input",()=>{s.value=Math.round(parseFloat(n.value)*100000);update();});
+}
+function syncTP(){
+  const s=document.getElementById("targetPayment-slider"),n=document.getElementById("targetPayment");
+  s.addEventListener("input",()=>{n.value=s.value;update();});
+  n.addEventListener("input",()=>{s.value=n.value;update();});
+}
+
+// ── Wire all inputs ───────────────────────────────────────────────────────
+function wireInputs(){
+  syncSlider("msrp-slider","msrp");
+  syncSlider("capCost-slider","capCost");
+  syncSlider("residualPct-slider","residualPct");
+  syncSlider("taxRate-slider","taxRate");
+  syncMF();syncTP();
+  ["acqFee","downPayment","tradeIn","rebates","docFee","dispFee"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",update);
   });
-  </script>
+  document.getElementById("capitalizeAcq").addEventListener("change",update);
+  document.getElementById("rebateTaxable").addEventListener("change",update);
+
+  document.querySelectorAll(".term-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".term-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");update();
+    });
+  });
+
+  document.querySelectorAll(".seg-btn[data-tax-method]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".seg-btn[data-tax-method]").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tax-method-hint").textContent=TAX_HINTS[btn.dataset.taxMethod]||"";
+      update();
+    });
+  });
+
+  document.getElementById("zip-lookup-btn").addEventListener("click",()=>{
+    lookupZip(document.getElementById("zipCode").value.trim());
+  });
+  document.getElementById("zipCode").addEventListener("keydown",e=>{
+    if(e.key==="Enter") lookupZip(document.getElementById("zipCode").value.trim());
+  });
+}
+
+document.addEventListener("DOMContentLoaded",()=>{wireInputs();update();});
+</script>
 </body>
 </html>
