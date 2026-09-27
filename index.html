@@ -20,6 +20,7 @@
     input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(99,102,241,.3);}
     .num-input{background:#0f1117;border:1px solid #2a2d3a;border-radius:.375rem;color:#f1f5f9;padding:.375rem .5rem;font-size:.875rem;width:100%;}
     .num-input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.2);}
+    .num-input:read-only{opacity:.6;cursor:not-allowed;border-color:#1e2235;}
     .term-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.875rem;transition:all .15s;}
     .term-btn.active{background:#6366f1;border-color:#6366f1;color:#fff;}
     .seg-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.3rem .5rem;cursor:pointer;font-size:.78rem;transition:all .15s;flex:1;text-align:center;}
@@ -37,12 +38,20 @@
     .tip-btn:hover{border-color:#6366f1;color:#6366f1;}
     .tooltip-box{position:absolute;z-index:50;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;padding:.75rem 1rem;max-width:280px;min-width:200px;font-size:.78rem;line-height:1.5;color:#f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,.5);}
     .zip-status{font-size:.75rem;margin-top:.25rem;min-height:1rem;}
+    .vehicle-search-wrap{position:relative;}
+    .vehicle-dropdown{position:absolute;top:100%;left:0;right:0;z-index:40;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;margin-top:.25rem;max-height:240px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);}
+    .vehicle-option{padding:.5rem .75rem;font-size:.85rem;color:#f1f5f9;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2d3a;}
+    .vehicle-option:last-child{border-bottom:none;}
+    .vehicle-option:hover,.vehicle-option.highlighted{background:#6366f1;color:#fff;}
+    .vehicle-option .v-meta{font-size:.7rem;color:#64748b;font-family:"ui-monospace",monospace;white-space:nowrap;}
+    .vehicle-option:hover .v-meta,.vehicle-option.highlighted .v-meta{color:rgba(255,255,255,.7);}
+    .lock-badge{display:inline-flex;align-items:center;gap:.25rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e;border-radius:.375rem;padding:.2rem .5rem;font-size:.7rem;font-weight:600;letter-spacing:.02em;}
+    .slider-lock-overlay{position:absolute;inset:0;cursor:not-allowed;z-index:10;border-radius:3px;}
   </style>
 </head>
 <body class="min-h-screen">
 <div id="tooltip-portal"></div>
 
-<!-- HEADER -->
 <header class="border-b border-[#2a2d3a] px-6 py-4">
   <div class="max-w-6xl mx-auto flex items-center justify-between">
     <div>
@@ -54,11 +63,26 @@
 </header>
 
 <main class="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
-
-  <!-- LEFT: INPUTS -->
   <section class="space-y-4">
     <div class="card p-5 space-y-5">
       <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Deal Inputs</h2>
+
+      <!-- Vehicle Selector -->
+      <div>
+        <label class="text-sm font-medium text-[#f1f5f9] flex items-center mb-2">
+          Select Vehicle (optional)
+          <button class="tip-btn" data-tip="vehicleSelect">i</button>
+        </label>
+        <div class="vehicle-search-wrap">
+          <input type="text" id="vehicleSearch" placeholder="Type make or model to search..." class="num-input" autocomplete="off" spellcheck="false" />
+          <div id="vehicleDropdown" class="vehicle-dropdown" style="display:none;"></div>
+        </div>
+        <div id="vehicle-lock-row" class="hidden mt-2 flex items-center justify-between">
+          <span class="lock-badge">&#x1F512; Verified Sept 2026</span>
+          <button id="unlock-btn" class="text-xs text-[#6366f1] underline bg-transparent border-none cursor-pointer">Edit Manually</button>
+        </div>
+        <p id="vehicle-status" class="text-xs text-[#64748b] mt-1"></p>
+      </div>
 
       <!-- MSRP -->
       <div>
@@ -68,7 +92,10 @@
             <input type="number" id="msrp" value="45000" min="10000" max="200000" step="500" class="num-input w-28 text-right" />
           </div>
         </div>
-        <input type="range" id="msrp-slider" min="10000" max="200000" step="500" value="45000" class="w-full" />
+        <div class="relative">
+          <input type="range" id="msrp-slider" min="10000" max="200000" step="500" value="45000" class="w-full" />
+          <div id="msrp-slider-lock" class="slider-lock-overlay" style="display:none;"></div>
+        </div>
         <div class="flex justify-between text-xs text-[#64748b] mt-1"><span>$10k</span><span>$200k</span></div>
       </div>
 
@@ -93,7 +120,10 @@
             <span class="text-xs text-[#64748b]">%</span>
           </div>
         </div>
-        <input type="range" id="residualPct-slider" min="20" max="80" step="0.5" value="55" class="w-full" />
+        <div class="relative">
+          <input type="range" id="residualPct-slider" min="20" max="80" step="0.5" value="55" class="w-full" />
+          <div id="residualPct-slider-lock" class="slider-lock-overlay" style="display:none;"></div>
+        </div>
         <p class="text-xs text-[#64748b] mt-1" id="residual-dollars">Set by lender — higher is better for you</p>
       </div>
 
@@ -121,7 +151,7 @@
         </div>
       </div>
 
-      <!-- Tax Rate + Zip + Method -->
+      <!-- Tax Rate + ZIP + Method -->
       <div class="space-y-3">
         <div class="flex justify-between items-center">
           <label class="text-sm font-medium text-[#f1f5f9]">Sales Tax Rate</label>
@@ -131,8 +161,6 @@
           </div>
         </div>
         <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
-
-        <!-- ZIP lookup -->
         <div>
           <div class="flex items-center gap-2">
             <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" class="num-input w-28" style="letter-spacing:.1em;" />
@@ -140,11 +168,9 @@
           </div>
           <p class="zip-status text-[#64748b]" id="zip-status">Enter ZIP to auto-detect state tax rate</p>
         </div>
-
-        <!-- Tax method -->
         <div>
           <label class="text-xs text-[#64748b] uppercase tracking-wider mb-1 block">Tax Method</label>
-          <div class="flex gap-1" id="tax-method-btns">
+          <div class="flex gap-1">
             <button class="seg-btn active" data-tax-method="monthly">Monthly</button>
             <button class="seg-btn" data-tax-method="fullsale">Full Sale Price</button>
             <button class="seg-btn" data-tax-method="upfront">Upfront Total</button>
@@ -161,14 +187,12 @@
         <span class="text-xs text-[#6366f1]">tap to expand</span>
       </summary>
       <div class="mt-4 space-y-4">
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
             <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
           </div>
         </div>
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9] flex items-center">Down Payment <button class="tip-btn" data-tip="downPayment">i</button></label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
@@ -176,15 +200,12 @@
           </div>
         </div>
         <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
             <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
           </div>
         </div>
-
-        <!-- Rebates + taxable toggle -->
         <div>
           <div class="flex justify-between items-center">
             <label class="text-sm text-[#f1f5f9] flex items-center">Manufacturer Rebates <button class="tip-btn" data-tip="rebates">i</button></label>
@@ -197,34 +218,28 @@
             <label for="rebateTaxable" class="text-xs text-[#64748b] cursor-pointer">Taxable rebate &mdash; some states tax manufacturer rebates. Check your state&rsquo;s rules.</label>
           </div>
         </div>
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
             <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
           </div>
         </div>
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
             <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
           </div>
         </div>
-
         <div class="flex justify-between items-center">
           <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
           <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
         </div>
-
       </div>
     </details>
   </section>
 
   <!-- RIGHT: OUTPUTS -->
   <section class="space-y-4 mt-4 lg:mt-0">
-
-    <!-- Hero -->
     <div class="card p-6 text-center">
       <p class="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">Monthly Payment</p>
       <div class="hero-payment text-[#6366f1]" id="hero-payment">$&mdash;</div>
@@ -232,7 +247,6 @@
       <p class="text-sm text-[#64748b] mt-3">Total cost of lease: <span id="hero-total" class="font-semibold text-[#f1f5f9] font-mono">&mdash;</span></p>
     </div>
 
-    <!-- Budget-to-Deal -->
     <div class="card p-5">
       <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Budget-to-Deal</h2>
       <p class="text-xs text-[#64748b] mb-3">Set a target payment &mdash; see the max cap cost you should accept.</p>
@@ -248,11 +262,10 @@
         <div class="flex justify-between"><span class="text-sm text-[#64748b]">Max cap cost</span><span class="font-mono font-semibold text-[#22c55e]" id="bs-maxcap">&mdash;</span></div>
         <div class="flex justify-between"><span class="text-sm text-[#64748b]">Discount from MSRP</span><span class="font-mono text-sm text-[#f1f5f9]" id="bs-discount">&mdash;</span></div>
         <div class="flex justify-between"><span class="text-sm text-[#64748b]">Verified payment</span><span class="font-mono text-sm text-[#f1f5f9]" id="bs-verified">&mdash;</span></div>
-        <div class="border-t border-[#2a2d3a] pt-2 mt-2"><p class="text-xs text-[#64748b]" id="bs-walkaway">&mdash;</p></div>
+        <div class="border-t border-[#2a2d3a] pt-2"><p class="text-xs text-[#64748b]" id="bs-walkaway">&mdash;</p></div>
       </div>
     </div>
 
-    <!-- Cost Driver -->
     <div class="card p-5">
       <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider mb-4">Cost Driver Breakdown</h2>
       <div class="relative h-10 rounded-lg overflow-hidden flex mb-4">
@@ -283,7 +296,6 @@
       <p class="text-xs text-[#64748b]" id="cost-insight">&mdash;</p>
     </div>
 
-    <!-- Verification Worksheet -->
     <details class="card p-5">
       <summary class="flex justify-between items-center">
         <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Verification Worksheet</h2>
@@ -292,7 +304,6 @@
       <div class="mt-4 space-y-1" id="worksheet-content"></div>
     </details>
 
-    <!-- Tax Audit -->
     <details class="card p-5">
       <summary class="flex justify-between items-center">
         <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Tax Audit</h2>
@@ -300,7 +311,6 @@
       </summary>
       <div class="mt-4 space-y-1" id="tax-audit-content"></div>
     </details>
-
   </section>
 </main>
 
@@ -311,7 +321,61 @@
 <script>
 "use strict";
 
-// ── State tax table — state-level rates, Tax Foundation 2026 ──────────────
+// ── Vehicle data — tc7cf00, verified Sept 2026, 36mo/10k ─────────────────
+const VEHICLES = [
+  {year:2026,make:"Toyota",    model:"RAV4 Hybrid LE",         msrp:34410, residual:64},
+  {year:2026,make:"Toyota",    model:"Corolla LE",              msrp:24205, residual:63},
+  {year:2026,make:"Toyota",    model:"Camry SE",                msrp:32220, residual:61},
+  {year:2026,make:"Toyota",    model:"Tacoma TRD Off-Road",     msrp:45395, residual:76},
+  {year:2026,make:"Honda",     model:"CR-V Sport Hybrid",       msrp:37200, residual:62},
+  {year:2026,make:"Honda",     model:"Civic LX",                msrp:26145, residual:63},
+  {year:2026,make:"Honda",     model:"Accord EX",               msrp:31105, residual:59},
+  {year:2026,make:"Tesla",     model:"Model 3 RWD",             msrp:40380, residual:58},
+  {year:2026,make:"Tesla",     model:"Model Y RWD",             msrp:46380, residual:59},
+  {year:2026,make:"BMW",       model:"330i xDrive",             msrp:49195, residual:56},
+  {year:2026,make:"BMW",       model:"X3 xDrive30i",            msrp:51495, residual:56},
+  {year:2026,make:"Lexus",     model:"RX 350 Premium",          msrp:54150, residual:58},
+  {year:2026,make:"Lexus",     model:"ES 350",                  msrp:45190, residual:55},
+  {year:2026,make:"Lexus",     model:"NX 350h",                 msrp:47125, residual:62},
+  {year:2026,make:"Subaru",    model:"Forester Base",           msrp:31445, residual:63},
+  {year:2026,make:"Subaru",    model:"Outback Premium",         msrp:34190, residual:62},
+  {year:2026,make:"Ford",      model:"F-150 XLT",               msrp:56995, residual:60},
+  {year:2026,make:"Ford",      model:"Explorer Active",         msrp:47280, residual:62},
+  {year:2026,make:"Ford",      model:"Maverick XLT",            msrp:29590, residual:61},
+  {year:2026,make:"Ford",      model:"Bronco Big Bend",         msrp:42590, residual:71},
+  {year:2026,make:"Jeep",      model:"Grand Cherokee Laredo",   msrp:43595, residual:54},
+  {year:2026,make:"Jeep",      model:"Wrangler Sahara",         msrp:51590, residual:72},
+  {year:2026,make:"Audi",      model:"Q5 45 S-Line",            msrp:50695, residual:55},
+  {year:2026,make:"Audi",      model:"A4 40 Premium",           msrp:43195, residual:54},
+  {year:2026,make:"Mercedes-Benz",model:"GLC 300",              msrp:50150, residual:55},
+  {year:2026,make:"Mercedes-Benz",model:"C300 Sedan",           msrp:48150, residual:58},
+  {year:2026,make:"Hyundai",   model:"Ioniq 5 SEL",             msrp:50450, residual:51},
+  {year:2026,make:"Hyundai",   model:"Tucson SEL",              msrp:32595, residual:58},
+  {year:2026,make:"Kia",       model:"Sportage LX",             msrp:29985, residual:63},
+  {year:2026,make:"Kia",       model:"Telluride EX",            msrp:44585, residual:65},
+  {year:2026,make:"Chevrolet", model:"Silverado 1500 LT",       msrp:53995, residual:59},
+  {year:2026,make:"Chevrolet", model:"Equinox LT",              msrp:31395, residual:54},
+  {year:2026,make:"GMC",       model:"Sierra 1500 Elevation",   msrp:59995, residual:60},
+  {year:2026,make:"GMC",       model:"Acadia Elevation",        msrp:45495, residual:59},
+  {year:2026,make:"Nissan",    model:"Rogue SV",                msrp:32890, residual:60},
+  {year:2026,make:"Nissan",    model:"Pathfinder SV",           msrp:42590, residual:58},
+  {year:2026,make:"Mazda",     model:"CX-50 S Select",          msrp:31650, residual:59},
+  {year:2026,make:"Mazda",     model:"CX-5 2.5 S Select",       msrp:31350, residual:61},
+  {year:2026,make:"Acura",     model:"MDX SH-AWD",              msrp:55395, residual:57},
+  {year:2026,make:"Acura",     model:"Integra",                 msrp:34395, residual:59},
+  {year:2026,make:"Volvo",     model:"XC60 B5 Plus",            msrp:52195, residual:54},
+  {year:2026,make:"Volvo",     model:"XC90 B5 Core",            msrp:58195, residual:58},
+  {year:2026,make:"Volkswagen",model:"Tiguan SE",               msrp:33495, residual:56},
+  {year:2026,make:"Volkswagen",model:"Atlas SE",                msrp:40495, residual:55},
+  {year:2026,make:"Ram",       model:"1500 Big Horn",           msrp:52995, residual:59},
+  {year:2026,make:"Cadillac",  model:"LYRIQ Tech",              msrp:59490, residual:50},
+  {year:2026,make:"Infiniti",  model:"QX60 Pure",               msrp:52395, residual:56},
+  {year:2026,make:"Land Rover",model:"Defender 110 S",          msrp:63495, residual:63},
+  {year:2026,make:"Rivian",    model:"R1S Dual-Motor",          msrp:76800, residual:61},
+  {year:2026,make:"Lucid",     model:"Air Pure",                msrp:71400, residual:48},
+];
+
+// ── State tax table ───────────────────────────────────────────────────────
 const STATE_TAX = {
   AL:4.0,AK:0.0,AZ:5.6,AR:6.5,CA:7.25,CO:2.9,CT:6.35,DE:0.0,
   FL:6.0,GA:4.0,HI:4.0,ID:6.0,IL:6.25,IN:7.0,IA:6.0,KS:6.5,
@@ -335,8 +399,8 @@ const STATE_NAMES = {
   DC:"Washington D.C."
 };
 
-// ── Tooltip copy ─────────────────────────────────────────────────────────
 const TIPS = {
+  vehicleSelect:"Choose from verified Sept 2026 lease data. MSRP and residual will be auto-filled and locked to ensure accurate calculations.",
   moneyFactor:"The interest rate in disguise. Multiply by 2,400 to get the APR. Dealers mark this up \u2014 always ask for the \u2018buy rate\u2019 from the lender.",
   residualPct:"Set by the manufacturer, not the dealer. Non-negotiable. Higher residual = lower payment. Compare residuals across trim levels before choosing.",
   capCost:"This is your selling price. Negotiate it like a purchase \u2014 the lower this number, the lower every payment. Don\u2019t let the dealer anchor to MSRP.",
@@ -348,195 +412,258 @@ const TIPS = {
 };
 
 // ── Tooltip engine ────────────────────────────────────────────────────────
-let activeTip = null;
-function showTooltip(btn, key) {
-  if (activeTip && activeTip.key === key) { closeTooltip(); return; }
+let activeTip=null;
+function showTooltip(btn,key){
+  if(activeTip&&activeTip.key===key){closeTooltip();return;}
   closeTooltip();
-  const text = TIPS[key]; if (!text) return;
-  const box = document.createElement("div");
-  box.className = "tooltip-box";
-  box.textContent = text;
+  const text=TIPS[key];if(!text)return;
+  const box=document.createElement("div");box.className="tooltip-box";box.textContent=text;
   document.getElementById("tooltip-portal").appendChild(box);
-  const rect = btn.getBoundingClientRect();
-  const sy = window.scrollY||document.documentElement.scrollTop;
-  box.style.top  = (rect.bottom+sy+8)+"px";
-  box.style.left = Math.max(8,Math.min(rect.left+(window.scrollX||0),window.innerWidth-296))+"px";
-  activeTip = {key,box};
+  const rect=btn.getBoundingClientRect();
+  const sy=window.scrollY||document.documentElement.scrollTop;
+  box.style.top=(rect.bottom+sy+8)+"px";
+  box.style.left=Math.max(8,Math.min(rect.left+(window.scrollX||0),window.innerWidth-296))+"px";
+  activeTip={key,box};
 }
-function closeTooltip() { if(activeTip){activeTip.box.remove();activeTip=null;} }
+function closeTooltip(){if(activeTip){activeTip.box.remove();activeTip=null;}}
 document.addEventListener("click",e=>{
   if(e.target.classList.contains("tip-btn")){e.stopPropagation();showTooltip(e.target,e.target.dataset.tip);return;}
-  if(activeTip&&!activeTip.box.contains(e.target)) closeTooltip();
+  if(activeTip&&!activeTip.box.contains(e.target))closeTooltip();
 });
 
-// ── LeaseCalc ─────────────────────────────────────────────────────────────
-const LeaseCalc = {
-  /**
-   * calculate(inputs) -> breakdown
-   * Tax methods:
-   *   monthly  — tax on base_payment/mo (most states)
-   *   fullsale — tax on cap_cost upfront (TX/MN/IL)
-   *   upfront  — tax on total payments upfront
-   * rebateTaxable: if true, rebate included in taxable base
-   */
-  calculate(inputs) {
-    const {msrp,capCost,residualPct,moneyFactor,termMonths,
-           acqFee,capitalizeAcq,downPayment,tradeIn,rebates,
-           taxRate,docFee,dispFee,taxMethod,rebateTaxable} = inputs;
+// ── Vehicle selector ──────────────────────────────────────────────────────
+let vehicleLocked=false, selectedVehicle=null, filteredVehicles=[], dropdownIdx=-1;
 
-    const nonRebateReductions = downPayment + tradeIn;
-    const totalReductions = nonRebateReductions + rebates;
-    const adjCapCost = capCost - totalReductions + docFee + (capitalizeAcq ? acqFee : 0);
-    const residualValue = msrp * (residualPct/100);
+function vLabel(v){return v.year+" "+v.make+" "+v.model;}
 
-    const depFee = (adjCapCost - residualValue) / termMonths;
-    const finFee = (adjCapCost + residualValue) * moneyFactor;
-    const basePayment = depFee + finFee;
-    const rate = taxRate/100;
+function renderDropdown(matches){
+  const dd=document.getElementById("vehicleDropdown");
+  filteredVehicles=matches;dropdownIdx=-1;
+  if(!matches.length){dd.style.display="none";return;}
+  dd.innerHTML=matches.map((v,i)=>
+    `<div class="vehicle-option" data-idx="${i}">
+      <span>${vLabel(v)}</span>
+      <span class="v-meta">${v.residual}% res &bull; $${v.msrp.toLocaleString()}</span>
+    </div>`
+  ).join("");
+  dd.style.display="block";
+  dd.querySelectorAll(".vehicle-option").forEach(el=>{
+    el.addEventListener("mousedown",e=>{e.preventDefault();selectVehicle(parseInt(el.dataset.idx));});
+  });
+}
 
-    let monthlyTax=0, upfrontTax=0, taxBase="", taxDesc="";
+function selectVehicle(idx){
+  const v=filteredVehicles[idx];if(!v)return;
+  selectedVehicle=v;
+  const msrpEl=document.getElementById("msrp");
+  const resEl=document.getElementById("residualPct");
+  msrpEl.value=v.msrp;
+  document.getElementById("msrp-slider").value=v.msrp;
+  resEl.value=v.residual;
+  document.getElementById("residualPct-slider").value=v.residual;
+  // Clamp cap cost slider max to vehicle MSRP
+  const ccSlider=document.getElementById("capCost-slider");
+  ccSlider.max=v.msrp;
+  const ccNum=document.getElementById("capCost");
+  if(parseFloat(ccNum.value)>v.msrp){ccNum.value=v.msrp;ccSlider.value=v.msrp;}
+  lockFields(true);
+  document.getElementById("vehicleSearch").value=vLabel(v);
+  document.getElementById("vehicleDropdown").style.display="none";
+  document.getElementById("vehicle-status").textContent="";
+  update();
+}
 
-    if (taxMethod==="monthly") {
-      const taxable = rebateTaxable ? basePayment+(rebates/termMonths) : basePayment;
-      monthlyTax = taxable*rate;
-      taxBase = rebateTaxable ? "base payment + rebate spread ($"+taxable.toFixed(2)+"/mo)" : "base payment ($"+basePayment.toFixed(2)+")";
-      taxDesc = "Tax applied to each monthly payment";
-    } else if (taxMethod==="fullsale") {
-      const taxable = rebateTaxable ? capCost : capCost-rebates;
-      upfrontTax = taxable*rate;
-      taxBase = rebateTaxable ? "full cap cost" : "cap cost less rebates";
-      taxDesc = "Tax on full sale price, collected upfront";
-    } else if (taxMethod==="upfront") {
-      const totalLease = basePayment*termMonths;
-      const taxable = rebateTaxable ? totalLease+rebates : totalLease;
-      upfrontTax = taxable*rate;
-      taxBase = rebateTaxable ? "total payments + rebates" : "total payments";
-      taxDesc = "Tax on total lease payments, collected upfront";
-    }
-
-    const monthlyPayment = basePayment + monthlyTax;
-    const upfrontAcq = capitalizeAcq ? 0 : acqFee;
-    const dueAtSigning = monthlyPayment + upfrontAcq + downPayment + upfrontTax;
-    const totalPayments = monthlyPayment * termMonths;
-    const totalCost = totalPayments + downPayment + upfrontAcq + dispFee + upfrontTax;
-
-    const depPct = (depFee/monthlyPayment)*100;
-    const finPct = (finFee/monthlyPayment)*100;
-    const taxPct = (monthlyTax/monthlyPayment)*100;
-
-    return {
-      adjCapCost,residualValue,nonRebateReductions,totalReductions,rebates,
-      depFee,finFee,basePayment,monthlyTax,upfrontTax,
-      monthlyPayment,dueAtSigning,totalPayments,totalCost,
-      depPct,finPct,taxPct,upfrontAcq,acqFee,capitalizeAcq,
-      taxMethod,taxBase,taxDesc,taxRate,rebateTaxable,
-      msrp,capCost,residualPct,moneyFactor,termMonths,docFee,dispFee,downPayment,tradeIn,
-    };
-  },
-
-  backsolve(targetPayment, inputs) {
-    const {msrp,residualPct,moneyFactor,termMonths,
-           acqFee,capitalizeAcq,downPayment,tradeIn,rebates,
-           taxRate,docFee,taxMethod} = inputs;
-    const residualValue = msrp*(residualPct/100);
-    const mf=moneyFactor,term=termMonths,rate=taxRate/100;
-    const taxMult = taxMethod==="monthly" ? 1+rate : 1;
-    const preTax = targetPayment/taxMult;
-    const num = preTax - residualValue*(mf-1/term);
-    const den = 1/term + mf;
-    const targetAdj = num/den;
-    const feeLoad = docFee+(capitalizeAcq?acqFee:0);
-    const reductions = downPayment+tradeIn+rebates;
-    const maxCap = targetAdj+reductions-feeLoad;
-    if(maxCap<=0) return null;
-    const verified = this.calculate({...inputs,capCost:maxCap});
-    return {
-      maxCapCost:maxCap,
-      discountDollars:msrp-maxCap,
-      discountPct:((msrp-maxCap)/msrp)*100,
-      verifiedPayment:verified.monthlyPayment
-    };
-  },
-};
-
-// ── Helpers ───────────────────────────────────────────────────────────────
-const fmt = {
-  money: n => n==null?"\u2014":"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}),
-  pct:   n => n==null?"\u2014":n.toFixed(2)+"%",
-  mf:    n => n.toFixed(5),
-};
-
-// ── Zip lookup ────────────────────────────────────────────────────────────
-let detectedState = null;
-async function lookupZip(zip) {
-  const st = document.getElementById("zip-status");
-  if(!/^\d{5}$/.test(zip)){st.textContent="Enter a valid 5-digit ZIP";st.style.color="#f59e0b";return;}
-  st.textContent="Looking up\u2026";st.style.color="#64748b";
-  try {
-    const r = await fetch("https://api.zippopotam.us/us/"+zip);
-    if(!r.ok) throw new Error();
-    const d = await r.json();
-    const abbr = d.places[0]["state abbreviation"];
-    const name = STATE_NAMES[abbr]||abbr;
-    const rate = STATE_TAX[abbr];
-    if(rate===undefined) throw new Error();
-    detectedState = {abbr,name,rate};
-    document.getElementById("taxRate").value = rate;
-    document.getElementById("taxRate-slider").value = rate;
-    st.textContent = name+" \u2014 "+rate+"% state rate (auto-filled)";
-    st.style.color="#22c55e";
-    update();
-  } catch(e) {
-    st.textContent="Could not detect state \u2014 enter rate manually";
-    st.style.color="#f59e0b";
-    detectedState=null;
+function lockFields(lock){
+  vehicleLocked=lock;
+  const msrpEl=document.getElementById("msrp");
+  const resEl=document.getElementById("residualPct");
+  const lockRow=document.getElementById("vehicle-lock-row");
+  const msrpLock=document.getElementById("msrp-slider-lock");
+  const resLock=document.getElementById("residualPct-slider-lock");
+  if(lock){
+    msrpEl.readOnly=true;resEl.readOnly=true;
+    msrpLock.style.display="block";resLock.style.display="block";
+    lockRow.classList.remove("hidden");
+  } else {
+    msrpEl.readOnly=false;resEl.readOnly=false;
+    msrpLock.style.display="none";resLock.style.display="none";
+    lockRow.classList.add("hidden");
+    selectedVehicle=null;
+    document.getElementById("vehicleSearch").value="";
+    document.getElementById("vehicle-status").textContent="Fields unlocked for manual editing.";
+    // Restore cap cost slider max
+    document.getElementById("capCost-slider").max=200000;
   }
 }
 
-// ── Read inputs ───────────────────────────────────────────────────────────
-function readInputs() {
-  return {
-    msrp:          parseFloat(document.getElementById("msrp").value)||0,
-    capCost:       parseFloat(document.getElementById("capCost").value)||0,
-    residualPct:   parseFloat(document.getElementById("residualPct").value)||0,
-    moneyFactor:   parseFloat(document.getElementById("moneyFactor").value)||0,
-    termMonths:    parseInt(document.querySelector(".term-btn.active").dataset.term)||36,
-    taxRate:       parseFloat(document.getElementById("taxRate").value)||0,
-    taxMethod:     document.querySelector(".seg-btn.active[data-tax-method]")?.dataset.taxMethod||"monthly",
-    rebateTaxable: document.getElementById("rebateTaxable").checked,
-    acqFee:        parseFloat(document.getElementById("acqFee").value)||0,
-    downPayment:   parseFloat(document.getElementById("downPayment").value)||0,
-    tradeIn:       parseFloat(document.getElementById("tradeIn").value)||0,
-    rebates:       parseFloat(document.getElementById("rebates").value)||0,
-    docFee:        parseFloat(document.getElementById("docFee").value)||0,
-    dispFee:       parseFloat(document.getElementById("dispFee").value)||0,
-    capitalizeAcq: document.getElementById("capitalizeAcq").checked,
-    targetPayment: parseFloat(document.getElementById("targetPayment").value)||0,
+function highlightDropdown(){
+  document.querySelectorAll(".vehicle-option").forEach((el,i)=>{
+    el.classList.toggle("highlighted",i===dropdownIdx);
+    if(i===dropdownIdx)el.scrollIntoView({block:"nearest"});
+  });
+}
+
+function wireVehicleSelector(){
+  const search=document.getElementById("vehicleSearch");
+  const dd=document.getElementById("vehicleDropdown");
+
+  search.addEventListener("input",()=>{
+    if(vehicleLocked)return;
+    const q=search.value.trim().toLowerCase();
+    if(!q){dd.style.display="none";filteredVehicles=[];return;}
+    renderDropdown(VEHICLES.filter(v=>(v.make+" "+v.model+" "+v.year).toLowerCase().includes(q)).slice(0,20));
+  });
+
+  search.addEventListener("keydown",e=>{
+    if(!filteredVehicles.length)return;
+    if(e.key==="ArrowDown"){e.preventDefault();dropdownIdx=Math.min(dropdownIdx+1,filteredVehicles.length-1);highlightDropdown();}
+    else if(e.key==="ArrowUp"){e.preventDefault();dropdownIdx=Math.max(dropdownIdx-1,0);highlightDropdown();}
+    else if(e.key==="Enter"&&dropdownIdx>=0){e.preventDefault();selectVehicle(dropdownIdx);}
+    else if(e.key==="Escape"){dd.style.display="none";}
+  });
+
+  search.addEventListener("focus",()=>{
+    if(!vehicleLocked&&search.value.trim()){
+      renderDropdown(VEHICLES.filter(v=>(v.make+" "+v.model+" "+v.year).toLowerCase().includes(search.value.trim().toLowerCase())).slice(0,20));
+    }
+  });
+
+  document.addEventListener("click",e=>{
+    if(!search.contains(e.target)&&!dd.contains(e.target))dd.style.display="none";
+  });
+
+  document.getElementById("unlock-btn").addEventListener("click",()=>{lockFields(false);update();});
+}
+
+// ── LeaseCalc ─────────────────────────────────────────────────────────────
+const LeaseCalc={
+  calculate(inputs){
+    const{msrp,capCost,residualPct,moneyFactor,termMonths,acqFee,capitalizeAcq,downPayment,tradeIn,rebates,taxRate,docFee,dispFee,taxMethod,rebateTaxable}=inputs;
+    const nonRebateReductions=downPayment+tradeIn;
+    const totalReductions=nonRebateReductions+rebates;
+    const adjCapCost=capCost-totalReductions+docFee+(capitalizeAcq?acqFee:0);
+    const residualValue=msrp*(residualPct/100);
+    const depFee=(adjCapCost-residualValue)/termMonths;
+    const finFee=(adjCapCost+residualValue)*moneyFactor;
+    const basePayment=depFee+finFee;
+    const rate=taxRate/100;
+    let monthlyTax=0,upfrontTax=0,taxBase="",taxDesc="";
+    if(taxMethod==="monthly"){
+      const taxable=rebateTaxable?basePayment+(rebates/termMonths):basePayment;
+      monthlyTax=taxable*rate;
+      taxBase=rebateTaxable?"base payment + rebate spread":"base payment ($"+basePayment.toFixed(2)+")";
+      taxDesc="Tax applied to each monthly payment";
+    }else if(taxMethod==="fullsale"){
+      const taxable=rebateTaxable?capCost:capCost-rebates;
+      upfrontTax=taxable*rate;
+      taxBase=rebateTaxable?"full cap cost":"cap cost less rebates";
+      taxDesc="Tax on full sale price, collected upfront";
+    }else if(taxMethod==="upfront"){
+      const totalLease=basePayment*termMonths;
+      const taxable=rebateTaxable?totalLease+rebates:totalLease;
+      upfrontTax=taxable*rate;
+      taxBase=rebateTaxable?"total payments + rebates":"total payments";
+      taxDesc="Tax on total lease payments, collected upfront";
+    }
+    const monthlyPayment=basePayment+monthlyTax;
+    const upfrontAcq=capitalizeAcq?0:acqFee;
+    const dueAtSigning=monthlyPayment+upfrontAcq+downPayment+upfrontTax;
+    const totalPayments=monthlyPayment*termMonths;
+    const totalCost=totalPayments+downPayment+upfrontAcq+dispFee+upfrontTax;
+    const depPct=(depFee/monthlyPayment)*100;
+    const finPct=(finFee/monthlyPayment)*100;
+    const taxPct=(monthlyTax/monthlyPayment)*100;
+    return{adjCapCost,residualValue,nonRebateReductions,totalReductions,rebates,depFee,finFee,basePayment,monthlyTax,upfrontTax,monthlyPayment,dueAtSigning,totalPayments,totalCost,depPct,finPct,taxPct,upfrontAcq,acqFee,capitalizeAcq,taxMethod,taxBase,taxDesc,taxRate,rebateTaxable,msrp,capCost,residualPct,moneyFactor,termMonths,docFee,dispFee,downPayment,tradeIn};
+  },
+  backsolve(targetPayment,inputs){
+    const{msrp,residualPct,moneyFactor,termMonths,acqFee,capitalizeAcq,downPayment,tradeIn,rebates,taxRate,docFee,taxMethod}=inputs;
+    const residualValue=msrp*(residualPct/100);
+    const mf=moneyFactor,term=termMonths,rate=taxRate/100;
+    const taxMult=taxMethod==="monthly"?1+rate:1;
+    const preTax=targetPayment/taxMult;
+    const num=preTax-residualValue*(mf-1/term);
+    const den=1/term+mf;
+    const targetAdj=num/den;
+    const feeLoad=docFee+(capitalizeAcq?acqFee:0);
+    const reductions=downPayment+tradeIn+rebates;
+    const maxCap=targetAdj+reductions-feeLoad;
+    if(maxCap<=0)return null;
+    const verified=this.calculate({...inputs,capCost:maxCap});
+    return{maxCapCost:maxCap,discountDollars:msrp-maxCap,discountPct:((msrp-maxCap)/msrp)*100,verifiedPayment:verified.monthlyPayment};
+  },
+};
+
+const fmt={
+  money:n=>n==null?"\u2014":"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}),
+  pct:  n=>n==null?"\u2014":n.toFixed(2)+"%",
+  mf:   n=>n.toFixed(5),
+};
+
+let detectedState=null;
+async function lookupZip(zip){
+  const st=document.getElementById("zip-status");
+  if(!/^\d{5}$/.test(zip)){st.textContent="Enter a valid 5-digit ZIP";st.style.color="#f59e0b";return;}
+  st.textContent="Looking up\u2026";st.style.color="#64748b";
+  try{
+    const r=await fetch("https://api.zippopotam.us/us/"+zip);
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const abbr=d.places[0]["state abbreviation"];
+    const name=STATE_NAMES[abbr]||abbr;
+    const rate=STATE_TAX[abbr];
+    if(rate===undefined)throw new Error();
+    detectedState={abbr,name,rate};
+    document.getElementById("taxRate").value=rate;
+    document.getElementById("taxRate-slider").value=rate;
+    st.textContent=name+"\u2014"+rate+"% state rate (auto-filled)";
+    st.style.color="#22c55e";
+    update();
+  }catch(e){
+    st.textContent="Could not detect state \u2014 enter rate manually";
+    st.style.color="#f59e0b";detectedState=null;
+  }
+}
+
+function readInputs(){
+  return{
+    msrp:         parseFloat(document.getElementById("msrp").value)||0,
+    capCost:      parseFloat(document.getElementById("capCost").value)||0,
+    residualPct:  parseFloat(document.getElementById("residualPct").value)||0,
+    moneyFactor:  parseFloat(document.getElementById("moneyFactor").value)||0,
+    termMonths:   parseInt(document.querySelector(".term-btn.active").dataset.term)||36,
+    taxRate:      parseFloat(document.getElementById("taxRate").value)||0,
+    taxMethod:    document.querySelector(".seg-btn.active[data-tax-method]")?.dataset.taxMethod||"monthly",
+    rebateTaxable:document.getElementById("rebateTaxable").checked,
+    acqFee:       parseFloat(document.getElementById("acqFee").value)||0,
+    downPayment:  parseFloat(document.getElementById("downPayment").value)||0,
+    tradeIn:      parseFloat(document.getElementById("tradeIn").value)||0,
+    rebates:      parseFloat(document.getElementById("rebates").value)||0,
+    docFee:       parseFloat(document.getElementById("docFee").value)||0,
+    dispFee:      parseFloat(document.getElementById("dispFee").value)||0,
+    capitalizeAcq:document.getElementById("capitalizeAcq").checked,
+    targetPayment:parseFloat(document.getElementById("targetPayment").value)||0,
   };
 }
 
-// ── Update functions ──────────────────────────────────────────────────────
-function updateHero(b) {
+function updateHero(b){
   const el=document.getElementById("hero-payment");
   el.textContent=fmt.money(b.monthlyPayment);
   el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
-  document.getElementById("hero-pretax").textContent  = fmt.money(b.basePayment);
-  document.getElementById("hero-signing").textContent = fmt.money(b.dueAtSigning);
-  document.getElementById("hero-total").textContent   = fmt.money(b.totalCost);
+  document.getElementById("hero-pretax").textContent=fmt.money(b.basePayment);
+  document.getElementById("hero-signing").textContent=fmt.money(b.dueAtSigning);
+  document.getElementById("hero-total").textContent=fmt.money(b.totalCost);
   const off=b.msrp-b.capCost;
-  document.getElementById("cap-cost-pct").textContent =
-    off>=0 ? "$"+off.toLocaleString()+" off MSRP ("+((off/b.msrp)*100).toFixed(1)+"% discount)"
-           : "$"+Math.abs(off).toLocaleString()+" above MSRP";
-  document.getElementById("residual-dollars").textContent =
-    "Residual value: "+fmt.money(b.residualValue)+" \u2014 set by lender";
+  document.getElementById("cap-cost-pct").textContent=
+    off>=0?"$"+off.toLocaleString()+" off MSRP ("+((off/b.msrp)*100).toFixed(1)+"% discount)":
+           "$"+Math.abs(off).toLocaleString()+" above MSRP";
+  document.getElementById("residual-dollars").textContent="Residual value: "+fmt.money(b.residualValue)+" \u2014 set by lender";
 }
 
-function updateBacksolve(inputs) {
+function updateBacksolve(inputs){
   const r=LeaseCalc.backsolve(inputs.targetPayment,inputs);
   if(!r){
     document.getElementById("bs-maxcap").textContent="Not achievable";
-    document.getElementById("bs-discount").textContent="\u2014";
-    document.getElementById("bs-verified").textContent="\u2014";
+    ["bs-discount","bs-verified"].forEach(id=>document.getElementById(id).textContent="\u2014");
     document.getElementById("bs-walkaway").textContent="Target payment is too low for these lease terms.";
     return;
   }
@@ -546,7 +673,7 @@ function updateBacksolve(inputs) {
   document.getElementById("bs-walkaway").textContent="Walk away from any offer above "+fmt.money(r.maxCapCost)+".";
 }
 
-function updateCostBar(b) {
+function updateCostBar(b){
   document.getElementById("bar-dep").style.width=b.depPct.toFixed(2)+"%";
   document.getElementById("bar-fin").style.width=b.finPct.toFixed(2)+"%";
   document.getElementById("bar-tax").style.width=b.taxPct.toFixed(2)+"%";
@@ -556,82 +683,66 @@ function updateCostBar(b) {
   document.getElementById("dep-pct").textContent=fmt.pct(b.depPct)+" of payment";
   document.getElementById("fin-pct").textContent=fmt.pct(b.finPct)+" of payment";
   document.getElementById("tax-pct").textContent=b.monthlyTax>0?fmt.pct(b.taxPct)+" of payment":"collected upfront";
-  document.getElementById("cost-insight").textContent =
+  document.getElementById("cost-insight").textContent=
     b.depPct>70?"Depreciation dominates \u2014 negotiate the cap cost down.":
     b.finPct>20?"Finance fee is high \u2014 ask for a lower money factor.":
     b.taxPct>15?"Tax is significant \u2014 consider low-tax states.":
     "Well-balanced deal structure.";
 }
 
-function updateWorksheet(b) {
+function updateWorksheet(b){
   const mfApr=(b.moneyFactor*2400).toFixed(2);
+  const vehicleLine=selectedVehicle
+    ?{cls:"section",text:"\uD83D\uDD12 VEHICLE: "+vLabel(selectedVehicle)+" | Verified Sept 2026 | Residual: "+selectedVehicle.residual+"%"}
+    :null;
   const lines=[
+    vehicleLine,
     {cls:"section",text:"INPUTS"},
     {text:"MSRP                         "+fmt.money(b.msrp)},
     {text:"Negotiated Cap Cost           "+fmt.money(b.capCost)},
-    b.rebates>0
-      ?{text:"Manufacturer Rebates          -"+fmt.money(b.rebates).replace("$","")+"   \u2190 applied after negotiation"}
-      :{text:"Manufacturer Rebates          $0.00"},
-    b.rebates>0
-      ?{cls:"warn",text:"  \u26a0 Do not let the dealer fold rebates into their discount \u2014 this is manufacturer money."}
-      :null,
+    b.rebates>0?{text:"Manufacturer Rebates          -"+fmt.money(b.rebates).replace("$","")+"   \u2190 applied after negotiation"}:{text:"Manufacturer Rebates          $0.00"},
+    b.rebates>0?{cls:"warn",text:"  \u26a0 Do not let dealer fold rebates into their discount \u2014 this is manufacturer money."}:null,
     b.nonRebateReductions>0?{text:"Down + Trade-in               -"+fmt.money(b.nonRebateReductions).replace("$","")}:null,
-    b.acqFee>0&&b.capitalizeAcq?{text:"Acquisition Fee               +"+fmt.money(b.acqFee).replace("$","")+"   (capitalized)"}
-      :b.acqFee>0?{text:"Acquisition Fee               "+fmt.money(b.acqFee)+"   (due at signing)"}:null,
+    b.acqFee>0&&b.capitalizeAcq?{text:"Acquisition Fee               +"+fmt.money(b.acqFee).replace("$","")+"   (capitalized)"}:b.acqFee>0?{text:"Acquisition Fee               "+fmt.money(b.acqFee)+"   (due at signing)"}:null,
     b.docFee>0?{text:"Doc Fee                       +"+fmt.money(b.docFee).replace("$","")}:null,
     {cls:"result",text:"Adjusted Cap Cost             "+fmt.money(b.adjCapCost)},
     {cls:"result",text:"Residual Value ("+b.residualPct+"% of MSRP)   "+fmt.money(b.residualValue)},
     {text:"Money Factor                  "+fmt.mf(b.moneyFactor)+"  (~"+mfApr+"% APR)"},
     {text:"Term                          "+b.termMonths+" months"},
     {text:"Tax Rate                      "+b.taxRate+"%  ["+b.taxMethod+"]"},
-
     {cls:"section",text:"STEP 1 \u2014 DEPRECIATION FEE"},
     {text:"(Adj Cap Cost - Residual) \u00f7 Term"},
     {text:"("+fmt.money(b.adjCapCost)+" - "+fmt.money(b.residualValue)+") \u00f7 "+b.termMonths},
     {cls:"result",text:"= "+fmt.money(b.depFee)+" /mo"},
-
     {cls:"section",text:"STEP 2 \u2014 FINANCE FEE (RENT CHARGE)"},
     {text:"(Adj Cap Cost + Residual) \u00d7 Money Factor"},
     {text:"("+fmt.money(b.adjCapCost)+" + "+fmt.money(b.residualValue)+") \u00d7 "+fmt.mf(b.moneyFactor)},
     {cls:"result",text:"= "+fmt.money(b.finFee)+" /mo"},
-
     {cls:"section",text:"STEP 3 \u2014 BASE PAYMENT (PRE-TAX)"},
     {text:fmt.money(b.depFee)+" + "+fmt.money(b.finFee)},
     {cls:"result",text:"= "+fmt.money(b.basePayment)+" /mo"},
-
     {cls:"section",text:"STEP 4 \u2014 TAX  ["+b.taxMethod+"]"},
-    b.monthlyTax>0
-      ?{text:fmt.money(b.basePayment)+" \u00d7 "+b.taxRate+"% = "+fmt.money(b.monthlyTax)+" /mo"}
-      :{text:fmt.money(b.upfrontTax)+" collected upfront (see Tax Audit)"},
+    b.monthlyTax>0?{text:fmt.money(b.basePayment)+" \u00d7 "+b.taxRate+"% = "+fmt.money(b.monthlyTax)+" /mo"}:{text:fmt.money(b.upfrontTax)+" collected upfront (see Tax Audit)"},
     {cls:"result",text:"Monthly tax: "+fmt.money(b.monthlyTax)},
-
     {cls:"section",text:"MONTHLY PAYMENT"},
     {cls:"result",text:fmt.money(b.basePayment)+" + "+fmt.money(b.monthlyTax)+" = "+fmt.money(b.monthlyPayment)+" /mo"},
-
     {cls:"section",text:"DUE AT SIGNING"},
     {text:"First Month                  "+fmt.money(b.monthlyPayment)},
     b.upfrontAcq>0?{text:"Acq Fee (upfront)            "+fmt.money(b.acqFee)}:null,
     b.downPayment>0?{text:"Down Payment                 "+fmt.money(b.downPayment)}:null,
     b.upfrontTax>0?{cls:"warn",text:"Tax (upfront)                "+fmt.money(b.upfrontTax)}:null,
     {cls:"result",text:"Total Due at Signing         "+fmt.money(b.dueAtSigning)},
-
     {cls:"section",text:"TOTAL COST OF LEASE"},
     {text:"Monthly \u00d7 "+b.termMonths+" months        "+fmt.money(b.totalPayments)},
     b.dispFee>0?{text:"Disposition Fee              "+fmt.money(b.dispFee)}:null,
     {cls:"result",text:"Total Cost                   "+fmt.money(b.totalCost)},
   ].filter(Boolean);
-  document.getElementById("worksheet-content").innerHTML=
-    lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+  document.getElementById("worksheet-content").innerHTML=lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
 }
 
-function updateTaxAudit(b) {
-  const stateLine = detectedState
-    ? "State: "+detectedState.name+" ("+detectedState.rate+"% state-level rate)"
-    : "State: not detected \u2014 manual rate "+b.taxRate+"%";
-  const totalTax = b.monthlyTax>0 ? b.monthlyTax*b.termMonths : b.upfrontTax;
-  const rebateLine = b.rebateTaxable
-    ? "Rebates: included in taxable base (taxable rebate ON)"
-    : "Rebates: excluded from taxable base (taxable rebate OFF)";
+function updateTaxAudit(b){
+  const stateLine=detectedState?"State: "+detectedState.name+" ("+detectedState.rate+"% state-level rate)":"State: not detected \u2014 manual rate "+b.taxRate+"%";
+  const totalTax=b.monthlyTax>0?b.monthlyTax*b.termMonths:b.upfrontTax;
   const lines=[
     {cls:"section",text:"TAX METHOD"},
     {cls:"result",text:b.taxDesc},
@@ -642,22 +753,16 @@ function updateTaxAudit(b) {
     b.monthlyTax>0?{text:"Tax per month: "+fmt.money(b.monthlyTax)}:{text:"Upfront tax: "+fmt.money(b.upfrontTax)},
     {cls:"result",text:"Total tax over lease: "+fmt.money(totalTax)},
     {cls:"section",text:"REBATE TAX STATUS"},
-    {text:rebateLine},
-    b.rebates>0&&!b.rebateTaxable
-      ?{text:"Rebate of "+fmt.money(b.rebates)+" reduces cap cost before tax"}
-      :b.rebates>0&&b.rebateTaxable
-      ?{cls:"warn",text:"\u26a0 Rebate of "+fmt.money(b.rebates)+" is in taxable base \u2014 verify for your state"}
-      :{text:"No rebates entered"},
+    {text:b.rebateTaxable?"Rebates: included in taxable base (taxable rebate ON)":"Rebates: excluded from taxable base (taxable rebate OFF)"},
+    b.rebates>0&&!b.rebateTaxable?{text:"Rebate of "+fmt.money(b.rebates)+" reduces cap cost before tax"}:b.rebates>0&&b.rebateTaxable?{cls:"warn",text:"\u26a0 Rebate of "+fmt.money(b.rebates)+" is in taxable base \u2014 verify for your state"}:{text:"No rebates entered"},
   ];
-  document.getElementById("tax-audit-content").innerHTML=
-    lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+  document.getElementById("tax-audit-content").innerHTML=lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
 }
 
-// ── Main update ───────────────────────────────────────────────────────────
-function update() {
+function update(){
   const inputs=readInputs();
-  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0||inputs.termMonths<=0) return;
-  if(inputs.residualPct<=0||inputs.residualPct>=100) return;
+  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0||inputs.termMonths<=0)return;
+  if(inputs.residualPct<=0||inputs.residualPct>=100)return;
   const b=LeaseCalc.calculate(inputs);
   updateHero(b);updateBacksolve(inputs);updateCostBar(b);updateWorksheet(b);updateTaxAudit(b);
   document.getElementById("mf-apr-val").textContent=(inputs.moneyFactor*2400).toFixed(2);
@@ -669,11 +774,10 @@ const TAX_HINTS={
   upfront:"Tax on total of all lease payments, collected upfront at signing",
 };
 
-// ── Slider sync ────────────────────────────────────────────────────────────
 function syncSlider(sid,nid){
   const s=document.getElementById(sid),n=document.getElementById(nid);
-  s.addEventListener("input",()=>{n.value=s.value;update();});
-  n.addEventListener("input",()=>{s.value=n.value;update();});
+  s.addEventListener("input",()=>{if(!n.readOnly){n.value=s.value;update();}});
+  n.addEventListener("input",()=>{if(!n.readOnly){s.value=n.value;update();}});
 }
 function syncMF(){
   const s=document.getElementById("moneyFactor-slider"),n=document.getElementById("moneyFactor");
@@ -686,7 +790,6 @@ function syncTP(){
   n.addEventListener("input",()=>{s.value=n.value;update();});
 }
 
-// ── Wire all inputs ───────────────────────────────────────────────────────
 function wireInputs(){
   syncSlider("msrp-slider","msrp");
   syncSlider("capCost-slider","capCost");
@@ -698,14 +801,12 @@ function wireInputs(){
   });
   document.getElementById("capitalizeAcq").addEventListener("change",update);
   document.getElementById("rebateTaxable").addEventListener("change",update);
-
   document.querySelectorAll(".term-btn").forEach(btn=>{
     btn.addEventListener("click",()=>{
       document.querySelectorAll(".term-btn").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");update();
     });
   });
-
   document.querySelectorAll(".seg-btn[data-tax-method]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       document.querySelectorAll(".seg-btn[data-tax-method]").forEach(b=>b.classList.remove("active"));
@@ -714,16 +815,11 @@ function wireInputs(){
       update();
     });
   });
-
-  document.getElementById("zip-lookup-btn").addEventListener("click",()=>{
-    lookupZip(document.getElementById("zipCode").value.trim());
-  });
-  document.getElementById("zipCode").addEventListener("keydown",e=>{
-    if(e.key==="Enter") lookupZip(document.getElementById("zipCode").value.trim());
-  });
+  document.getElementById("zip-lookup-btn").addEventListener("click",()=>{lookupZip(document.getElementById("zipCode").value.trim());});
+  document.getElementById("zipCode").addEventListener("keydown",e=>{if(e.key==="Enter")lookupZip(document.getElementById("zipCode").value.trim());});
 }
 
-document.addEventListener("DOMContentLoaded",()=>{wireInputs();update();});
+document.addEventListener("DOMContentLoaded",()=>{wireVehicleSelector();wireInputs();update();});
 </script>
 </body>
 </html>
