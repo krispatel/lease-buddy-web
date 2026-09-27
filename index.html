@@ -73,8 +73,9 @@
           Select Vehicle (optional)
           <button class="tip-btn" data-tip="vehicleSelect">i</button>
         </label>
-        <div class="vehicle-search-wrap">
+        <div class="vehicle-search-wrap" style="position:relative;">
           <input type="text" id="vehicleSearch" placeholder="Type make or model to search..." class="num-input" autocomplete="off" spellcheck="false" />
+          <button id="vehicle-clear-btn" title="Clear selection" style="display:none;position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;line-height:1;padding:.25rem;z-index:5;">&times;</button>
           <div id="vehicleDropdown" class="vehicle-dropdown" style="display:none;"></div>
         </div>
         <div id="vehicle-lock-row" class="hidden mt-2 flex items-center justify-between">
@@ -468,6 +469,7 @@ function selectVehicle(idx){
   if(parseFloat(ccNum.value)>v.msrp){ccNum.value=v.msrp;ccSlider.value=v.msrp;}
   lockFields(true);
   document.getElementById("vehicleSearch").value=vLabel(v);
+  document.getElementById("vehicle-clear-btn").style.display="block";
   document.getElementById("vehicleDropdown").style.display="none";
   document.getElementById("vehicle-status").textContent="";
   update();
@@ -490,6 +492,7 @@ function lockFields(lock){
     lockRow.classList.add("hidden");
     selectedVehicle=null;
     document.getElementById("vehicleSearch").value="";
+    document.getElementById("vehicle-clear-btn").style.display="none";
     document.getElementById("vehicle-status").textContent="Fields unlocked for manual editing.";
     // Restore cap cost slider max
     document.getElementById("capCost-slider").max=200000;
@@ -533,6 +536,11 @@ function wireVehicleSelector(){
   });
 
   document.getElementById("unlock-btn").addEventListener("click",()=>{lockFields(false);update();});
+  document.getElementById("vehicle-clear-btn").addEventListener("click",()=>{lockFields(false);update();});
+  // Show/hide clear button with search content
+  document.getElementById("vehicleSearch").addEventListener("input",()=>{
+    document.getElementById("vehicle-clear-btn").style.display=document.getElementById("vehicleSearch").value?"block":"none";
+  });
 }
 
 // ── LeaseCalc ─────────────────────────────────────────────────────────────
