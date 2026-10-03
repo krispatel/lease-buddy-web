@@ -221,15 +221,6 @@
     <div class="card p-5 space-y-4">
       <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Discounts, Cash &amp; Fees</h2>
 
-      <!-- Down Payment -->
-      <div class="flex justify-between items-center">
-        <label class="text-sm text-[#f1f5f9] flex items-center">Money Down <button class="tip-btn" data-tip="downPayment">i</button></label>
-        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-          <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
-        </div>
-      </div>
-      <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
-
       <!-- Trade-in -->
       <div class="flex justify-between items-center">
         <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
@@ -237,6 +228,15 @@
           <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
         </div>
       </div>
+
+      <!-- Down Payment -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9] flex items-center">Down Payment <button class="tip-btn" data-tip="downPayment">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
+        </div>
+      </div>
+      <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
 
       <!-- Rebates -->
       <div>
@@ -252,31 +252,37 @@
         </div>
       </div>
 
-      <!-- Fees (collapsed) -->
+      <!-- Acquisition Fee -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
+        </div>
+      </div>
+
+      <!-- Doc Fee -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
+        </div>
+      </div>
+
+      <!-- Disposition Fee -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
+        </div>
+      </div>
+
+      <!-- Capitalize Acq Fee + Tax (collapsed) -->
       <details>
         <summary class="flex justify-between items-center cursor-pointer">
-          <span class="text-sm font-medium text-[#f1f5f9]">Fees &amp; Advanced</span>
+          <span class="text-sm font-medium text-[#f1f5f9]">Tax &amp; Advanced</span>
           <span class="text-xs text-[#6366f1]">tap to expand</span>
         </summary>
         <div class="mt-4 space-y-4">
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
-            </div>
-          </div>
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
-            </div>
-          </div>
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
-            </div>
-          </div>
           <div class="flex justify-between items-center">
             <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
             <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
