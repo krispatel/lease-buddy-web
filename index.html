@@ -66,8 +66,9 @@
 
 <main class="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
   <section class="space-y-4">
+    <!-- ── Section 1: Vehicle & Market Data (OEM / auto-filled) ── -->
     <div class="card p-5 space-y-5">
-      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Deal Inputs</h2>
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Vehicle &amp; Market Data</h2>
 
       <!-- Vehicle Selector — cascading Year / Make / Model / Trim -->
       <div>
@@ -106,6 +107,16 @@
         <p id="vehicle-status" class="text-xs text-[#64748b] mt-1"></p>
       </div>
 
+      <!-- ZIP -->
+      <div class="space-y-2">
+        <label class="text-sm font-medium text-[#f1f5f9] block">ZIP Code</label>
+        <div class="flex items-center gap-2">
+          <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" class="num-input w-28" style="letter-spacing:.1em;" />
+          <button id="zip-lookup-btn" style="background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.8rem;white-space:nowrap;">Look up</button>
+        </div>
+        <p class="zip-status text-[#64748b]" id="zip-status">Enter ZIP to auto-detect state tax rate</p>
+      </div>
+
       <!-- MSRP -->
       <div>
         <div class="flex justify-between items-center mb-2">
@@ -119,18 +130,6 @@
           <div id="msrp-slider-lock" class="slider-lock-overlay" style="display:none;"></div>
         </div>
         <div class="flex justify-between text-xs text-[#64748b] mt-1"><span>$10k</span><span>$200k</span></div>
-      </div>
-
-      <!-- Cap Cost -->
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Negotiated Cap Cost <button class="tip-btn" data-tip="capCost">i</button></label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="capCost" value="43200" min="5000" max="200000" step="100" class="num-input w-28 text-right" />
-          </div>
-        </div>
-        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="43200" class="w-full" />
-        <p class="text-xs text-[#64748b] mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
       </div>
 
       <!-- Residual % -->
@@ -161,6 +160,30 @@
         <p class="text-xs text-[#64748b] mt-1">&#x2248; <span id="mf-apr-val">3.00</span>% APR &mdash; ask your dealer for the buy-rate MF</p>
         <div class="flex justify-between text-xs text-[#64748b]"><span>0.00001</span><span>0.00500</span></div>
       </div>
+    </div>
+
+    <!-- ── Separator: Your Deal ── -->
+    <div class="flex items-center gap-3 px-1">
+      <div class="flex-1 border-t border-[#2a2d3a]"></div>
+      <span class="text-xs font-semibold text-[#6366f1] uppercase tracking-widest">Your Deal</span>
+      <div class="flex-1 border-t border-[#2a2d3a]"></div>
+    </div>
+
+    <!-- ── Section 2: User Negotiation Inputs ── -->
+    <div class="card p-5 space-y-5">
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Negotiation</h2>
+
+      <!-- Negotiated Price (formerly Cap Cost) -->
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Negotiated Price <button class="tip-btn" data-tip="capCost">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="capCost" value="43200" min="5000" max="200000" step="100" class="num-input w-28 text-right" />
+          </div>
+        </div>
+        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="43200" class="w-full" />
+        <p class="text-xs text-[#64748b] mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
+      </div>
 
       <!-- Term -->
       <div>
@@ -173,91 +196,114 @@
         </div>
       </div>
 
-      <!-- Tax Rate + ZIP + Method -->
-      <div class="space-y-3">
+      <!-- Mileage Per Year -->
+      <div>
         <div class="flex justify-between items-center">
-          <label class="text-sm font-medium text-[#f1f5f9]">Sales Tax Rate</label>
+          <label class="text-sm font-medium text-[#f1f5f9]">Mileage Per Year</label>
           <div class="flex items-center gap-1">
-            <input type="number" id="taxRate" value="8.75" min="0" max="15" step="0.25" class="num-input w-20 text-right" />
-            <span class="text-xs text-[#64748b]">%</span>
+            <input type="number" id="mileagePerYear" value="10000" min="7500" max="20000" step="2500" class="num-input w-24 text-right font-mono" />
+            <span class="text-xs text-[#64748b]">mi</span>
           </div>
         </div>
-        <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
-        <div>
-          <div class="flex items-center gap-2">
-            <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" class="num-input w-28" style="letter-spacing:.1em;" />
-            <button id="zip-lookup-btn" style="background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.8rem;white-space:nowrap;">Look up</button>
-          </div>
-          <p class="zip-status text-[#64748b]" id="zip-status">Enter ZIP to auto-detect state tax rate</p>
-        </div>
-        <div>
-          <label class="text-xs text-[#64748b] uppercase tracking-wider mb-1 block">Tax Method</label>
-          <div class="flex gap-1">
-            <button class="seg-btn active" data-tax-method="monthly">Monthly</button>
-            <button class="seg-btn" data-tax-method="fullsale">Full Sale Price</button>
-            <button class="seg-btn" data-tax-method="upfront">Upfront Total</button>
-          </div>
-          <p class="text-xs text-[#64748b] mt-1" id="tax-method-hint">Tax applied to each monthly payment (most states)</p>
-        </div>
+        <input type="range" id="mileagePerYear-slider" min="7500" max="20000" step="2500" value="10000" class="w-full mt-2" />
+        <div class="flex justify-between text-xs text-[#64748b] mt-1"><span>7,500</span><span>20,000</span></div>
       </div>
     </div>
 
-    <!-- Advanced / Fees -->
-    <details class="card p-5">
-      <summary class="flex justify-between items-center">
-        <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Advanced / Fees</h2>
-        <span class="text-xs text-[#6366f1]">tap to expand</span>
-      </summary>
-      <div class="mt-4 space-y-4">
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9] flex items-center">Down Payment <button class="tip-btn" data-tip="downPayment">i</button></label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
-          </div>
-        </div>
-        <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
-          </div>
-        </div>
-        <div>
-          <div class="flex justify-between items-center">
-            <label class="text-sm text-[#f1f5f9] flex items-center">Manufacturer Rebates <button class="tip-btn" data-tip="rebates">i</button></label>
-            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-              <input type="number" id="rebates" value="0" min="0" max="20000" step="100" class="num-input w-24 text-right" />
-            </div>
-          </div>
-          <div class="flex items-center gap-2 mt-2">
-            <input type="checkbox" id="rebateTaxable" class="w-4 h-4 accent-[#6366f1] cursor-pointer" />
-            <label for="rebateTaxable" class="text-xs text-[#64748b] cursor-pointer">Taxable rebate &mdash; some states tax manufacturer rebates. Check your state&rsquo;s rules.</label>
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
-          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
-          </div>
-        </div>
-        <div class="flex justify-between items-center">
-          <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
-          <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
+    <!-- ── Separator: Discounts, Cash & Fees ── -->
+    <div class="flex items-center gap-3 px-1">
+      <div class="flex-1 border-t border-[#2a2d3a]"></div>
+      <span class="text-xs font-semibold text-[#6366f1] uppercase tracking-widest">Discounts, Cash &amp; Fees</span>
+      <div class="flex-1 border-t border-[#2a2d3a]"></div>
+    </div>
+
+    <!-- ── Section 3: Discounts, Cash & Fees ── -->
+    <div class="card p-5 space-y-4">
+      <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Discounts, Cash &amp; Fees</h2>
+
+      <!-- Down Payment -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9] flex items-center">Money Down <button class="tip-btn" data-tip="downPayment">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" />
         </div>
       </div>
-    </details>
+      <p class="text-xs text-[#f59e0b]">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
+
+      <!-- Trade-in -->
+      <div class="flex justify-between items-center">
+        <label class="text-sm text-[#f1f5f9]">Trade-in Value</label>
+        <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+          <input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" />
+        </div>
+      </div>
+
+      <!-- Rebates -->
+      <div>
+        <div class="flex justify-between items-center">
+          <label class="text-sm text-[#f1f5f9] flex items-center">Manufacturer Rebates <button class="tip-btn" data-tip="rebates">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+            <input type="number" id="rebates" value="0" min="0" max="20000" step="100" class="num-input w-24 text-right" />
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <input type="checkbox" id="rebateTaxable" class="w-4 h-4 accent-[#6366f1] cursor-pointer" />
+          <label for="rebateTaxable" class="text-xs text-[#64748b] cursor-pointer">Taxable rebate &mdash; some states tax manufacturer rebates. Check your state&rsquo;s rules.</label>
+        </div>
+      </div>
+
+      <!-- Fees (collapsed) -->
+      <details>
+        <summary class="flex justify-between items-center cursor-pointer">
+          <span class="text-sm font-medium text-[#f1f5f9]">Fees &amp; Advanced</span>
+          <span class="text-xs text-[#6366f1]">tap to expand</span>
+        </summary>
+        <div class="mt-4 space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="text-sm text-[#f1f5f9] flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
+            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+              <input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" />
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <label class="text-sm text-[#f1f5f9]">Doc Fee</label>
+            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+              <input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" />
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <label class="text-sm text-[#f1f5f9] flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
+            <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
+              <input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" />
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <label class="text-sm text-[#f1f5f9]">Capitalize Acq. Fee?</label>
+            <input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 accent-[#6366f1] cursor-pointer" />
+          </div>
+          <!-- Tax Rate + Method -->
+          <div class="space-y-3 pt-2 border-t border-[#2a2d3a]">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-medium text-[#f1f5f9]">Sales Tax Rate</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="taxRate" value="8.75" min="0" max="15" step="0.25" class="num-input w-20 text-right" />
+                <span class="text-xs text-[#64748b]">%</span>
+              </div>
+            </div>
+            <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
+            <div>
+              <label class="text-xs text-[#64748b] uppercase tracking-wider mb-1 block">Tax Method</label>
+              <div class="flex gap-1">
+                <button class="seg-btn active" data-tax-method="monthly">Monthly</button>
+                <button class="seg-btn" data-tax-method="fullsale">Full Sale Price</button>
+                <button class="seg-btn" data-tax-method="upfront">Upfront Total</button>
+              </div>
+              <p class="text-xs text-[#64748b] mt-1" id="tax-method-hint">Tax applied to each monthly payment (most states)</p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
   </section>
 
   <!-- RIGHT: OUTPUTS -->
@@ -985,6 +1031,7 @@ function wireInputs(){
   syncSlider("capCost-slider","capCost");
   syncSlider("residualPct-slider","residualPct");
   syncSlider("taxRate-slider","taxRate");
+  syncSlider("mileagePerYear-slider","mileagePerYear");
   syncMF();syncTP();
   ["acqFee","downPayment","tradeIn","rebates","docFee","dispFee"].forEach(id=>{
     document.getElementById(id).addEventListener("input",update);
