@@ -21,6 +21,9 @@
     .num-input{background:#0f1117;border:1px solid #2a2d3a;border-radius:.375rem;color:#f1f5f9;padding:.375rem .5rem;font-size:.875rem;width:100%;}
     .num-input:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.2);}
     .num-input:read-only{opacity:.6;cursor:not-allowed;border-color:#1e2235;}
+    .cascade-select{background:#0f1117;border:1px solid #2a2d3a;border-radius:.375rem;color:#f1f5f9;padding:.375rem .5rem;font-size:.875rem;width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;}
+    .cascade-select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.2);}
+    .cascade-select:disabled{opacity:.35;cursor:not-allowed;}
     .term-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.875rem;transition:all .15s;}
     .term-btn.active{background:#6366f1;border-color:#6366f1;color:#fff;}
     .seg-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.3rem .5rem;cursor:pointer;font-size:.78rem;transition:all .15s;flex:1;text-align:center;}
@@ -38,13 +41,6 @@
     .tip-btn:hover{border-color:#6366f1;color:#6366f1;}
     .tooltip-box{position:absolute;z-index:50;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;padding:.75rem 1rem;max-width:280px;min-width:200px;font-size:.78rem;line-height:1.5;color:#f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,.5);}
     .zip-status{font-size:.75rem;margin-top:.25rem;min-height:1rem;}
-    .vehicle-search-wrap{position:relative;}
-    .vehicle-dropdown{position:absolute;top:100%;left:0;right:0;z-index:40;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;margin-top:.25rem;max-height:240px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.6);}
-    .vehicle-option{padding:.5rem .75rem;font-size:.85rem;color:#f1f5f9;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2d3a;}
-    .vehicle-option:last-child{border-bottom:none;}
-    .vehicle-option:hover,.vehicle-option.highlighted{background:#6366f1;color:#fff;}
-    .vehicle-option .v-meta{font-size:.7rem;color:#64748b;font-family:"ui-monospace",monospace;white-space:nowrap;}
-    .vehicle-option:hover .v-meta,.vehicle-option.highlighted .v-meta{color:rgba(255,255,255,.7);}
     .lock-badge{display:inline-flex;align-items:center;gap:.25rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e;border-radius:.375rem;padding:.2rem .5rem;font-size:.7rem;font-weight:600;letter-spacing:.02em;}
     .lock-badge.fallback{background:rgba(100,116,139,.1);border-color:rgba(100,116,139,.3);color:#94a3b8;}
     .slider-lock-overlay{position:absolute;inset:0;cursor:not-allowed;z-index:10;border-radius:3px;}
@@ -72,20 +68,39 @@
     <div class="card p-5 space-y-5">
       <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Deal Inputs</h2>
 
-      <!-- Vehicle Selector -->
+      <!-- Vehicle Selector — cascading Year / Make / Model / Trim -->
       <div>
         <label class="text-sm font-medium text-[#f1f5f9] flex items-center mb-2">
-          Select Vehicle (optional)
+          Select Vehicle
           <button class="tip-btn" data-tip="vehicleSelect">i</button>
         </label>
-        <div class="vehicle-search-wrap" style="position:relative;">
-          <input type="text" id="vehicleSearch" placeholder="Type make or model to search..." class="num-input" autocomplete="off" spellcheck="false" />
-          <button id="vehicle-clear-btn" title="Clear selection" style="display:none;position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;line-height:1;padding:.25rem;z-index:5;">&times;</button>
-          <div id="vehicleDropdown" class="vehicle-dropdown" style="display:none;"></div>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label class="text-xs text-[#64748b] mb-1 block">Year</label>
+            <select id="sel-year" class="cascade-select"></select>
+          </div>
+          <div>
+            <label class="text-xs text-[#64748b] mb-1 block">Make</label>
+            <select id="sel-make" class="cascade-select" disabled>
+              <option value="">Loading…</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-[#64748b] mb-1 block">Model</label>
+            <select id="sel-model" class="cascade-select" disabled>
+              <option value="">Select make first</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-[#64748b] mb-1 block">Trim</label>
+            <select id="sel-trim" class="cascade-select" disabled>
+              <option value="">Select model first</option>
+            </select>
+          </div>
         </div>
         <div id="vehicle-lock-row" class="hidden mt-2 flex items-center justify-between">
-          <span class="lock-badge">&#x1F512; Verified Sept 2026</span>
-          <button id="unlock-btn" class="text-xs text-[#6366f1] underline bg-transparent border-none cursor-pointer">Edit Manually</button>
+          <span class="lock-badge">&#x1F512; Live OEM Data</span>
+          <button id="unlock-btn" class="text-xs text-[#6366f1] underline bg-transparent border-none cursor-pointer">Clear / Edit Manually</button>
         </div>
         <p id="vehicle-status" class="text-xs text-[#64748b] mt-1"></p>
       </div>
@@ -328,129 +343,96 @@
 <script>
 "use strict";
 
-// ── Vehicle data — tc7cf00, verified Sept 2026, 36mo/10k ─────────────────
-const VEHICLES_META = { last_updated: "2026-09-27", term: "36/10k" };
-const VEHICLES = [
-  {year:2026,make:"Toyota",    model:"RAV4 Hybrid LE",         msrp:34410, residual:64},
-  {year:2026,make:"Toyota",    model:"Corolla LE",              msrp:24205, residual:63},
-  {year:2026,make:"Toyota",    model:"Camry SE",                msrp:32220, residual:61},
-  {year:2026,make:"Toyota",    model:"Tacoma TRD Off-Road",     msrp:45395, residual:76},
-  {year:2026,make:"Honda",     model:"CR-V Sport Hybrid",       msrp:37200, residual:62},
-  {year:2026,make:"Honda",     model:"Civic LX",                msrp:26145, residual:63},
-  {year:2026,make:"Honda",     model:"Accord EX",               msrp:31105, residual:59},
-  {year:2026,make:"Tesla",     model:"Model 3 RWD",             msrp:40380, residual:58},
-  {year:2026,make:"Tesla",     model:"Model Y RWD",             msrp:46380, residual:59},
-  {year:2026,make:"BMW",       model:"330i xDrive",             msrp:49195, residual:56},
-  {year:2026,make:"BMW",       model:"X3 xDrive30i",            msrp:51495, residual:56},
-  {year:2026,make:"Lexus",     model:"RX 350 Premium",          msrp:54150, residual:58},
-  {year:2026,make:"Lexus",     model:"ES 350",                  msrp:45190, residual:55},
-  {year:2026,make:"Lexus",     model:"NX 350h",                 msrp:47125, residual:62},
-  {year:2026,make:"Subaru",    model:"Forester Base",           msrp:31445, residual:63},
-  {year:2026,make:"Subaru",    model:"Outback Premium",         msrp:34190, residual:62},
-  {year:2026,make:"Ford",      model:"F-150 XLT",               msrp:56995, residual:60},
-  {year:2026,make:"Ford",      model:"Explorer Active",         msrp:47280, residual:62},
-  {year:2026,make:"Ford",      model:"Maverick XLT",            msrp:29590, residual:61},
-  {year:2026,make:"Ford",      model:"Bronco Big Bend",         msrp:42590, residual:71},
-  {year:2026,make:"Jeep",      model:"Grand Cherokee Laredo",   msrp:43595, residual:54},
-  {year:2026,make:"Jeep",      model:"Wrangler Sahara",         msrp:51590, residual:72},
-  {year:2026,make:"Audi",      model:"Q5 45 S-Line",            msrp:50695, residual:55},
-  {year:2026,make:"Audi",      model:"A4 40 Premium",           msrp:43195, residual:54},
-  {year:2026,make:"Mercedes-Benz",model:"GLC 300",              msrp:50150, residual:55},
-  {year:2026,make:"Mercedes-Benz",model:"C300 Sedan",           msrp:48150, residual:58},
-  {year:2026,make:"Hyundai",   model:"Ioniq 5 SEL",             msrp:50450, residual:51},
-  {year:2026,make:"Hyundai",   model:"Tucson SEL",              msrp:32595, residual:58},
-  {year:2026,make:"Kia",       model:"Sportage LX",             msrp:29985, residual:63},
-  {year:2026,make:"Kia",       model:"Telluride EX",            msrp:44585, residual:65},
-  {year:2026,make:"Chevrolet", model:"Silverado 1500 LT",       msrp:53995, residual:59},
-  {year:2026,make:"Chevrolet", model:"Equinox LT",              msrp:31395, residual:54},
-  {year:2026,make:"GMC",       model:"Sierra 1500 Elevation",   msrp:59995, residual:60},
-  {year:2026,make:"GMC",       model:"Acadia Elevation",        msrp:45495, residual:59},
-  {year:2026,make:"Nissan",    model:"Rogue SV",                msrp:32890, residual:60},
-  {year:2026,make:"Nissan",    model:"Pathfinder SV",           msrp:42590, residual:58},
-  {year:2026,make:"Mazda",     model:"CX-50 S Select",          msrp:31650, residual:59},
-  {year:2026,make:"Mazda",     model:"CX-5 2.5 S Select",       msrp:31350, residual:61},
-  {year:2026,make:"Acura",     model:"MDX SH-AWD",              msrp:55395, residual:57},
-  {year:2026,make:"Acura",     model:"Integra",                 msrp:34395, residual:59},
-  {year:2026,make:"Volvo",     model:"XC60 B5 Plus",            msrp:52195, residual:54},
-  {year:2026,make:"Volvo",     model:"XC90 B5 Core",            msrp:58195, residual:58},
-  {year:2026,make:"Volkswagen",model:"Tiguan SE",               msrp:33495, residual:56},
-  {year:2026,make:"Volkswagen",model:"Atlas SE",                msrp:40495, residual:55},
-  {year:2026,make:"Ram",       model:"1500 Big Horn",           msrp:52995, residual:59},
-  {year:2026,make:"Cadillac",  model:"LYRIQ Tech",              msrp:59490, residual:50},
-  {year:2026,make:"Infiniti",  model:"QX60 Pure",               msrp:52395, residual:56},
-  {year:2026,make:"Land Rover",model:"Defender 110 S",          msrp:63495, residual:63},
-  {year:2026,make:"Rivian",    model:"R1S Dual-Motor",          msrp:76800, residual:61},
-  {year:2026,make:"Lucid",     model:"Air Pure",                msrp:71400, residual:48},
-];
-
 // ── MarketCheck OEM Incentives API ────────────────────────────────────────
-const MC_API_KEY = 'mc_live_nWsMnHd2UBpMneMVY9Hww8Lx61tcqYtJ';
+const MC_API_KEY = '***';
 const MC_BASE_URL = 'https://api.marketcheck.com/v2/search/car/incentive/oem';
 
-function mcBuildUrl({make, model, year, trim, rows=10}){
-  const p = new URLSearchParams({api_key: MC_API_KEY, make, model, year, rows});
-  if(trim) p.set('trim', trim);
-  return MC_BASE_URL+'?'+p.toString();
-}
-
-function mcNormalizeOffer(listingId, offer){
-  const msrp          = offer.msrp ?? null;
-  const residualValue = offer.lease_end_purchase_price ?? null;
-  const firstAmt      = offer.amounts?.[0] ?? {};
-  const monthly       = firstAmt.monthly ?? null;
-  const term          = firstAmt.term    ?? null;
-  const residualPct   = (residualValue && msrp && msrp > 0)
-    ? parseFloat(((residualValue / msrp) * 100).toFixed(2))
-    : null;
-  return {
-    residual_value:        residualValue,
-    monthly_payment:       monthly,
-    down_payment:          offer.down_payment     ?? null,
-    term,
-    mileage_limit:         offer.mileage_limit    ?? null,
-    excess_mileage_charge: offer.over_mileage_fee ?? null,
-    msrp,
-    due_at_signing:        offer.due_at_signing   ?? null,
-    acquisition_fee:       offer.acquisition_fee  ?? null,
-    net_cap_cost:          offer.net_cap_cost      ?? null,
-    valid_from:            offer.valid_from        ?? null,
-    valid_through:         offer.valid_through     ?? null,
-    residual_percent:      residualPct,
-    _source:               'marketcheck_oem',
-    _raw_listing_id:       listingId ?? null,
-  };
-}
-
-async function mcFetchLeaseOffer({make, model, year, trim}){
-  const url = mcBuildUrl({make, model, year, trim});
+async function mcFetchOffers({make, model, year}){
+  const p = new URLSearchParams({api_key: ***, make, model, year, rows:10});
+  const url = MC_BASE_URL+'?'+p.toString();
   let resp;
   try { resp = await fetch(url); }
-  catch(err){ console.warn('[MarketCheck] Network error:', err.message); return null; }
-  if(!resp.ok){ console.warn('[MarketCheck] API error', resp.status); return null; }
+  catch(e){ console.warn('[MC] Network error:', e.message); return []; }
+  if(!resp.ok){ console.warn('[MC] API error', resp.status); return []; }
   let data;
-  try { data = await resp.json(); } catch(e){ return null; }
-  console.log('[MarketCheck] num_found:', data.num_found, '| First offer:', data.listings?.[0]?.offer);
+  try { data = await resp.json(); } catch(e){ return []; }
+  console.log('[MC] num_found:', data.num_found, '| listings:', data.listings?.length);
   const listings = data.listings ?? [];
-  const hit = listings.find(item => item.offer && item.offer.offer_type === 'lease')
-           ?? listings.find(item => item.offer);
-  if(!hit) return null;
-  return mcNormalizeOffer(hit.id, hit.offer);
+  const leaseListings = listings.filter(l => l.offer && l.offer.offer_type === 'lease');
+  const source = leaseListings.length ? leaseListings : listings.filter(l => l.offer);
+  return source.map(l => mcNormalize(l.id, l.offer)).filter(o => o !== null);
 }
 
-function mcParseVehicle(v){
-  const parts = v.model.trim().split(/\s+/);
+function mcNormalize(listingId, offer){
+  const msrp     = offer.msrp ?? null;
+  const residual = offer.lease_end_purchase_price ?? null;
+  const amt      = offer.amounts?.[0] ?? {};
+  const monthly  = amt.monthly ?? null;
+  const term     = amt.term    ?? null;
+  const trim     = offer.vehicles?.[0]?.trim ?? null;
+  if(!msrp || !residual || !monthly || !term) return null;
+  const residualPct = parseFloat(((residual / msrp) * 100).toFixed(2));
+  const depPerMo  = (msrp - residual) / term;
+  const mf        = parseFloat(((monthly - depPerMo) / (msrp + residual)).toFixed(6));
   return {
-    make:  v.make,
-    year:  v.year,
-    model: parts[0],
-    trim:  parts.length > 1 ? parts.slice(1).join(' ') : undefined,
+    trim,
+    msrp,
+    residual_value:   residual,
+    residual_percent: residualPct,
+    money_factor:     mf > 0 ? mf : null,
+    monthly_payment:  monthly,
+    term,
+    mileage_limit:    offer.mileage_limit    ?? null,
+    overage_per_mile: offer.over_mileage_fee ?? null,
+    down_payment:     offer.down_payment     ?? null,
+    due_at_signing:   offer.due_at_signing   ?? null,
+    acquisition_fee:  offer.acquisition_fee  ?? null,
+    net_cap_cost:     offer.net_cap_cost     ?? null,
+    valid_through:    offer.valid_through    ?? null,
+    _id:              listingId,
   };
 }
 
+// ── NHTSA vPIC API ─────────────────────────────────────────────────────────
+function toTitleCase(str){
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+async function nhtsaGetMakes(){
+  try {
+    const r = await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/car?format=json');
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    return (d.Results ?? []).map(m => toTitleCase(m.Make_Name)).sort();
+  } catch(e){
+    console.warn('[NHTSA] Makes error:', e.message);
+    return [];
+  }
+}
+
+async function nhtsaGetModels(make, year){
+  try {
+    const r = await fetch(
+      `https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/${encodeURIComponent(make)}/modelyear/${year}?format=json`
+    );
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    return (d.Results ?? []).map(m => m.Model_Name).sort();
+  } catch(e){
+    console.warn('[NHTSA] Models error:', e.message);
+    return [];
+  }
+}
+
+// ── Cascade state ──────────────────────────────────────────────────────────
+let cachedOffers = [], vehicleLocked = false;
+let currentMake = '', currentModel = '', currentYear = new Date().getFullYear(), currentTrim = '';
+
+// ── Loading/lock helpers ───────────────────────────────────────────────────
 function setLoadingState(isLoading){
-  ['msrp','residualPct'].forEach(id=>{
-    document.getElementById(id).classList.toggle('field-loading', isLoading);
-  });
+  ['msrp','residualPct','moneyFactor'].forEach(id =>
+    document.getElementById(id).classList.toggle('field-loading', isLoading)
+  );
 }
 
 function showOemComparison(oemMonthly){
@@ -463,6 +445,187 @@ function showOemComparison(oemMonthly){
 function hideOemComparison(){
   window._oemAdvertisedMonthly = null;
   document.getElementById('oem-comparison').style.display = 'none';
+}
+
+function lockFields(lock, variant){
+  vehicleLocked = lock;
+  const ids = ['msrp','residualPct','moneyFactor'];
+  const msrpLock  = document.getElementById('msrp-slider-lock');
+  const resLock   = document.getElementById('residualPct-slider-lock');
+  const lockRow   = document.getElementById('vehicle-lock-row');
+  const badge     = lockRow.querySelector('.lock-badge');
+  ids.forEach(id => { document.getElementById(id).readOnly = lock; });
+  msrpLock.style.display  = lock ? 'block' : 'none';
+  resLock.style.display   = lock ? 'block' : 'none';
+  if(lock){
+    lockRow.classList.remove('hidden');
+    if(badge){
+      badge.classList.remove('fallback');
+      if(variant === 'live')         { badge.innerHTML = '&#x1F7E2; Live OEM Data'; }
+      else if(variant === 'fallback'){ badge.innerHTML = 'Using cached data'; badge.classList.add('fallback'); }
+      else if(variant === 'loading') { badge.innerHTML = '&#x23F3; Loading&hellip;'; badge.classList.add('fallback'); }
+      else                           { badge.innerHTML = '&#x1F512; Live OEM Data'; }
+    }
+  } else {
+    lockRow.classList.add('hidden');
+    ids.forEach(id => { document.getElementById(id).readOnly = false; });
+    if(badge){ badge.innerHTML='&#x1F7E2; Live OEM Data'; badge.classList.remove('fallback'); }
+  }
+}
+
+function applyOffer(offer){
+  if(!offer) return;
+  const msrpEl   = document.getElementById('msrp');
+  const resEl    = document.getElementById('residualPct');
+  const mfEl     = document.getElementById('moneyFactor');
+  const acqEl    = document.getElementById('acqFee');
+  const ccSlider = document.getElementById('capCost-slider');
+  const ccNum    = document.getElementById('capCost');
+  msrpEl.value = offer.msrp;
+  document.getElementById('msrp-slider').value = offer.msrp;
+  resEl.value = offer.residual_percent;
+  document.getElementById('residualPct-slider').value = offer.residual_percent;
+  if(offer.money_factor !== null){
+    mfEl.value = offer.money_factor.toFixed(5);
+    document.getElementById('moneyFactor-slider').value = Math.round(offer.money_factor * 100000);
+  }
+  if(offer.acquisition_fee !== null){ acqEl.value = offer.acquisition_fee; }
+  if(offer.down_payment !== null){ document.getElementById('downPayment').value = offer.down_payment; }
+  ccSlider.max = offer.msrp;
+  if(parseFloat(ccNum.value) > offer.msrp){ ccNum.value = offer.msrp; ccSlider.value = offer.msrp; }
+  showOemComparison(offer.monthly_payment);
+}
+
+// ── Cascading dropdown logic ───────────────────────────────────────────────
+async function initCascade(){
+  const makeEl   = document.getElementById('sel-make');
+  const statusEl = document.getElementById('vehicle-status');
+
+  // Populate year dropdown dynamically
+  const yearEl = document.getElementById('sel-year');
+  const cy = new Date().getFullYear();
+  yearEl.innerHTML = [cy, cy-1].map(y => `<option value="${y}">${y}</option>`).join('');
+  currentYear = cy;
+
+  statusEl.textContent = 'Loading makes…';
+  const makes = await nhtsaGetMakes();
+  if(!makes.length){
+    makeEl.innerHTML = '<option value="">Failed to load — try reloading</option>';
+    statusEl.textContent = 'Could not load makes. Check connection.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  makeEl.innerHTML = '<option value="">Select make…</option>'
+    + makes.map(m => `<option value="${m}">${m}</option>`).join('');
+  makeEl.disabled = false;
+  statusEl.textContent = '';
+}
+
+async function onMakeOrYearChange(){
+  const makeEl   = document.getElementById('sel-make');
+  const modelEl  = document.getElementById('sel-model');
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const make = makeEl.value;
+  const year = parseInt(document.getElementById('sel-year').value, 10);
+  modelEl.innerHTML = '<option value="">Loading models…</option>';
+  modelEl.disabled = true;
+  trimEl.innerHTML = '<option value="">Select model first</option>';
+  trimEl.disabled = true;
+  cachedOffers = []; currentMake = make; currentYear = year; currentModel = ''; currentTrim = '';
+  if(!make){ modelEl.innerHTML = '<option value="">Select make first</option>'; return; }
+  statusEl.textContent = 'Loading models…'; statusEl.style.color = '#64748b';
+  const models = await nhtsaGetModels(make, year);
+  if(!models.length){
+    modelEl.innerHTML = '<option value="">No models found</option>';
+    statusEl.textContent = 'No models found for '+make+' '+year+'.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  modelEl.innerHTML = '<option value="">Select model…</option>'
+    + models.map(m => `<option value="${m}">${m}</option>`).join('');
+  modelEl.disabled = false;
+  statusEl.textContent = '';
+}
+
+async function onModelChange(){
+  const modelEl  = document.getElementById('sel-model');
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const make  = document.getElementById('sel-make').value;
+  const model = modelEl.value;
+  const year  = parseInt(document.getElementById('sel-year').value, 10);
+  currentModel = model; currentTrim = ''; cachedOffers = [];
+  trimEl.innerHTML = '<option value="">Loading trims…</option>';
+  trimEl.disabled = true;
+  lockFields(false); hideOemComparison();
+  if(!model) return;
+  statusEl.textContent = 'Fetching live OEM lease data…'; statusEl.style.color = '#64748b';
+  lockFields(true, 'loading'); setLoadingState(true); update();
+  const offers = await mcFetchOffers({make, model, year});
+  setLoadingState(false);
+  if(!offers.length){
+    lockFields(false);
+    trimEl.innerHTML = '<option value="">No OEM lease data</option>';
+    trimEl.disabled = true;
+    statusEl.textContent = 'No active OEM lease offers found — enter values manually.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  cachedOffers = offers;
+  const seen = new Set();
+  const uniqueTrims = offers
+    .filter(o => { if(!o.trim || seen.has(o.trim)) return false; seen.add(o.trim); return true; })
+    .map(o => o.trim);
+  trimEl.innerHTML = '<option value="">Select trim…</option>'
+    + uniqueTrims.map(t => `<option value="${t}">${t}</option>`).join('');
+  trimEl.disabled = false;
+  const firstOffer = offers[0];
+  applyOffer(firstOffer);
+  if(uniqueTrims.length === 1){ trimEl.value = uniqueTrims[0]; currentTrim = uniqueTrims[0]; }
+  lockFields(true, 'live');
+  const validThrough = firstOffer.valid_through ? ` (valid through ${firstOffer.valid_through})` : '';
+  statusEl.textContent = uniqueTrims.length + ' trim' + (uniqueTrims.length !== 1 ? 's' : '') + ' with active OEM lease offers' + validThrough;
+  statusEl.style.color = '#22c55e';
+  update();
+}
+
+function onTrimSelect(){
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const trim     = trimEl.value;
+  if(!trim) return;
+  currentTrim = trim;
+  const offer = cachedOffers.find(o => o.trim === trim) ?? null;
+  if(!offer){ statusEl.textContent = 'No data for this trim — check manually.'; statusEl.style.color = '#f59e0b'; return; }
+  applyOffer(offer);
+  lockFields(true, 'live');
+  const validThrough = offer.valid_through ? ` (valid through ${offer.valid_through})` : '';
+  statusEl.textContent = trim + ' — live OEM data' + validThrough;
+  statusEl.style.color = '#22c55e';
+  update();
+}
+
+function clearVehicleSelection(){
+  document.getElementById('sel-model').innerHTML = '<option value="">Select make first</option>';
+  document.getElementById('sel-model').disabled = true;
+  document.getElementById('sel-trim').innerHTML = '<option value="">Select model first</option>';
+  document.getElementById('sel-trim').disabled = true;
+  cachedOffers = []; currentMake = ''; currentModel = ''; currentTrim = '';
+  lockFields(false); hideOemComparison();
+  document.getElementById('capCost-slider').max = 200000;
+  const statusEl = document.getElementById('vehicle-status');
+  statusEl.textContent = 'Selection cleared — fields unlocked for manual editing.';
+  statusEl.style.color = '#64748b';
+  update();
+}
+
+function wireVehicleSelector(){
+  document.getElementById('sel-year').addEventListener('change', onMakeOrYearChange);
+  document.getElementById('sel-make').addEventListener('change', onMakeOrYearChange);
+  document.getElementById('sel-model').addEventListener('change', onModelChange);
+  document.getElementById('sel-trim').addEventListener('change', onTrimSelect);
+  document.getElementById('unlock-btn').addEventListener('click', clearVehicleSelection);
 }
 
 // ── State tax table ───────────────────────────────────────────────────────
@@ -490,7 +653,7 @@ const STATE_NAMES = {
 };
 
 const TIPS = {
-  vehicleSelect:"Choose from verified Sept 2026 lease data. MSRP and residual will be auto-filled and locked to ensure accurate calculations.",
+  vehicleSelect:"Select Year, Make, Model, and Trim. MSRP, residual %, and money factor are auto-filled from live OEM lease data and locked for accurate calculations.",
   moneyFactor:"The interest rate in disguise. Multiply by 2,400 to get the APR. Dealers mark this up \u2014 always ask for the \u2018buy rate\u2019 from the lender.",
   residualPct:"Set by the manufacturer, not the dealer. Non-negotiable. Higher residual = lower payment. Compare residuals across trim levels before choosing.",
   capCost:"This is your selling price. Negotiate it like a purchase \u2014 the lower this number, the lower every payment. Don\u2019t let the dealer anchor to MSRP.",
@@ -520,160 +683,6 @@ document.addEventListener("click",e=>{
   if(e.target.classList.contains("tip-btn")){e.stopPropagation();showTooltip(e.target,e.target.dataset.tip);return;}
   if(activeTip&&!activeTip.box.contains(e.target))closeTooltip();
 });
-
-// ── Vehicle selector ──────────────────────────────────────────────────────
-let vehicleLocked=false, selectedVehicle=null, filteredVehicles=[], dropdownIdx=-1;
-
-function vLabel(v){return v.year+" "+v.make+" "+v.model;}
-
-function renderDropdown(matches){
-  const dd=document.getElementById("vehicleDropdown");
-  filteredVehicles=matches;dropdownIdx=-1;
-  if(!matches.length){dd.style.display="none";return;}
-  dd.innerHTML=matches.map((v,i)=>
-    `<div class="vehicle-option" data-idx="${i}">
-      <span>${vLabel(v)}</span>
-      <span class="v-meta">${v.residual}% res &bull; $${v.msrp.toLocaleString()}</span>
-    </div>`
-  ).join("");
-  dd.style.display="block";
-  dd.querySelectorAll(".vehicle-option").forEach(el=>{
-    el.addEventListener("mousedown",e=>{e.preventDefault();selectVehicle(parseInt(el.dataset.idx));});
-  });
-}
-
-async function selectVehicle(idx){
-  const v=filteredVehicles[idx];if(!v)return;
-  selectedVehicle=v;
-
-  const msrpEl=document.getElementById("msrp");
-  const resEl=document.getElementById("residualPct");
-  const ccSlider=document.getElementById("capCost-slider");
-  const ccNum=document.getElementById("capCost");
-  msrpEl.value=v.msrp;
-  document.getElementById("msrp-slider").value=v.msrp;
-  resEl.value=v.residual;
-  document.getElementById("residualPct-slider").value=v.residual;
-  ccSlider.max=v.msrp;
-  if(parseFloat(ccNum.value)>v.msrp){ccNum.value=v.msrp;ccSlider.value=v.msrp;}
-
-  document.getElementById("vehicleSearch").value=vLabel(v);
-  document.getElementById("vehicle-clear-btn").style.display="block";
-  document.getElementById("vehicleDropdown").style.display="none";
-  const statusEl=document.getElementById("vehicle-status");
-  statusEl.textContent="Fetching live OEM data\u2026";
-  statusEl.style.color="#64748b";
-
-  lockFields(true,'loading');
-  setLoadingState(true);
-  update();
-
-  const liveOffer = await mcFetchLeaseOffer(mcParseVehicle(v));
-  setLoadingState(false);
-
-  if(liveOffer && liveOffer.residual_percent !== null && liveOffer.msrp !== null){
-    msrpEl.value=liveOffer.msrp;
-    document.getElementById("msrp-slider").value=liveOffer.msrp;
-    resEl.value=liveOffer.residual_percent;
-    document.getElementById("residualPct-slider").value=liveOffer.residual_percent;
-    if(parseFloat(ccNum.value)>liveOffer.msrp){ccNum.value=liveOffer.msrp;ccSlider.value=liveOffer.msrp;}
-    lockFields(true,'live');
-    showOemComparison(liveOffer.monthly_payment);
-    statusEl.textContent="Live OEM data loaded"+(liveOffer.valid_through?" (valid through "+liveOffer.valid_through+")":"");
-    statusEl.style.color="#22c55e";
-  } else {
-    lockFields(true,'fallback');
-    hideOemComparison();
-    statusEl.textContent="Using verified Sept 2026 data";
-    statusEl.style.color="#64748b";
-  }
-  update();
-}
-
-function lockFields(lock, variant){
-  vehicleLocked=lock;
-  const msrpEl=document.getElementById("msrp");
-  const resEl=document.getElementById("residualPct");
-  const lockRow=document.getElementById("vehicle-lock-row");
-  const msrpLock=document.getElementById("msrp-slider-lock");
-  const resLock=document.getElementById("residualPct-slider-lock");
-  const badge=lockRow.querySelector(".lock-badge");
-  if(lock){
-    msrpEl.readOnly=true;resEl.readOnly=true;
-    msrpLock.style.display="block";resLock.style.display="block";
-    lockRow.classList.remove("hidden");
-    if(badge){
-      badge.classList.remove("fallback");
-      if(variant==='live'){
-        badge.innerHTML='&#x1F7E2; Live OEM Data';
-      } else if(variant==='fallback'){
-        badge.innerHTML='Using verified Sept 2026 data';
-        badge.classList.add("fallback");
-      } else if(variant==='loading'){
-        badge.innerHTML='&#x23F3; Loading live data\u2026';
-        badge.classList.add("fallback");
-      } else {
-        badge.innerHTML='&#x1F512; Verified Sept 2026';
-      }
-    }
-  } else {
-    msrpEl.readOnly=false;resEl.readOnly=false;
-    msrpLock.style.display="none";resLock.style.display="none";
-    lockRow.classList.add("hidden");
-    selectedVehicle=null;
-    document.getElementById("vehicleSearch").value="";
-    document.getElementById("vehicle-clear-btn").style.display="none";
-    const statusEl=document.getElementById("vehicle-status");
-    statusEl.textContent="Fields unlocked for manual editing.";
-    statusEl.style.color="#64748b";
-    hideOemComparison();
-    document.getElementById("capCost-slider").max=200000;
-    if(badge){badge.innerHTML='&#x1F512; Verified Sept 2026';badge.classList.remove("fallback");}
-  }
-}
-
-function highlightDropdown(){
-  document.querySelectorAll(".vehicle-option").forEach((el,i)=>{
-    el.classList.toggle("highlighted",i===dropdownIdx);
-    if(i===dropdownIdx)el.scrollIntoView({block:"nearest"});
-  });
-}
-
-function wireVehicleSelector(){
-  const search=document.getElementById("vehicleSearch");
-  const dd=document.getElementById("vehicleDropdown");
-
-  search.addEventListener("input",()=>{
-    if(vehicleLocked)return;
-    const q=search.value.trim().toLowerCase();
-    if(!q){dd.style.display="none";filteredVehicles=[];return;}
-    renderDropdown(VEHICLES.filter(v=>(v.make+" "+v.model+" "+v.year).toLowerCase().includes(q)).slice(0,20));
-  });
-
-  search.addEventListener("keydown",e=>{
-    if(!filteredVehicles.length)return;
-    if(e.key==="ArrowDown"){e.preventDefault();dropdownIdx=Math.min(dropdownIdx+1,filteredVehicles.length-1);highlightDropdown();}
-    else if(e.key==="ArrowUp"){e.preventDefault();dropdownIdx=Math.max(dropdownIdx-1,0);highlightDropdown();}
-    else if(e.key==="Enter"&&dropdownIdx>=0){e.preventDefault();selectVehicle(dropdownIdx);}
-    else if(e.key==="Escape"){dd.style.display="none";}
-  });
-
-  search.addEventListener("focus",()=>{
-    if(!vehicleLocked&&search.value.trim()){
-      renderDropdown(VEHICLES.filter(v=>(v.make+" "+v.model+" "+v.year).toLowerCase().includes(search.value.trim().toLowerCase())).slice(0,20));
-    }
-  });
-
-  document.addEventListener("click",e=>{
-    if(!search.contains(e.target)&&!dd.contains(e.target))dd.style.display="none";
-  });
-
-  document.getElementById("unlock-btn").addEventListener("click",()=>{lockFields(false);update();});
-  document.getElementById("vehicle-clear-btn").addEventListener("click",()=>{lockFields(false);update();});
-  document.getElementById("vehicleSearch").addEventListener("input",()=>{
-    document.getElementById("vehicle-clear-btn").style.display=document.getElementById("vehicleSearch").value?"block":"none";
-  });
-}
 
 // ── LeaseCalc ─────────────────────────────────────────────────────────────
 const LeaseCalc={
@@ -835,8 +844,8 @@ function updateCostBar(b){
 
 function updateWorksheet(b){
   const mfApr=(b.moneyFactor*2400).toFixed(2);
-  const vehicleLine=selectedVehicle
-    ?{cls:"section",text:"\uD83D\uDD12 VEHICLE: "+vLabel(selectedVehicle)+" | Verified Sept 2026 | Residual: "+selectedVehicle.residual+"%"}
+  const vehicleLine=(currentMake && currentModel)
+    ?{cls:"section",text:"\uD83D\uDD12 VEHICLE: "+currentYear+" "+currentMake+" "+currentModel+(currentTrim?" "+currentTrim:"")+" | Live OEM Data"}
     :null;
   const lines=[
     vehicleLine,
@@ -962,7 +971,19 @@ function wireInputs(){
   document.getElementById("zipCode").addEventListener("keydown",e=>{if(e.key==="Enter")lookupZip(document.getElementById("zipCode").value.trim());});
 }
 
-document.addEventListener("DOMContentLoaded",()=>{wireVehicleSelector();wireInputs();update();});
+function buildYearSelect(){
+  const yr = new Date().getFullYear();
+  const sel = document.getElementById('sel-year');
+  sel.innerHTML = [yr, yr-1].map(y => `<option value="${y}"${y===yr?' selected':''}>${y}</option>`).join('');
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  buildYearSelect();
+  wireVehicleSelector();
+  wireInputs();
+  update();
+  initCascade();
+});
 </script>
 </body>
 </html>
