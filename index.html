@@ -77,13 +77,7 @@
         <div class="grid grid-cols-2 gap-2 mb-2">
           <div>
             <label class="text-xs text-[#64748b] mb-1 block">Year</label>
-            <select id="sel-year" class="cascade-select">
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-            </select>
+            <select id="sel-year" class="cascade-select"></select>
           </div>
           <div>
             <label class="text-xs text-[#64748b] mb-1 block">Make</label>
@@ -496,6 +490,7 @@ function applyOffer(offer){
     document.getElementById('moneyFactor-slider').value = Math.round(offer.money_factor * 100000);
   }
   if(offer.acquisition_fee !== null){ acqEl.value = offer.acquisition_fee; }
+  if(offer.down_payment !== null){ document.getElementById('downPayment').value = offer.down_payment; }
   ccSlider.max = offer.msrp;
   if(parseFloat(ccNum.value) > offer.msrp){ ccNum.value = offer.msrp; ccSlider.value = offer.msrp; }
   showOemComparison(offer.monthly_payment);
@@ -976,7 +971,14 @@ function wireInputs(){
   document.getElementById("zipCode").addEventListener("keydown",e=>{if(e.key==="Enter")lookupZip(document.getElementById("zipCode").value.trim());});
 }
 
+function buildYearSelect(){
+  const yr = new Date().getFullYear();
+  const sel = document.getElementById('sel-year');
+  sel.innerHTML = [yr, yr-1].map(y => `<option value="${y}"${y===yr?' selected':''}>${y}</option>`).join('');
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
+  buildYearSelect();
   wireVehicleSelector();
   wireInputs();
   update();
