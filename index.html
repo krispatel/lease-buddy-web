@@ -502,11 +502,8 @@ async function initCascade(){
   const makeEl   = document.getElementById('sel-make');
   const statusEl = document.getElementById('vehicle-status');
 
-  // Populate year dropdown dynamically
-  const yearEl = document.getElementById('sel-year');
-  const cy = new Date().getFullYear();
-  yearEl.innerHTML = [cy, cy-1].map(y => `<option value="${y}">${y}</option>`).join('');
-  currentYear = cy;
+  // Year is already populated by buildYearSelect() — just read current value
+  currentYear = parseInt(document.getElementById('sel-year').value, 10) || new Date().getFullYear();
 
   statusEl.textContent = 'Loading makes…';
   const makes = await nhtsaGetMakes();
