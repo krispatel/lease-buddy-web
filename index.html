@@ -178,10 +178,10 @@
         <div class="flex justify-between items-center mb-2">
           <label class="text-sm font-medium text-[#f1f5f9] flex items-center">Negotiated Price <button class="tip-btn" data-tip="capCost">i</button></label>
           <div class="flex items-center gap-1"><span class="text-xs text-[#64748b]">$</span>
-            <input type="number" id="capCost" value="43200" min="5000" max="200000" step="100" class="num-input w-28 text-right" />
+            <input type="number" id="capCost" value="" min="5000" max="200000" step="100" class="num-input w-28 text-right" placeholder="0" />
           </div>
         </div>
-        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="43200" class="w-full" />
+        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="45000" class="w-full" />
         <p class="text-xs text-[#64748b] mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
       </div>
 
@@ -584,8 +584,10 @@ function applyOffer(offer){
   }
   if(offer.acquisition_fee !== null){ acqEl.value = offer.acquisition_fee; }
   if(offer.down_payment !== null){ document.getElementById('downPayment').value = offer.down_payment; }
+  // Pre-fill Negotiated Price with MSRP — user negotiates down from here
+  ccNum.value = offer.msrp;
   ccSlider.max = offer.msrp;
-  if(parseFloat(ccNum.value) > offer.msrp){ ccNum.value = offer.msrp; ccSlider.value = offer.msrp; }
+  ccSlider.value = offer.msrp;
   showOemComparison(offer.monthly_payment);
 }
 
