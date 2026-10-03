@@ -23,6 +23,7 @@
     .num-input:read-only{opacity:.6;cursor:not-allowed;border-color:#1e2235;}
     .cascade-select{background:#0f1117;border:1px solid #2a2d3a;border-radius:.375rem;color:#f1f5f9;padding:.375rem .5rem;font-size:.875rem;width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;}
     .cascade-select:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.2);}
+    .cascade-select{min-height:2.25rem;}
     .cascade-select:disabled{opacity:.35;cursor:not-allowed;}
     .term-btn{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.375rem;padding:.375rem .75rem;cursor:pointer;font-size:.875rem;transition:all .15s;}
     .term-btn.active{background:#6366f1;border-color:#6366f1;color:#fff;}
@@ -77,7 +78,7 @@
         <div class="grid grid-cols-2 gap-2 mb-2">
           <div>
             <label class="text-xs text-[#64748b] mb-1 block">Year</label>
-            <select id="sel-year" class="cascade-select"></select>
+            <select id="sel-year" class="cascade-select"><option value="">Select year…</option></select>
           </div>
           <div>
             <label class="text-xs text-[#64748b] mb-1 block">Make</label>
@@ -344,11 +345,11 @@
 "use strict";
 
 // ── MarketCheck OEM Incentives API ────────────────────────────────────────
-const MC_API_KEY = '***';
+const MC_API_KEY = 'mc_live_nWsMnHd2UBpMneMVY9Hww8Lx61tcqYtJ';
 const MC_BASE_URL = 'https://api.marketcheck.com/v2/search/car/incentive/oem';
 
 async function mcFetchOffers({make, model, year}){
-  const p = new URLSearchParams({api_key: ***, make, model, year, rows:10});
+  const p = new URLSearchParams({api_key: MC_API_KEY, make, model, year, rows:10});
   const url = MC_BASE_URL+'?'+p.toString();
   let resp;
   try { resp = await fetch(url); }
@@ -501,11 +502,8 @@ async function initCascade(){
   const makeEl   = document.getElementById('sel-make');
   const statusEl = document.getElementById('vehicle-status');
 
-  // Populate year dropdown dynamically
-  const yearEl = document.getElementById('sel-year');
-  const cy = new Date().getFullYear();
-  yearEl.innerHTML = [cy, cy-1].map(y => `<option value="${y}">${y}</option>`).join('');
-  currentYear = cy;
+  // Year is already populated by buildYearSelect() — just read current value
+  currentYear = parseInt(document.getElementById('sel-year').value, 10) || new Date().getFullYear();
 
   statusEl.textContent = 'Loading makes…';
   const makes = await nhtsaGetMakes();
