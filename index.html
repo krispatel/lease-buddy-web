@@ -720,7 +720,7 @@ function wireVehicleSelector(){
   document.getElementById('unlock-btn').addEventListener('click', clearVehicleSelection);
 }
 
-// ── State tax table ───────────────────────────────────────────────────────
+// ── State tax table (fallback only — live combined rate comes from USgeocoder) ──
 const STATE_TAX = {
   AL:4.0,AK:0.0,AZ:5.6,AR:6.5,CA:7.25,CO:2.9,CT:6.35,DE:0.0,
   FL:6.0,GA:4.0,HI:4.0,ID:6.0,IL:6.25,IN:7.0,IA:6.0,KS:6.5,
@@ -841,28 +841,74 @@ const fmt={
 };
 
 let detectedState=null;
+const GEO_AUTHKEY = ''; // TODO: wire via serverless proxy — do NOT commit raw key client-side (see LB-010 brief note #4)
+const GEO_BASE_URL = 'https://api.usgeocoder.com/api/get_info.php';
+const geoRateCache = {}; // per-ZIP cache for this session — avoid repeat API hits
+
+async function geoFetchTaxRate(zip){
+  if(geoRateCache[zip] !== undefined) return geoRateCache[zip];
+  if(!GEO_AUTHKEY){ geoRateCache[zip] = null; return null; }
+  const url = GEO_BASE_URL+'?'+new URLSearchParams({zipcode:zip, authkey:GEO_AUTHKEY, format:'json'});
+  let resp;
+  try { resp = await fetch(url); }
+  catch(e){ console.warn('[Geo] Network error:', e.message); geoRateCache[zip]=null; return null; }
+  if(!resp.ok){ console.warn('[Geo] API error', resp.status); geoRateCache[zip]=null; return null; }
+  let data;
+  try { data = await resp.json(); } catch(e){ geoRateCache[zip]=null; return null; }
+  const summary = data?.usgeocoder?.totalcollection_tax_summary;
+  if(!summary || summary.t_tax_summary_status !== 'Match Found'){ geoRateCache[zip]=null; return null; }
+  const parsePct = v => v ? parseFloat(String(v).replace('%','')) : 0;
+  const result = {
+    total:  parsePct(summary.t_tax_total_tax),
+    state:  { name: summary.t_tax_state_jurisction_name || '', rate: parsePct(summary.t_tax_state_tax) },
+    county: { name: summary.t_tax_county_jurisdiction_name || '', rate: parsePct(summary.t_tax_county_tax) },
+    city:   { name: summary.t_tax_city_jurisdiction_name || '', rate: parsePct(summary.t_tax_city_tax) },
+  };
+  geoRateCache[zip] = result;
+  return result;
+}
+
 async function lookupZip(zip){
   const st=document.getElementById("zip-status");
   if(!/^\d{5}$/.test(zip)){st.textContent="Enter a valid 5-digit ZIP";st.style.color="#f59e0b";return;}
   st.textContent="Looking up\u2026";st.style.color="#64748b";
-  try{
+  // Step 1: resolve state name/abbr via Zippopotam (free, no key — display only)
+  let abbr=null, name=null;
+  try {
     const r=await fetch("https://api.zippopotam.us/us/"+zip);
-    if(!r.ok)throw new Error();
+    if(!r.ok) throw new Error();
     const d=await r.json();
-    const abbr=d.places[0]["state abbreviation"];
-    const name=STATE_NAMES[abbr]||abbr;
-    const rate=STATE_TAX[abbr];
-    if(rate===undefined)throw new Error();
-    detectedState={abbr,name,rate};
-    document.getElementById("taxRate").value=rate;
-    document.getElementById("taxRate-slider").value=rate;
-    st.textContent=name+"\u2014"+rate+"% state rate (auto-filled)";
+    abbr=d.places[0]["state abbreviation"];
+    name=STATE_NAMES[abbr]||abbr;
+  } catch(e){ /* fall through — state label unavailable, live rate may still work */ }
+
+  // Step 2: live ZIP-level combined rate via USgeocoder
+  const geo = await geoFetchTaxRate(zip);
+  if(geo){
+    detectedState={abbr:abbr||geo.state.name, name:name||geo.state.name, rate:geo.state.rate, geo};
+    document.getElementById("taxRate").value=geo.total;
+    document.getElementById("taxRate-slider").value=geo.total;
+    st.textContent=(name||geo.state.name)+" \u2014 "+geo.total+"% combined rate (live, auto-filled)";
     st.style.color="#22c55e";
     update();
-  }catch(e){
-    st.textContent="Could not detect state \u2014 enter rate manually";
-    st.style.color="#f59e0b";detectedState=null;
+    return;
   }
+
+  // Fallback: static state-only rate
+  if(abbr && STATE_TAX[abbr] !== undefined){
+    const rate=STATE_TAX[abbr];
+    detectedState={abbr,name,rate,geo:null};
+    document.getElementById("taxRate").value=rate;
+    document.getElementById("taxRate-slider").value=rate;
+    st.textContent=name+" \u2014 "+rate+"% state rate only \u2014 ZIP-level lookup unavailable, using estimated state rate";
+    st.style.color="#f59e0b";
+    update();
+    return;
+  }
+
+  st.textContent="Could not detect state \u2014 enter rate manually";
+  st.style.color="#f59e0b";
+  detectedState=null;
 }
 
 function readInputs(){
@@ -985,13 +1031,25 @@ function updateWorksheet(b){
 }
 
 function updateTaxAudit(b){
-  const stateLine=detectedState?"State: "+detectedState.name+" ("+detectedState.rate+"% state-level rate)":"State: not detected \u2014 manual rate "+b.taxRate+"%";
+  const hasLiveGeo = detectedState && detectedState.geo;
+  const stateLine=detectedState?"State: "+detectedState.name+(hasLiveGeo?"":" ("+detectedState.rate+"% state-level rate)"):"State: not detected \u2014 manual rate "+b.taxRate+"%";
   const totalTax=b.monthlyTax>0?b.monthlyTax*b.termMonths:b.upfrontTax;
+  const jurisdictionLines = hasLiveGeo ? [
+    {cls:"section",text:"JURISDICTION BREAKDOWN (live, ZIP-level)"},
+    {text:"State ("+detectedState.geo.state.name+"): "+detectedState.geo.state.rate.toFixed(4)+"%"},
+    detectedState.geo.county.name?{text:"County ("+detectedState.geo.county.name+"): "+detectedState.geo.county.rate.toFixed(4)+"%"}:null,
+    detectedState.geo.city.name?{text:"City ("+detectedState.geo.city.name+"): "+detectedState.geo.city.rate.toFixed(4)+"%"}:null,
+    {cls:"result",text:"Combined rate: "+detectedState.geo.total.toFixed(4)+"%"},
+  ].filter(Boolean) : (detectedState && !hasLiveGeo ? [
+    {cls:"section",text:"JURISDICTION BREAKDOWN"},
+    {cls:"warn",text:"\u26a0 Using estimated state rate \u2014 ZIP-level lookup unavailable"},
+  ] : []);
   const lines=[
     {cls:"section",text:"TAX METHOD"},
     {cls:"result",text:b.taxDesc},
     {text:stateLine},
     {text:"Tax rate: "+b.taxRate+"%"},
+    ...jurisdictionLines,
     {cls:"section",text:"TAX CALCULATION"},
     {text:"Taxable base: "+b.taxBase},
     b.monthlyTax>0?{text:"Tax per month: "+fmt.money(b.monthlyTax)}:{text:"Upfront tax: "+fmt.money(b.upfrontTax)},
