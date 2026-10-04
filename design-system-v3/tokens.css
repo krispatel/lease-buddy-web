@@ -113,18 +113,23 @@
   --risk-high-bg:         #fef8ec;
   --risk-high-stroke:     2.5px;
 
-  --status-error-bg:      var(--color-red-100);
-  --status-error-text:    var(--color-red-600);
-  --status-error-border:  var(--color-red-400);
-  --status-warning-bg:    #fffbeb;
+  /* V3: status collapsed onto the risk-level vocabulary (sage/slate/amber)
+     instead of a separate red/amber/green system. Error gets visual WEIGHT
+     (thick border), not a fourth hue -- consistent with V3's grayscale-first,
+     color-rationed discipline (brand-direction.md section 3.1). */
+  --status-error-bg:      var(--color-parchment);
+  --status-error-text:    var(--color-ink);
+  --status-error-border:  var(--color-ink);
+  --status-error-border-width: 3px;
+  --status-warning-bg:    #fef8ec;
   --status-warning-text:  var(--color-amber-500);
-  --status-warning-border:var(--color-amber-300);
-  --status-success-bg:    var(--color-green-100);
-  --status-success-text:  var(--color-green-600);
-  --status-success-border:var(--color-green-400);
-  --status-info-bg:       var(--color-sage-50);
-  --status-info-text:     var(--color-sage-700);
-  --status-info-border:   var(--color-sage-100);
+  --status-warning-border:var(--color-amber-500);
+  --status-success-bg:    var(--color-sage-50);
+  --status-success-text:  var(--color-sage-700);
+  --status-success-border:var(--color-sage-500);
+  --status-info-bg:       #eceef1;
+  --status-info-text:     var(--color-slate);
+  --status-info-border:   var(--color-slate);
 
   /* V3: shadows reserved for overlay/modal scrim only -- the document
      metaphor implies a flat sheet, not floating layers */
@@ -172,18 +177,19 @@
   --risk-high-color:      var(--color-amber-300);
   --risk-high-bg:         rgba(245, 158, 11, 0.12);
 
-  --status-error-bg:      rgba(220, 38, 38, 0.12);
-  --status-error-text:    var(--color-red-400);
-  --status-error-border:  rgba(220, 38, 38, 0.32);
+  --status-error-bg:      var(--color-dark-surface-raised);
+  --status-error-text:    var(--color-dark-text-primary);
+  --status-error-border:  var(--color-dark-text-primary);
+  --status-error-border-width: 3px;
   --status-warning-bg:    rgba(245, 158, 11, 0.10);
   --status-warning-text:  var(--color-amber-300);
-  --status-warning-border:rgba(245, 158, 11, 0.28);
-  --status-success-bg:    rgba(22, 163, 74, 0.12);
-  --status-success-text:  var(--color-green-400);
-  --status-success-border:rgba(22, 163, 74, 0.30);
-  --status-info-bg:       rgba(92, 122, 107, 0.12);
-  --status-info-text:     var(--color-sage-300);
-  --status-info-border:   rgba(92, 122, 107, 0.28);
+  --status-warning-border:var(--color-amber-300);
+  --status-success-bg:    rgba(92, 122, 107, 0.12);
+  --status-success-text:  var(--color-sage-300);
+  --status-success-border:var(--color-sage-300);
+  --status-info-bg:       rgba(107, 114, 128, 0.14);
+  --status-info-text:     var(--color-slate);
+  --status-info-border:   var(--color-slate);
 
   --shadow-focus:         0 0 0 3px rgba(138, 181, 164, 0.36);
   --shadow-focus-error:   0 0 0 3px rgba(248, 113, 113, 0.28);
