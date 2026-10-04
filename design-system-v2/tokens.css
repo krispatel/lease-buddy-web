@@ -1,0 +1,668 @@
+/* =============================================================================
+   LEASE BUDDY — DESIGN TOKENS V2
+   tokens.css
+   Version: 2.0.0
+   Author:  Jo (UI/UX Design Agent)
+   Date:    2026-10-04
+
+   V2 CHANGES FROM V1:
+   ─────────────────────────────────────────────────────────────────────────────
+   • Border radius:   ALL --radius-* are 0px. Only --radius-full (9999px) and
+                      --radius-drag-handle (2px) are non-zero.
+   • Input style:     Underline only (bottom border). Full-border box removed.
+   • Tap target:      --input-tap-target-height: 52px (was 48px in V1)
+   • Type weights:    Added --weight-light: 300. Google Fonts import now
+                      includes wght@300.
+   • Type roles:      body-sm and meta now use var(--weight-light).
+   • Section grouping: Ruled hairlines + left accent bar tokens added.
+   • Texture:         SVG paper grain pseudo-element added to body::before.
+   • Color system:    IDENTICAL to V1. No color changes.
+   ─────────────────────────────────────────────────────────────────────────────
+============================================================================= */
+
+/* -------------------------------------------------------------------------- */
+/* GOOGLE FONTS — V2: includes weight 300 (Light)                             */
+/* -------------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+/* -------------------------------------------------------------------------- */
+/* COLOR PRIMITIVES                                                            */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Neutrals */
+  --color-warm-white:  #faf9f6;
+  --color-paper:       #f4f2ed;
+  --color-parchment:   #ede9e0;
+  --color-ink:         #1a1a1a;
+  --color-graphite:    #3d3d3d;
+  --color-slate:       #6b7280;
+  --color-fog:         #9ca3af;
+  --color-white:       #ffffff;
+
+  /* Sage green */
+  --color-sage-50:     #f0f4f2;
+  --color-sage-100:    #d6e4dd;
+  --color-sage-300:    #8fb5a7;
+  --color-sage-500:    #5c7a6b;
+  --color-sage-700:    #3d5a4f;
+  --color-sage-900:    #1f3028;
+
+  /* Amber */
+  --color-amber-300:   #fcd34d;
+  --color-amber-500:   #f59e0b;
+
+  /* Red */
+  --color-red-100:     #fee2e2;
+  --color-red-400:     #f87171;
+  --color-red-600:     #dc2626;
+
+  /* Green */
+  --color-green-100:   #dcfce7;
+  --color-green-400:   #4ade80;
+  --color-green-600:   #16a34a;
+
+  /* Dark mode primitives (used in [data-theme="dark"] below) */
+  --color-dark-base:           #121210;
+  --color-dark-surface:        #1c1c1a;
+  --color-dark-surface-raised: #252523;
+  --color-dark-border:         #2e2e2c;
+  --color-dark-text-primary:   #e8e4db;
+  --color-dark-text-secondary: #a09890;
+  --color-dark-text-muted:     #6b6560;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SEMANTIC TOKENS — LIGHT MODE                                                */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces */
+  --color-bg:             var(--color-warm-white);
+  --color-surface:        var(--color-paper);
+  --color-surface-raised: var(--color-parchment);
+
+  /* Text */
+  --color-text-primary:   var(--color-ink);
+  --color-text-secondary: var(--color-graphite);
+  --color-text-muted:     var(--color-slate);
+  --color-text-disabled:  var(--color-fog);
+  --color-text-inverse:   var(--color-white);
+  --color-text-accent:    var(--color-sage-500);
+
+  /* Border */
+  --color-border-default: var(--color-parchment);
+  --color-border-strong:  var(--color-slate);
+  --color-border-accent:  var(--color-sage-500);
+  --color-border-error:   var(--color-red-600);
+
+  /* Accent */
+  --color-accent:         var(--color-sage-500);
+  --color-accent-hover:   var(--color-sage-700);
+  --color-accent-subtle:  var(--color-sage-50);
+  --color-accent-muted:   var(--color-sage-100);
+
+  /* Status */
+  --color-warning-icon:   var(--color-amber-500);
+  --color-warning-bg:     var(--color-amber-300);
+  --color-error-icon:     var(--color-red-600);
+  --color-error-bg:       var(--color-red-100);
+  --color-success-icon:   var(--color-green-600);
+  --color-success-bg:     var(--color-green-100);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SEMANTIC TOKENS — DARK MODE                                                 */
+/* -------------------------------------------------------------------------- */
+
+[data-theme="dark"] {
+  --color-bg:             var(--color-dark-base);
+  --color-surface:        var(--color-dark-surface);
+  --color-surface-raised: var(--color-dark-surface-raised);
+  --color-border-default: var(--color-dark-border);
+
+  --color-text-primary:   var(--color-dark-text-primary);
+  --color-text-secondary: var(--color-dark-text-secondary);
+  --color-text-muted:     var(--color-dark-text-muted);
+  --color-text-disabled:  var(--color-dark-text-muted);
+  --color-text-inverse:   var(--color-ink);
+  --color-text-accent:    var(--color-sage-300);
+
+  --color-accent:         var(--color-sage-300);
+  --color-accent-hover:   var(--color-sage-500);
+  --color-accent-subtle:  var(--color-sage-900);
+  --color-accent-muted:   var(--color-sage-700);
+
+  --color-border-accent:  var(--color-sage-300);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* TYPOGRAPHY TOKENS                                                           */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Font families */
+  --font-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Font sizes */
+  --size-xs:   11px;
+  --size-sm:   12px;
+  --size-md:   13px;
+  --size-base: 16px;
+  --size-lg:   18px;
+  --size-xl:   20px;
+  --size-2xl:  30px;
+  --size-3xl:  38px;
+
+  /* Font weights — V2: adds --weight-light */
+  --weight-light:    300;   /* V2 new: body-sm, meta */
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* Line heights */
+  --leading-tight:   1.2;
+  --leading-snug:    1.3;
+  --leading-label:   1.4;
+  --leading-heading: 1.35;
+  --leading-body:    1.5;
+
+  /* Letter spacing */
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.04em;
+  --tracking-widest:   0.08em;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SPACING — 4px base grid                                                    */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --space-0:  0px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  28px;
+  --space-8:  32px;
+  --space-9:  36px;
+  --space-10: 40px;
+  --space-11: 44px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* BORDER RADIUS — V2: ALL 0px except full and drag-handle                    */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --radius-none:        0px;     /* All cards, inputs, buttons, modals, sheets */
+  --radius-sm:          0px;     /* V2: 0px (was 4px in V1)  */
+  --radius-md:          0px;     /* V2: 0px (was 8px in V1)  */
+  --radius-lg:          0px;     /* V2: 0px (was 12px in V1) */
+  --radius-xl:          0px;     /* V2: 0px (was 16px in V1) */
+  --radius-full:        9999px;  /* Pill badges, bottom sheet drag handle outer */
+  --radius-drag-handle: 2px;     /* Drag handle grip bar only — functional exception */
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* BORDER WIDTHS                                                               */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --border-none:   0px;
+  --border-thin:   1px;
+  --border-medium: 1.5px;
+  --border-thick:  2px;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* INPUT SYSTEM — V2: Underline style                                          */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --input-border-width-default:  1.5px;
+  --input-border-width-focus:    2px;
+  --input-border-color-default:  var(--color-parchment);
+  --input-border-color-focus:    var(--color-sage-500);
+  --input-border-color-error:    var(--color-red-600);
+  --input-border-color-disabled: var(--color-parchment);
+  --input-tap-target-height:     52px;   /* V2: increased from 48px */
+  --input-bg-readonly:           var(--color-parchment);
+  --input-opacity-disabled:      0.4;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SECTION GROUPING TOKENS                                                     */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --section-divider-width:    1px;
+  --section-divider-color:    var(--color-parchment);
+  --section-accent-bar-width: 3px;
+  --section-accent-bar-color: var(--color-sage-500);
+  --section-accent-bar-indent: 16px;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* TEXTURE TOKENS                                                              */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --texture-grain-opacity-light: 0.025;
+  --texture-grain-opacity-dark:  0.040;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SHADOWS                                                                     */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --shadow-none:        none;
+  --shadow-xs:          0 1px 2px 0 rgba(26, 26, 26, 0.05);
+  --shadow-sm:          0 1px 3px 0 rgba(26, 26, 26, 0.08),
+                        0 1px 2px -1px rgba(26, 26, 26, 0.06);
+  --shadow-md:          0 4px 6px -1px rgba(26, 26, 26, 0.08),
+                        0 2px 4px -2px rgba(26, 26, 26, 0.06);
+  --shadow-lg:          0 10px 15px -3px rgba(26, 26, 26, 0.08),
+                        0 4px 6px -4px rgba(26, 26, 26, 0.06);
+  --shadow-xl:          0 20px 25px -5px rgba(26, 26, 26, 0.08),
+                        0 8px 10px -6px rgba(26, 26, 26, 0.06);
+  --shadow-focus:       0 0 0 2px #faf9f6, 0 0 0 4px #5c7a6b;
+  --shadow-focus-error: 0 0 0 2px #faf9f6, 0 0 0 4px #dc2626;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* Z-INDEX                                                                     */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-toast:    500;
+  --z-tooltip:  600;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* MOTION                                                                      */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --duration-instant:  0ms;
+  --duration-fast:     100ms;
+  --duration-normal:   200ms;
+  --duration-moderate: 300ms;
+  --duration-slow:     500ms;
+
+  --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);   /* Elements entering */
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);   /* Elements leaving  */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant:  0ms;
+    --duration-fast:     0ms;
+    --duration-normal:   0ms;
+    --duration-moderate: 0ms;
+    --duration-slow:     0ms;
+  }
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* BASE RESETS                                                                 */
+/* -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--size-base);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-base);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* PAPER GRAIN TEXTURE — SVG noise pseudo-element                             */
+/* -------------------------------------------------------------------------- */
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-base);
+  opacity: var(--texture-grain-opacity-light);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+[data-theme="dark"] body::before {
+  opacity: var(--texture-grain-opacity-dark);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* TYPOGRAPHIC ROLE CLASSES                                                    */
+/* -------------------------------------------------------------------------- */
+
+.type-display-xl {
+  font-family: var(--font-base);
+  font-size: var(--size-3xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.type-display-lg {
+  font-family: var(--font-base);
+  font-size: var(--size-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.type-display-md {
+  font-family: var(--font-base);
+  font-size: var(--size-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-normal);
+  color: var(--color-text-primary);
+}
+
+.type-body-lg {
+  font-family: var(--font-base);
+  font-size: var(--size-lg);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+}
+
+.type-body-base {
+  font-family: var(--font-base);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+}
+
+/* V2: body-sm is now Light 300 (was Regular 400 in V1) */
+.type-body-sm {
+  font-family: var(--font-base);
+  font-size: var(--size-md);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-body);
+  color: var(--color-text-secondary);
+}
+
+.type-label-lg {
+  font-family: var(--font-base);
+  font-size: 14px;
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-label);
+  color: var(--color-text-primary);
+}
+
+.type-label-md {
+  font-family: var(--font-base);
+  font-size: var(--size-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-label);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-secondary);
+}
+
+.type-label-sm {
+  font-family: var(--font-base);
+  font-size: var(--size-xs);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* V2 new role: timestamps, fine print — Light 300 */
+.type-meta {
+  font-family: var(--font-base);
+  font-size: var(--size-xs);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-snug);
+  color: var(--color-text-muted);
+}
+
+.type-mono {
+  font-family: var(--font-mono);
+  font-size: var(--size-md);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--color-text-primary);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* TABULAR NUMERICS UTILITY                                                    */
+/* -------------------------------------------------------------------------- */
+
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* INPUT — UNDERLINE STYLE                                                     */
+/* -------------------------------------------------------------------------- */
+
+.input-underline {
+  display: block;
+  width: 100%;
+  min-height: var(--input-tap-target-height);
+  padding: var(--space-3) 0;
+  font-family: var(--font-base);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: var(--input-border-width-default) solid var(--input-border-color-default);
+  border-radius: 0;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.input-underline::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input-underline:focus {
+  border-bottom-width: var(--input-border-width-focus);
+  border-bottom-color: var(--input-border-color-focus);
+}
+
+.input-underline:disabled {
+  border-bottom-color: var(--input-border-color-disabled);
+  opacity: var(--input-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.input-underline[readonly] {
+  border-bottom: none;
+  background-color: var(--input-bg-readonly);
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+  cursor: default;
+}
+
+.input-underline.error {
+  border-bottom-width: var(--input-border-width-focus);
+  border-bottom-color: var(--input-border-color-error);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* SECTION GROUPING                                                            */
+/* -------------------------------------------------------------------------- */
+
+/* Default ruled section — hairline top and bottom, no side borders */
+.section-ruled {
+  border-top: var(--section-divider-width) solid var(--section-divider-color);
+  border-bottom: var(--section-divider-width) solid var(--section-divider-color);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+
+/* Grouped/featured section — 3px sage left bar, content indented */
+.section-accent {
+  border-left: var(--section-accent-bar-width) solid var(--section-accent-bar-color);
+  padding-left: var(--section-accent-bar-indent);
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+/* Standalone hairline divider */
+.divider {
+  border: none;
+  border-top: var(--section-divider-width) solid var(--section-divider-color);
+  margin: 0;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* BUTTONS                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-base);
+  font-size: var(--size-base);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-label);
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 0;   /* V2: sharp corners, no exceptions */
+  border: var(--border-medium) solid transparent;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    color            var(--duration-fast) var(--ease-standard),
+    border-color     var(--duration-fast) var(--ease-standard);
+  /* No scale, no shadow lift — color only on hover */
+}
+
+.btn:disabled {
+  opacity: var(--input-opacity-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary — sage fill, white text */
+.btn-primary {
+  background-color: var(--color-sage-500);
+  color: var(--color-white);
+  border-color: var(--color-sage-500);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-sage-700);
+  border-color: var(--color-sage-700);
+}
+
+/* Secondary — sage border, sage text, transparent fill */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-sage-500);
+  border-color: var(--color-sage-500);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-sage-50);
+}
+
+/* Ghost — no border, no fill, ink text */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-parchment);
+}
+
+/* Destructive — red border, red text, transparent fill */
+.btn-destructive {
+  background-color: transparent;
+  color: var(--color-red-600);
+  border-color: var(--color-red-600);
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: var(--color-red-100);
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* FOCUS VISIBLE                                                               */
+/* -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
