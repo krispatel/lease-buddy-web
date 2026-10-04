@@ -55,7 +55,7 @@
     .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:4px;flex-shrink:0;vertical-align:middle;}
     .lever-badge.high{background:rgba(34,197,94,.15);}
     .lever-badge.medium{background:rgba(245,158,11,.15);}
-    .lever-badge.fixed{background:rgba(239,68,68,.15);}
+    .lever-badge.nonneg{background:rgba(239,68,68,.15);}
     .lever-why-box{background:#0f1117;border:1px solid #2a2d3a;border-radius:.5rem;padding:.75rem;font-size:.78rem;color:#94a3b8;line-height:1.5;margin-top:.5rem;display:none;}
     .lever-why-box.open{display:block;}
     .compare-card{background:#0f1117;border:1px solid #2a2d3a;border-radius:.5rem;padding:.75rem;font-size:.8rem;}
@@ -1410,17 +1410,17 @@ const LEVER_EDUCATION = {
     why: "Largely dealer profit in most states; some states cap it by law. Always worth asking, rarely fully waived."
   },
   dispFee: {
-    level: 'fixed',
+    level: 'nonneg',
     label: 'Disposition Fee',
     why: "Charged at lease-end, set by the bank. Essentially fixed — some loyalty programs waive it on a repeat lease with the same brand. This is a future lever, not a negotiation-day lever."
   },
   residualPct: {
-    level: 'fixed',
+    level: 'nonneg',
     label: 'Residual %',
     why: "Set by manufacturer/bank residual tables — not negotiable. Matters for choosing the right car (higher residual = lower payment), not for negotiating a specific deal."
   },
   term: {
-    level: 'fixed',
+    level: 'nonneg',
     label: 'Term Length',
     why: "Pure math — shorter term = higher payment, longer = lower payment but more depreciation exposure. A personal choice, not a negotiation point."
   },
@@ -1430,7 +1430,7 @@ const LEVER_EDUCATION = {
     why: "Trades off directly against payment. Dealers often default to low mileage (10k/yr) to show a lower advertised payment, then hit consumers with overage fees later."
   },
   downPayment: {
-    level: 'fixed',
+    level: 'nonneg',
     label: 'Down Payment',
     why: "Reduces monthly payment but is NOT covered by GAP insurance in a total loss. A choice, not a negotiation."
   },
@@ -1452,7 +1452,7 @@ const MF_CREDIT_TIERS_HTML = `
   <p style="margin-top:.5rem;font-style:italic;color:#64748b;">Note: exact MF decimals vary by lender and shift with rates — not shown here to avoid stale numbers. Ask which tier you qualify for.</p>
 `;
 
-const LEVER_BADGE_ICON = { high: '🟢', medium: '🟡', fixed: '🔴' };
+const LEVER_BADGE_ICON = { high: '🟢', medium: '🟡', nonneg: '🔴' };
 
 function injectLeverBadges(){
   Object.keys(LEVER_EDUCATION).forEach(inputId=>{
