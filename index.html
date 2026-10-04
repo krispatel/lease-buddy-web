@@ -49,6 +49,20 @@
     .field-loading{animation:field-loading .9s ease-in-out infinite;pointer-events:none;}
     .oem-comparison{font-size:.75rem;color:#64748b;margin-top:.5rem;display:none;}
     .oem-comparison .oem-val{color:#94a3b8;font-family:"ui-monospace",monospace;}
+    .mode-tab{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.5rem .5rem 0 0;padding:.5rem 1rem;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;border-bottom:none;}
+    .mode-tab.active{background:#1a1d27;color:#f1f5f9;border-color:#6366f1;}
+    .mode-panel.hidden{display:none;}
+    .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:4px;flex-shrink:0;vertical-align:middle;}
+    .lever-badge.high{background:rgba(34,197,94,.15);}
+    .lever-badge.medium{background:rgba(245,158,11,.15);}
+    .lever-badge.fixed{background:rgba(239,68,68,.15);}
+    .lever-why-box{background:#0f1117;border:1px solid #2a2d3a;border-radius:.5rem;padding:.75rem;font-size:.78rem;color:#94a3b8;line-height:1.5;margin-top:.5rem;display:none;}
+    .lever-why-box.open{display:block;}
+    .compare-card{background:#0f1117;border:1px solid #2a2d3a;border-radius:.5rem;padding:.75rem;font-size:.8rem;}
+    .neg-section{background:#1a1d27;border:1px solid #2a2d3a;border-radius:.75rem;padding:1.25rem;}
+    .neg-section h3{color:#6366f1;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;}
+    .neg-section p{color:#cbd5e1;font-size:.9rem;line-height:1.6;margin-bottom:.75rem;}
+    .neg-section .tactic{background:#0f1117;border-left:3px solid #6366f1;padding:.6rem .75rem;border-radius:0 .375rem .375rem 0;font-size:.85rem;color:#94a3b8;}
   </style>
 </head>
 <body class="min-h-screen">
@@ -64,6 +78,56 @@
   </div>
 </header>
 
+<nav class="max-w-6xl mx-auto px-4 pt-4 flex gap-2" id="mode-nav">
+  <button class="mode-tab active" data-mode="explore">1. Explore &amp; Compare</button>
+  <button class="mode-tab active" data-mode="calculate">2. Calculate &amp; Educate</button>
+  <button class="mode-tab" data-mode="negotiate">3. Negotiate</button>
+</nav>
+
+<!-- ═══════════════════════ MODE 1: EXPLORE & COMPARE ═══════════════════════ -->
+<div id="mode-explore" class="mode-panel hidden">
+<main class="max-w-6xl mx-auto px-4 py-6">
+  <div class="card p-5 space-y-5 mb-4">
+    <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Find a Vehicle</h2>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div>
+        <label class="text-xs text-[#64748b] mb-1 block">Year</label>
+        <select id="m1-sel-year" class="cascade-select"><option value="">Select year…</option></select>
+      </div>
+      <div>
+        <label class="text-xs text-[#64748b] mb-1 block">Make</label>
+        <select id="m1-sel-make" class="cascade-select" disabled><option value="">Loading…</option></select>
+      </div>
+      <div>
+        <label class="text-xs text-[#64748b] mb-1 block">Model</label>
+        <select id="m1-sel-model" class="cascade-select" disabled><option value="">Select make first</option></select>
+      </div>
+      <div>
+        <label class="text-xs text-[#64748b] mb-1 block">Trim</label>
+        <select id="m1-sel-trim" class="cascade-select" disabled><option value="">Select model first</option></select>
+      </div>
+    </div>
+    <p id="m1-status" class="text-xs text-[#64748b] mt-1"></p>
+  </div>
+
+  <div id="m1-preview-card" class="card p-5 space-y-3 mb-4 hidden">
+    <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Quick Preview</h2>
+    <div id="m1-preview-content" class="text-sm text-[#f1f5f9] space-y-1"></div>
+    <div class="flex gap-2 pt-2">
+      <button id="m1-save-btn" class="term-btn">+ Save to Compare</button>
+      <button id="m1-use-btn" class="term-btn" style="background:#6366f1;border-color:#6366f1;color:#fff;">Use in Calculator →</button>
+    </div>
+  </div>
+
+  <div class="card p-5 space-y-3">
+    <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Comparing (<span id="m1-compare-count">0</span>/3)</h2>
+    <div id="m1-compare-table" class="text-sm text-[#64748b]">No vehicles saved yet — find one above and click &ldquo;Save to Compare.&rdquo;</div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════════════════ MODE 2: CALCULATE & EDUCATE ═══════════════════════ -->
+<div id="mode-calculate" class="mode-panel">
 <main class="max-w-6xl mx-auto px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
   <section class="space-y-4">
     <!-- ── Section 1: Vehicle & Market Data (OEM / auto-filled) ── -->
@@ -371,6 +435,11 @@
       <p class="text-xs text-[#64748b]" id="cost-insight">&mdash;</p>
     </div>
 
+    <div class="card p-5">
+      <button id="set-target-btn" class="term-btn w-full" style="background:#6366f1;border-color:#6366f1;color:#fff;">Set as Negotiation Target →</button>
+      <p class="text-xs text-[#64748b] mt-2 text-center">Saves this deal so you can compare it against a dealer's offer in Mode 3.</p>
+    </div>
+
     <details class="card p-5">
       <summary class="flex justify-between items-center">
         <h2 class="text-sm font-semibold text-[#64748b] uppercase tracking-wider">Verification Worksheet</h2>
@@ -392,6 +461,16 @@
 <footer class="text-center text-xs text-[#64748b] py-6 border-t border-[#2a2d3a] mt-4">
   Lease Buddy &mdash; for informational purposes only. Always verify numbers with your lender.
 </footer>
+</div>
+<!-- /mode-calculate -->
+
+<!-- ═══════════════════════ MODE 3: NEGOTIATE ═══════════════════════ -->
+<div id="mode-negotiate" class="mode-panel hidden">
+<main class="max-w-6xl mx-auto px-4 py-6">
+  <div id="m3-content" class="space-y-4"></div>
+</main>
+</div>
+<!-- /mode-negotiate — content populated by JS in chunk 3 -->
 
 <script>
 "use strict";
@@ -1133,7 +1212,420 @@ document.addEventListener("DOMContentLoaded",()=>{
   wireInputs();
   update();
   initCascade();
+  wireModeNav();
+  wireMode1();
+  m1InitCascade();
+  injectLeverBadges();
+  document.getElementById('set-target-btn').addEventListener('click', snapshotDealTarget);
 });
+
+// ══════════════════════════════════════════════════════════════════════
+// LB-011: 3-MODE ARCHITECTURE — shared state + Mode 1 (Explore & Compare)
+// ══════════════════════════════════════════════════════════════════════
+
+const AppState = {
+  vehicle: null,       // { make, model, year, trim, offer } — set by Mode 1 "Use in Calculator" or Mode 2 cascade
+  savedVehicles: [],   // up to 3, for Mode 1 compare table
+  dealTarget: null,    // snapshot of Mode 2's calculated deal — set by "Set as negotiation target" button
+};
+
+function showMode(name){
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('mode-'+name).classList.remove('hidden');
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === name));
+  if(name === 'negotiate') renderMode3(); // build/refresh Mode 3 content each time it's shown
+}
+
+function wireModeNav(){
+  document.querySelectorAll('.mode-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=> showMode(btn.dataset.mode));
+  });
+}
+
+// ── Mode 1: Explore & Compare ──────────────────────────────────────────
+let m1Offers = [], m1CurrentPreview = null;
+
+async function m1InitCascade(){
+  const yr = new Date().getFullYear();
+  document.getElementById('m1-sel-year').innerHTML = [yr, yr-1].map(y => `<option value="${y}"${y===yr?' selected':''}>${y}</option>`).join('');
+  const makeEl = document.getElementById('m1-sel-make');
+  const makes = await nhtsaGetMakes();
+  makeEl.innerHTML = '<option value="">Select make…</option>' + makes.map(m => `<option value="${m}">${m}</option>`).join('');
+  makeEl.disabled = false;
+}
+
+async function m1OnMakeOrYearChange(){
+  const modelEl = document.getElementById('m1-sel-model');
+  const trimEl  = document.getElementById('m1-sel-trim');
+  const make = document.getElementById('m1-sel-make').value;
+  modelEl.innerHTML = '<option value="">Loading models…</option>';
+  modelEl.disabled = true;
+  trimEl.innerHTML = '<option value="">Select model first</option>';
+  trimEl.disabled = true;
+  document.getElementById('m1-preview-card').classList.add('hidden');
+  if(!make){ modelEl.innerHTML = '<option value="">Select make first</option>'; return; }
+  const models = await nhtsaGetModels(make);
+  modelEl.innerHTML = '<option value="">Select model…</option>' + models.map(m => `<option value="${m}">${m}</option>`).join('');
+  modelEl.disabled = false;
+}
+
+async function m1OnModelChange(){
+  const statusEl = document.getElementById('m1-status');
+  const trimEl   = document.getElementById('m1-sel-trim');
+  const make  = document.getElementById('m1-sel-make').value;
+  const model = document.getElementById('m1-sel-model').value;
+  const year  = parseInt(document.getElementById('m1-sel-year').value, 10);
+  document.getElementById('m1-preview-card').classList.add('hidden');
+  trimEl.innerHTML = '<option value="">Loading…</option>'; trimEl.disabled = true;
+  if(!model) return;
+  statusEl.textContent = 'Fetching live OEM lease data…'; statusEl.style.color = '#64748b';
+  const offers = await mcFetchOffers({make, model, year});
+  if(!offers.length){
+    trimEl.innerHTML = '<option value="">No OEM lease data</option>';
+    statusEl.textContent = 'No active OEM lease offers found for this vehicle.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  m1Offers = offers;
+  const seen = new Set();
+  const uniqueTrims = offers.filter(o => { if(!o.trim || seen.has(o.trim)) return false; seen.add(o.trim); return true; }).map(o => o.trim);
+  trimEl.innerHTML = '<option value="">Select trim…</option>' + uniqueTrims.map(t => `<option value="${t}">${t}</option>`).join('');
+  trimEl.disabled = false;
+  statusEl.textContent = uniqueTrims.length + ' trim(s) available.'; statusEl.style.color = '#22c55e';
+  m1ShowPreview(offers[0], make, model, year);
+}
+
+function m1OnTrimChange(){
+  const trim = document.getElementById('m1-sel-trim').value;
+  if(!trim) return;
+  const offer = m1Offers.find(o => o.trim === trim);
+  if(!offer) return;
+  const make  = document.getElementById('m1-sel-make').value;
+  const model = document.getElementById('m1-sel-model').value;
+  const year  = parseInt(document.getElementById('m1-sel-year').value, 10);
+  m1ShowPreview(offer, make, model, year);
+}
+
+function m1ShowPreview(offer, make, model, year){
+  m1CurrentPreview = { make, model, year, trim: offer.trim, offer };
+  const card = document.getElementById('m1-preview-card');
+  const content = document.getElementById('m1-preview-content');
+  content.innerHTML = `
+    <p><strong>${year} ${make} ${model}${offer.trim ? ' '+offer.trim : ''}</strong></p>
+    <p>MSRP: $${offer.msrp.toLocaleString()}</p>
+    <p>OEM Advertised Monthly: $${offer.monthly_payment ? offer.monthly_payment.toFixed(0) : '—'}/mo</p>
+    <p>Term: ${offer.term || '—'} months</p>
+  `;
+  card.classList.remove('hidden');
+}
+
+function m1SaveToCompare(){
+  if(!m1CurrentPreview) return;
+  if(AppState.savedVehicles.length >= 3){
+    alert('Compare list is full (3 max). Remove one first.');
+    return;
+  }
+  AppState.savedVehicles.push(m1CurrentPreview);
+  m1RenderCompareTable();
+}
+
+function m1RenderCompareTable(){
+  document.getElementById('m1-compare-count').textContent = AppState.savedVehicles.length;
+  const el = document.getElementById('m1-compare-table');
+  if(!AppState.savedVehicles.length){
+    el.innerHTML = 'No vehicles saved yet — find one above and click &ldquo;Save to Compare.&rdquo;';
+    return;
+  }
+  el.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-3 gap-3">' +
+    AppState.savedVehicles.map((v, i) => `
+      <div class="compare-card">
+        <p class="font-semibold text-[#f1f5f9]">${v.year} ${v.make} ${v.model}${v.trim ? ' '+v.trim : ''}</p>
+        <p class="text-[#64748b] mt-1">MSRP: $${v.offer.msrp.toLocaleString()}</p>
+        <p class="text-[#64748b]">Est. monthly: $${v.offer.monthly_payment ? v.offer.monthly_payment.toFixed(0) : '—'}/mo</p>
+        <button class="text-xs text-[#6366f1] underline bg-transparent border-none cursor-pointer mt-2" onclick="m1RemoveFromCompare(${i})">Remove</button>
+      </div>
+    `).join('') + '</div>';
+}
+
+function m1RemoveFromCompare(idx){
+  AppState.savedVehicles.splice(idx, 1);
+  m1RenderCompareTable();
+}
+
+function m1UseInCalculator(){
+  if(!m1CurrentPreview) return;
+  AppState.vehicle = m1CurrentPreview;
+  // Drive Mode 2's existing cascade selects programmatically to pre-fill the calculator
+  document.getElementById('sel-year').value = m1CurrentPreview.year;
+  onMakeOrYearChange().then(()=>{
+    document.getElementById('sel-make').value = m1CurrentPreview.make;
+    return onMakeOrYearChange();
+  }).then(()=>{
+    document.getElementById('sel-model').value = m1CurrentPreview.model;
+    return onModelChange();
+  }).then(()=>{
+    if(m1CurrentPreview.trim){
+      document.getElementById('sel-trim').value = m1CurrentPreview.trim;
+      onTrimSelect();
+    }
+    showMode('calculate');
+  });
+}
+
+function wireMode1(){
+  document.getElementById('m1-sel-year').addEventListener('change', m1OnMakeOrYearChange);
+  document.getElementById('m1-sel-make').addEventListener('change', m1OnMakeOrYearChange);
+  document.getElementById('m1-sel-model').addEventListener('change', m1OnModelChange);
+  document.getElementById('m1-sel-trim').addEventListener('change', m1OnTrimChange);
+  document.getElementById('m1-save-btn').addEventListener('click', m1SaveToCompare);
+  document.getElementById('m1-use-btn').addEventListener('click', m1UseInCalculator);
+}
+
+// ── Mode 2: Lever Education Layer (additive — does not touch existing calc logic) ──
+const LEVER_EDUCATION = {
+  capCost: {
+    level: 'high',
+    label: 'Negotiated Price (Cap Cost)',
+    why: "This is effectively the car's sale price. Dealers have real margin built into MSRP — this is the most normalized, expected negotiation point."
+  },
+  moneyFactor: {
+    level: 'medium',
+    label: 'Money Factor',
+    why: "Money factor is based on a wholesale \"buy rate\" from the captive lender. Dealers can mark it up as pure profit. Know your credit tier, then ask if you're getting the buy rate or a marked-up rate.",
+    extra: 'mf-credit-tiers' // flag to render the credit-tier table inline
+  },
+  rebates: {
+    level: 'medium',
+    label: 'Manufacturer Rebates/Incentives',
+    why: "Not negotiable with the dealer directly (set by manufacturer), but often not automatically applied — must be requested explicitly."
+  },
+  acqFee: {
+    level: 'medium',
+    label: 'Acquisition Fee',
+    why: "Bank-set fee, generally fixed at the bank level — but dealers sometimes add their own markup on top. Ask if this is the bank's fee or if there's an add-on."
+  },
+  docFee: {
+    level: 'medium',
+    label: 'Doc Fee',
+    why: "Largely dealer profit in most states; some states cap it by law. Always worth asking, rarely fully waived."
+  },
+  dispFee: {
+    level: 'fixed',
+    label: 'Disposition Fee',
+    why: "Charged at lease-end, set by the bank. Essentially fixed — some loyalty programs waive it on a repeat lease with the same brand. This is a future lever, not a negotiation-day lever."
+  },
+  residualPct: {
+    level: 'fixed',
+    label: 'Residual %',
+    why: "Set by manufacturer/bank residual tables — not negotiable. Matters for choosing the right car (higher residual = lower payment), not for negotiating a specific deal."
+  },
+  term: {
+    level: 'fixed',
+    label: 'Term Length',
+    why: "Pure math — shorter term = higher payment, longer = lower payment but more depreciation exposure. A personal choice, not a negotiation point."
+  },
+  mileagePerYear: {
+    level: 'high',
+    label: 'Mileage Allowance',
+    why: "Trades off directly against payment. Dealers often default to low mileage (10k/yr) to show a lower advertised payment, then hit consumers with overage fees later."
+  },
+  downPayment: {
+    level: 'fixed',
+    label: 'Down Payment',
+    why: "Reduces monthly payment but is NOT covered by GAP insurance in a total loss. A choice, not a negotiation."
+  },
+  tradeIn: {
+    level: 'high',
+    label: 'Trade-In Value',
+    why: "A separate negotiation from the lease — see Mode 3, Section 2. Should never be blended into the new-car numbers."
+  },
+};
+
+const MF_CREDIT_TIERS_HTML = `
+  <table style="width:100%;font-size:.75rem;border-collapse:collapse;margin-top:.5rem;">
+    <tr style="color:#6366f1;text-align:left;"><th style="padding:.25rem 0;">Tier</th><th>Score</th><th>Guidance</th></tr>
+    <tr><td style="padding:.25rem 0;">Tier 1 (Super Prime)</td><td>740+</td><td>Expect the best rate. Any markup is pure profit — push hardest.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 2 (Prime)</td><td>700–739</td><td>Ask what score unlocks Tier 1 pricing — sometimes a small gap.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 3 (Non-Prime)</td><td>650–699</td><td>More room for hidden markup. Ask for the buy rate explicitly.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 4 (Subprime)</td><td>Below 650</td><td>Less MF leverage — focus on price instead of rate.</td></tr>
+  </table>
+  <p style="margin-top:.5rem;font-style:italic;color:#64748b;">Note: exact MF decimals vary by lender and shift with rates — not shown here to avoid stale numbers. Ask which tier you qualify for.</p>
+`;
+
+const LEVER_BADGE_ICON = { high: '🟢', medium: '🟡', fixed: '🔴' };
+
+function injectLeverBadges(){
+  Object.keys(LEVER_EDUCATION).forEach(inputId=>{
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    // Find the nearest preceding label in the same field wrapper
+    const wrapper = input.closest('div');
+    if(!wrapper) return;
+    const label = wrapper.parentElement?.querySelector('label') || wrapper.querySelector('label');
+    if(!label || label.querySelector('.lever-badge')) return; // avoid double-inject
+    const lev = LEVER_EDUCATION[inputId];
+    const badge = document.createElement('span');
+    badge.className = 'lever-badge ' + lev.level;
+    badge.textContent = LEVER_BADGE_ICON[lev.level];
+    badge.title = lev.level === 'high' ? 'High negotiability' : lev.level === 'medium' ? 'Medium negotiability' : 'Fixed — not negotiable';
+    badge.style.cursor = 'pointer';
+    label.appendChild(badge);
+    const whyBox = document.createElement('div');
+    whyBox.className = 'lever-why-box';
+    whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why + (lev.extra === 'mf-credit-tiers' ? MF_CREDIT_TIERS_HTML : '');
+    wrapper.appendChild(whyBox);
+    badge.addEventListener('click', ()=> whyBox.classList.toggle('open'));
+  });
+
+  // Term is a button group, not an input — handle separately
+  const termLabel = document.querySelector('label[for="term-btns"], .term-btn')?.closest('div')?.querySelector('label');
+  if(termLabel && !termLabel.querySelector('.lever-badge')){
+    const lev = LEVER_EDUCATION.term;
+    const badge = document.createElement('span');
+    badge.className = 'lever-badge ' + lev.level;
+    badge.textContent = LEVER_BADGE_ICON[lev.level];
+    badge.style.cursor = 'pointer';
+    termLabel.appendChild(badge);
+    const whyBox = document.createElement('div');
+    whyBox.className = 'lever-why-box';
+    whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why;
+    termLabel.closest('div').appendChild(whyBox);
+    badge.addEventListener('click', ()=> whyBox.classList.toggle('open'));
+  }
+}
+
+function snapshotDealTarget(){
+  const inputs = readInputs();
+  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0) {
+    alert('Enter a complete deal in the calculator before setting it as your negotiation target.');
+    return;
+  }
+  const b = LeaseCalc.calculate(inputs);
+  AppState.dealTarget = { inputs, calculated: b, vehicle: AppState.vehicle };
+  alert('Target deal saved! Head to the Negotiate tab to use it.');
+}
+
+// ── Mode 3: Negotiate ────────────────────────────────────────────────────
+const NEGOTIATION_SECTIONS = [
+  {
+    title: 'Section 1 — Mindset Briefing',
+    html: `
+      <p><strong>Your willingness to walk away is your single greatest bargaining chip.</strong></p>
+      <p>Dealerships operate on sales quotas — monthly, sometimes weekly — and salespeople/sales managers are often measured and paid on units moved in a period, not on maximizing each individual deal. A dealer facing end-of-month or end-of-quarter pressure, with inventory sitting on a floor plan (meaning they're paying interest on unsold cars every day), has urgency that works in your favor — but only if you're genuinely willing to leave.</p>
+      <div class="tactic"><strong>Practical application:</strong> Never negotiate as if this is the only car or dealer available. Get at least 2–3 comparable quotes before engaging seriously with any one dealer. State plainly, early: "I'm comparing a few dealers, and I'll go with whoever gives me the best deal." This signals competition without being adversarial.</div>
+      <p style="margin-top:.75rem;"><strong>The tell:</strong> If a salesperson needs to "check with my manager" multiple times, or the energy shifts when you stand up to leave — that's confirmation your walk-away leverage is working.</p>
+    `
+  },
+  {
+    title: 'Section 2 — Trade-In First',
+    html: `
+      <p><strong>Negotiate your trade-in value as a completely separate, standalone transaction — before discussing anything about the new lease.</strong></p>
+      <p>Dealers are skilled at blending trade-in value into the new deal to obscure both numbers at once. If your trade is undervalued by $1,000 but your "discount" on the new car looks great, you've lost money you can't see. Separating the two forces transparency on both sides.</p>
+      <div class="tactic"><strong>Tactic:</strong> Get your trade-in appraised and get a firm number — ideally in writing, or from competing offers (CarMax, Carvana, other dealers) — before you start talking about the new lease. Walk in already knowing what your trade is worth elsewhere.</div>
+    `
+  },
+  {
+    title: "Section 3 — Don't Reveal Future Intent",
+    html: `
+      <p><strong>Never tell the dealer upfront whether you plan to lease or finance, or whether you're buying another car from them down the road — until your numbers are locked.</strong></p>
+      <p>This question is a probe, not small talk. Revealing future intent (e.g., "I always lease a new one every 3 years") only gives the dealer information that helps them, never you.</p>
+      <div class="tactic"><strong>Tactic:</strong> If asked "are you looking to lease or finance?" or similar — keep it neutral: "I'm deciding based on the numbers you give me." Lock in price, money factor, and fees first. Only discuss future plans, if at all, after deal terms are set.</div>
+    `
+  },
+  {
+    title: 'Section 4 — Negotiation Order: Start Here',
+    html: `
+      <p>(Trade-in removed from this list since it's handled separately in Section 2 above.)</p>
+      <ol style="list-style:decimal;padding-left:1.25rem;color:#cbd5e1;font-size:.9rem;line-height:1.8;">
+        <li><strong>Vehicle Price (Negotiated Price vs. MSRP)</strong> — most normalized, expected negotiation point. Anchor low based on research/comparable quotes, not MSRP.</li>
+        <li><strong>Manufacturer Rebates/Incentives</strong> — confirm explicitly these are applied. Ask: "what manufacturer incentives are available on this VIN this month?"</li>
+        <li><strong>Money Factor</strong> — ask what credit tier you qualify for, then ask if the quoted MF matches the buy rate for that tier or includes a markup.</li>
+        <li><strong>Fees (Doc, Acquisition markup)</strong> — ask what's bank-mandated vs. dealer-added. Expect partial wins, not full waivers.</li>
+      </ol>
+    `
+  },
+];
+
+function renderMode3(){
+  const container = document.getElementById('m3-content');
+  let html = NEGOTIATION_SECTIONS.map(s => `
+    <details class="neg-section" open>
+      <summary style="cursor:pointer;"><h3 style="display:inline;">${s.title}</h3></summary>
+      <div style="margin-top:.75rem;">${s.html}</div>
+    </details>
+  `).join('');
+
+  html += `
+    <details class="neg-section" open>
+      <summary style="cursor:pointer;"><h3 style="display:inline;">Section 5 — Your Target vs. Dealer's Offer</h3></summary>
+      <div style="margin-top:.75rem;" id="m3-section5"></div>
+    </details>
+  `;
+
+  container.innerHTML = html;
+  renderMode3Section5();
+}
+
+function renderMode3Section5(){
+  const el = document.getElementById('m3-section5');
+  if(!AppState.dealTarget){
+    el.innerHTML = `<p class="text-sm text-[#64748b]">No negotiation target set yet. Go to <strong>Calculate &amp; Educate</strong>, build your deal, and click &ldquo;Set as Negotiation Target.&rdquo;</p>`;
+    return;
+  }
+  const target = AppState.dealTarget;
+  el.innerHTML = `
+    <p class="text-sm text-[#cbd5e1] mb-3">Enter the numbers from the dealer's actual offer below to see exactly where the gap is.</p>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div><label class="text-xs text-[#64748b] block mb-1">Dealer's Negotiated Price ($)</label><input type="number" id="m3-offer-capcost" class="num-input" value="${target.inputs.capCost}" /></div>
+      <div><label class="text-xs text-[#64748b] block mb-1">Dealer's Money Factor</label><input type="number" id="m3-offer-mf" step="0.00001" class="num-input" value="${target.inputs.moneyFactor}" /></div>
+      <div><label class="text-xs text-[#64748b] block mb-1">Dealer's Acq. Fee ($)</label><input type="number" id="m3-offer-acqfee" class="num-input" value="${target.inputs.acqFee}" /></div>
+      <div><label class="text-xs text-[#64748b] block mb-1">Dealer's Doc Fee ($)</label><input type="number" id="m3-offer-docfee" class="num-input" value="${target.inputs.docFee}" /></div>
+    </div>
+    <button id="m3-compare-btn" class="term-btn" style="background:#6366f1;border-color:#6366f1;color:#fff;">Compare →</button>
+    <div id="m3-compare-result" class="mt-4"></div>
+  `;
+  document.getElementById('m3-compare-btn').addEventListener('click', ()=>{
+    const dealerInputs = {
+      ...target.inputs,
+      capCost:    parseFloat(document.getElementById('m3-offer-capcost').value) || target.inputs.capCost,
+      moneyFactor:parseFloat(document.getElementById('m3-offer-mf').value) || target.inputs.moneyFactor,
+      acqFee:     parseFloat(document.getElementById('m3-offer-acqfee').value) || target.inputs.acqFee,
+      docFee:     parseFloat(document.getElementById('m3-offer-docfee').value) || target.inputs.docFee,
+    };
+    const dealerCalc = LeaseCalc.calculate(dealerInputs);
+    const yourCalc = target.calculated;
+    const deltaPayment = dealerCalc.monthlyPayment - yourCalc.monthlyPayment;
+    const priceDelta = dealerInputs.capCost - target.inputs.capCost;
+    const mfDelta = dealerInputs.moneyFactor - target.inputs.moneyFactor;
+    // inflection: $500 price move and 0.0001 MF move, translated to $/mo impact using same deal shape
+    const priceInflection = LeaseCalc.calculate({...target.inputs, capCost: target.inputs.capCost + 500}).monthlyPayment - yourCalc.monthlyPayment;
+    const mfInflection = LeaseCalc.calculate({...target.inputs, moneyFactor: target.inputs.moneyFactor + 0.0001}).monthlyPayment - yourCalc.monthlyPayment;
+
+    document.getElementById('m3-compare-result').innerHTML = `
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="compare-card">
+          <p class="text-xs text-[#64748b] uppercase tracking-wider mb-1">Your Target</p>
+          <p class="text-2xl font-bold" style="color:#22c55e;">${fmt.money(yourCalc.monthlyPayment)}/mo</p>
+        </div>
+        <div class="compare-card">
+          <p class="text-xs text-[#64748b] uppercase tracking-wider mb-1">Dealer's Offer</p>
+          <p class="text-2xl font-bold" style="color:${deltaPayment > 0 ? '#f59e0b' : '#22c55e'};">${fmt.money(dealerCalc.monthlyPayment)}/mo</p>
+        </div>
+      </div>
+      <p class="text-sm mb-3" style="color:${deltaPayment > 0 ? '#f59e0b' : '#22c55e'};">
+        ${deltaPayment > 0 ? 'Dealer is $'+deltaPayment.toFixed(2)+'/mo above your target.' : deltaPayment < 0 ? 'Dealer is $'+Math.abs(deltaPayment).toFixed(2)+'/mo below your target — great deal!' : 'Dealer matches your target exactly.'}
+      </p>
+      <div class="worksheet-line section">LEVER-BY-LEVER GAP</div>
+      <p class="worksheet-line">Negotiated Price: ${fmt.money(target.inputs.capCost)} → ${fmt.money(dealerInputs.capCost)} (${priceDelta >= 0 ? '+' : ''}${fmt.money(priceDelta)})</p>
+      <p class="worksheet-line">Money Factor: ${fmt.mf(target.inputs.moneyFactor)} → ${fmt.mf(dealerInputs.moneyFactor)} (${mfDelta >= 0 ? '+' : ''}${mfDelta.toFixed(5)})</p>
+      <p class="worksheet-line">Acquisition Fee: ${fmt.money(target.inputs.acqFee)} → ${fmt.money(dealerInputs.acqFee)}</p>
+      <p class="worksheet-line">Doc Fee: ${fmt.money(target.inputs.docFee)} → ${fmt.money(dealerInputs.docFee)}</p>
+      <div class="worksheet-line section" style="margin-top:.75rem;">INFLECTION POINTS (from your target)</div>
+      <p class="worksheet-line">Every $500 reduction in negotiated price ≈ ${fmt.money(Math.abs(priceInflection))}/mo</p>
+      <p class="worksheet-line">Every 0.0001 reduction in money factor ≈ ${fmt.money(Math.abs(mfInflection))}/mo</p>
+    `;
+  });
+}
 </script>
 </body>
 </html>
