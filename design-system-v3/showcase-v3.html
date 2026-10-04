@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lease Buddy — Design System V3 Showcase</title>
+<style>
+/* =============================================================================
+   LEASE BUDDY — DESIGN TOKENS V3 (verbatim from tokens.css)
+   "The Printed Brief" — paper prototyping + Kindle Paperwhite.
+   Color is rationed. Serif reserved for authority moments. Confidence stamps.
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;600;700&display=swap');
+
+:root {
+  --color-warm-white:          #faf9f6;
+  --color-paper:               #f4f2ed;
+  --color-parchment:           #ede9e0;
+  --color-ink:                 #1a1a1a;
+  --color-graphite:            #3d3d3d;
+  --color-slate:               #6b7280;
+  --color-fog:                 #9ca3af;
+  --color-white:               #ffffff;
+
+  --color-sage-50:             #eef3f0;
+  --color-sage-100:            #d4e4dc;
+  --color-sage-300:            #8ab5a4;
+  --color-sage-500:            #5c7a6b;
+  --color-sage-700:            #3d5a4f;
+  --color-sage-900:            #1e2e28;
+
+  --color-amber-300:           #fcd34d;
+  --color-amber-500:           #f59e0b;
+  --color-red-100:             #fee2e2;
+  --color-red-400:             #f87171;
+  --color-red-600:             #dc2626;
+  --color-green-100:           #dcfce7;
+  --color-green-400:           #4ade80;
+  --color-green-600:           #16a34a;
+
+  --color-dark-base:           #0f1117;
+  --color-dark-surface:        #1a1d27;
+  --color-dark-surface-raised: #22263a;
+  --color-dark-border:         #2a2d3a;
+  --color-dark-text-primary:   #f0ede8;
+  --color-dark-text-secondary: #9ca3af;
+  --color-dark-text-muted:     #6b7280;
+
+  --bg-app:               var(--color-warm-white);
+  --bg-surface:           var(--color-paper);
+  --bg-inset:             var(--color-parchment);
+  --text-primary:         var(--color-ink);
+  --text-secondary:       var(--color-graphite);
+  --text-muted:           var(--color-slate);
+  --text-placeholder:     var(--color-fog);
+  --text-disabled:        var(--color-fog);
+  --text-on-accent:       var(--color-white);
+
+  --border-default:       var(--color-parchment);
+  --border-strong:        var(--color-slate);
+  --border-focus:         var(--color-sage-500);
+
+  --accent:               var(--color-sage-500);
+  --accent-hover:         var(--color-sage-700);
+  --accent-pressed:       var(--color-sage-700);
+  --accent-subtle:        var(--color-sage-50);
+  --accent-muted:         var(--color-sage-100);
+  --accent-on-accent:     var(--color-white);
+
+  --stamp-ink:            var(--color-sage-700);
+
+  --status-error-bg:      var(--color-red-100);
+  --status-error-text:    var(--color-red-600);
+  --status-error-border:  var(--color-red-400);
+  --status-warning-bg:    #fffbeb;
+  --status-warning-text:  var(--color-amber-500);
+  --status-warning-border:var(--color-amber-300);
+  --status-success-bg:    var(--color-green-100);
+  --status-success-text:  var(--color-green-600);
+  --status-success-border:var(--color-green-400);
+  --status-info-bg:       var(--color-sage-50);
+  --status-info-text:     var(--color-sage-700);
+  --status-info-border:   var(--color-sage-100);
+
+  --font-ui:          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif:       'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono:        'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs:           11px;
+  --text-sm:           13px;
+  --text-base:         16px;
+  --text-md:           18px;
+  --text-lg:           20px;
+  --text-xl:           24px;
+  --text-2xl:          30px;
+  --text-3xl:          38px;
+  --text-hero-serif:      48px;
+  --text-dossier-header:  13px;
+
+  --weight-light:      300;
+  --weight-regular:    400;
+  --weight-medium:     500;
+  --weight-semibold:   600;
+  --weight-bold:       700;
+
+  --leading-tight:     1.2;
+  --leading-snug:      1.35;
+  --leading-normal:    1.5;
+  --leading-relaxed:   1.65;
+
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.04em;
+  --tracking-widest:   0.08em;
+
+  --space-1:  4px;  --space-2:  8px;  --space-3:  12px; --space-4:  16px;
+  --space-5:  20px; --space-6:  24px; --space-7:  28px; --space-8:  32px;
+  --space-10: 40px; --space-12: 48px; --space-14: 56px; --space-16: 64px;
+  --space-20: 80px; --space-24: 96px;
+
+  --page-margin-minimum:  var(--space-6);   /* 24px */
+  --page-margin-preferred: var(--space-8);  /* 32px */
+
+  --radius-none:  0px;
+
+  --border-none:   0px;
+  --border-thin:   1px;
+  --border-medium: 2px;
+  --border-thick:  3px;
+
+  --input-border-width-default:  1.5px;
+  --input-border-width-focus:    2px;
+  --input-border-color-default:  var(--color-parchment);
+  --input-border-color-focus:    var(--color-sage-500);
+  --input-border-color-error:    var(--color-red-600);
+  --input-tap-target-height:     52px;
+  --input-bg-readonly:           var(--color-parchment);
+  --input-opacity-disabled:      0.4;
+
+  --layout-max-content-width: 560px;
+
+  --stamp-stroke-width:     2px;
+  --stamp-circle-padding:   6px;
+  --stamp-bracket-cap:      8px;
+  --stamp-tick-length:      4px;
+  --stamp-draw-duration:    250ms;
+  --stamp-draw-easing:      cubic-bezier(0.4, 0, 0.2, 1);
+
+  --texture-grain-opacity-light: 0.030;
+  --texture-grain-opacity-dark:  0.045;
+  --texture-diffusion-blur:      0.3px;
+
+  --duration-fast:     100ms;
+  --duration-normal:   150ms;
+  --duration-page-turn: 220ms;
+  --duration-slow:     300ms;
+  --page-turn-settle-distance: 4px;
+  --ease-standard:     cubic-bezier(0.4, 0, 0.2, 1);
+
+  --shadow-focus:         0 0 0 3px rgba(92, 122, 107, 0.32);
+  --shadow-focus-error:   0 0 0 3px rgba(220, 38, 38, 0.24);
+  --shadow-overlay:       0 20px 25px rgba(26, 26, 26, 0.10), 0 10px 10px rgba(26, 26, 26, 0.04);
+}
+
+[data-theme="dark"] {
+  --bg-app:               var(--color-dark-base);
+  --bg-surface:           var(--color-dark-surface);
+  --bg-inset:             var(--color-dark-surface-raised);
+  --text-primary:         var(--color-dark-text-primary);
+  --text-secondary:       var(--color-dark-text-secondary);
+  --text-muted:           var(--color-dark-text-muted);
+  --text-placeholder:     var(--color-dark-text-muted);
+  --text-disabled:        var(--color-dark-text-muted);
+  --text-on-accent:       var(--color-dark-base);
+  --border-default:       var(--color-dark-border);
+  --border-strong:        var(--color-slate);
+  --border-focus:         var(--color-sage-300);
+  --accent:               var(--color-sage-300);
+  --accent-hover:         var(--color-sage-100);
+  --accent-subtle:        var(--color-sage-900);
+  --accent-muted:         rgba(92, 122, 107, 0.2);
+  --accent-on-accent:     var(--color-dark-base);
+  --stamp-ink:            var(--color-sage-300);
+  --status-error-bg:      rgba(220, 38, 38, 0.12);
+  --status-error-text:    var(--color-red-400);
+  --status-error-border:  rgba(220, 38, 38, 0.32);
+  --status-warning-bg:    rgba(245, 158, 11, 0.10);
+  --status-warning-text:  var(--color-amber-300);
+  --status-warning-border:rgba(245, 158, 11, 0.28);
+  --status-success-bg:    rgba(22, 163, 74, 0.12);
+  --status-success-text:  var(--color-green-400);
+  --status-success-border:rgba(22, 163, 74, 0.30);
+  --status-info-bg:       rgba(92, 122, 107, 0.12);
+  --status-info-text:     var(--color-sage-300);
+  --status-info-border:   rgba(92, 122, 107, 0.28);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: var(--text-base); -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* E-INK GRAIN — 3.0% light / 4.5% dark, no screen-glow gradient */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: var(--texture-grain-opacity-light);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+[data-theme="dark"] body::before { opacity: var(--texture-grain-opacity-dark); }
+
+/* typographic roles — serif reserved for authority only */
+.type-serif-hero { font-family: var(--font-serif); font-size: var(--text-hero-serif); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums lining-nums; }
+.type-dossier-header { font-family: var(--font-serif); font-size: var(--text-dossier-header); font-weight: 700; letter-spacing: var(--tracking-widest); text-transform: uppercase; }
+.type-display-lg { font-size: var(--text-2xl); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.type-body-lg  { font-size: 18px; font-weight: 400; line-height: 1.5; }
+.type-body-base{ font-size: 16px; font-weight: 400; line-height: 1.5; }
+.type-body-sm  { font-size: 13px; font-weight: 300; line-height: 1.5; color: var(--text-secondary); }
+.type-label-sm { font-size: 11px; font-weight: 500; line-height: 1.3; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.type-meta     { font-size: 11px; font-weight: 300; line-height: 1.3; color: var(--text-muted); }
+.type-mono     { font-family: var(--font-mono); font-size: 13px; font-weight: 400; line-height: 1.5; font-variant-numeric: tabular-nums lining-nums; }
+
+/* layout — single-page dossier, wide margins, 560px column */
+.wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 0 var(--page-margin-preferred) 120px; }
+.topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-8); background: var(--bg-app); border-bottom: var(--border-thin) solid var(--border-default); }
+.logo-mark { width: 34px; height: 34px; background: var(--accent); border-radius: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 0 7px; }
+.logo-mark span { display: block; height: 1px; background: rgba(255,255,255,0.8); }
+.logo-mark span:last-child { width: 60%; }
+.section { margin-top: 56px; }
+.section h2 { font-size: 20px; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
+.section > .hint { font-size: 13px; font-weight: 300; color: var(--text-muted); margin-bottom: 24px; max-width: 560px; }
+.grid { display: grid; gap: 16px; }
+.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.cols-6 { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 720px) { .cols-2,.cols-3,.cols-4,.cols-6 { grid-template-columns: 1fr; } }
+
+/* the dossier page — one job, one sheet */
+.dossier {
+  max-width: var(--layout-max-content-width);
+  background: var(--bg-surface);
+  border: var(--border-thin) solid var(--border-default);
+  padding: var(--space-8);
+  position: relative;
+}
+
+/* confidence stamps */
+.stamp-circle { display: inline-block; position: relative; padding: 4px 8px; }
+.stamp-circle::before { content: ''; position: absolute; inset: -4px; border: var(--stamp-stroke-width) solid var(--stamp-ink); border-radius: 50%; }
+.stamp-bracket { display: inline-block; position: relative; padding: 4px 10px; }
+.stamp-bracket::before, .stamp-bracket::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: var(--stamp-bracket-cap); height: var(--stamp-bracket-cap); border: var(--stamp-stroke-width) solid var(--stamp-ink); }
+.stamp-bracket::before { left: 0; border-right: none; }
+.stamp-bracket::after { right: 0; border-left: none; }
+.stamp-tick { display: inline-block; position: relative; padding-left: 14px; }
+.stamp-tick::before { content: ''; position: absolute; left: 0; top: 50%; width: var(--stamp-tick-length); height: var(--stamp-tick-length); border-left: var(--stamp-stroke-width) solid var(--stamp-ink); border-bottom: var(--stamp-stroke-width) solid var(--stamp-ink); transform: translateY(-50%); }
+
+/* page-turn navigation */
+.page-nav { display: flex; align-items: center; justify-content: space-between; max-width: var(--layout-max-content-width); margin-top: var(--space-4); padding-top: var(--space-4); border-top: var(--border-thin) solid var(--border-default); }
+.page-nav .count { font-family: var(--font-serif); font-size: 13px; color: var(--text-muted); letter-spacing: 0.04em; }
+
+/* components */
+.input-underline {
+  display: block; width: 100%; min-height: var(--input-tap-target-height); padding: 12px 0;
+  font-family: var(--font-ui); font-size: 16px; font-weight: 400; line-height: 1.5;
+  color: var(--text-primary); background: transparent;
+  border: none; border-bottom: var(--input-border-width-default) solid var(--input-border-color-default);
+  border-radius: 0; outline: none; appearance: none; -webkit-appearance: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+.input-underline::placeholder { color: var(--text-placeholder); }
+.input-underline:focus { border-bottom-width: var(--input-border-width-focus); border-bottom-color: var(--input-border-color-focus); }
+.input-underline:disabled { border-bottom-color: var(--input-border-color-default); opacity: var(--input-opacity-disabled); cursor: not-allowed; }
+.input-underline[readonly] { border-bottom: none; background-color: var(--input-bg-readonly); padding-left: 8px; padding-right: 8px; cursor: default; }
+.input-underline.error { border-bottom-width: var(--input-border-width-focus); border-bottom-color: var(--input-border-color-error); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; font-family: var(--font-ui); font-size: 16px; font-weight: 500;
+  line-height: 1.4; text-decoration: none; cursor: pointer;
+  border-radius: 0; border: 1.5px solid transparent;
+  transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast), border-color var(--duration-fast);
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.btn-primary { background-color: var(--accent); color: var(--text-on-accent); border-color: var(--accent); }
+.btn-primary:hover:not(:disabled) { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-secondary { background-color: transparent; color: var(--text-primary); border-color: var(--border-strong); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--text-primary); }
+.btn-ghost { background-color: transparent; color: var(--text-primary); border-color: transparent; }
+.btn-ghost:hover:not(:disabled) { background-color: var(--bg-inset); }
+.btn-destructive { background-color: transparent; color: var(--color-red-600); border-color: var(--color-red-600); }
+.btn-destructive:hover:not(:disabled) { background-color: var(--color-red-100); }
+
+:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+.alert { display: flex; gap: 10px; padding: 14px 16px; border-left: var(--border-thick) solid; font-size: 14px; }
+.alert-info    { background: var(--status-info-bg); border-color: var(--status-info-border); color: var(--status-info-text); }
+.alert-success { background: var(--status-success-bg); border-color: var(--status-success-border); color: var(--status-success-text); }
+.alert-warning { background: var(--status-warning-bg); border-color: var(--status-warning-border); color: var(--status-warning-text); }
+.alert-error   { background: var(--status-error-bg); border-color: var(--status-error-border); color: var(--status-error-text); }
+
+.swatch-cell { border: var(--border-thin) solid var(--border-default); background: var(--bg-surface); }
+.swatch-cell .chip { height: 48px; }
+.swatch-cell .meta { padding: 10px 12px; }
+.swatch-cell .meta b { display: block; font-weight: 600; font-size: 13px; }
+.swatch-cell .meta code { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+.type-row { display: flex; align-items: baseline; gap: 24px; padding: 14px 0; border-bottom: var(--border-thin) solid var(--border-default); }
+.type-row .name { width: 120px; font-size: 11px; font-weight: 300; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+
+.demo-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.field .help { font-size: 11px; font-weight: 300; color: var(--text-muted); margin-top: 4px; }
+.field .error-text { font-size: 12px; color: var(--status-error-text); margin-top: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); padding: 12px 16px; border-bottom: var(--border-thin) solid var(--border-strong); }
+td { padding: 14px 16px; border-bottom: var(--border-thin) solid var(--border-default); }
+td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+
+code.token { font-family: var(--font-mono); font-size: 12px; background: var(--bg-surface); padding: 2px 6px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-mark"><span></span><span></span><span></span></div>
+  <div style="flex:1;margin-left:12px;">
+    <div style="font-weight:700;font-size:16px;line-height:1.2;">Lease Buddy</div>
+    <div class="type-meta">Design System V3 — The Printed Brief</div>
+  </div>
+  <button class="btn btn-secondary" id="themeToggle" type="button">🌙 Dark mode</button>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="section" style="margin-top:24px;">
+    <div class="type-label-sm">V3 showcase</div>
+    <div class="type-serif-hero" style="margin-top:12px;">$127<span style="font-family:var(--font-ui);font-size:20px;font-weight:500;color:var(--text-muted);">/mo you could save</span></div>
+    <p class="type-body-lg" style="max-width:560px;color:var(--text-secondary);margin-top:8px;">
+      One sheet, one job. A printed brief that reads like it was prepared by someone who already did the work — sage rationed to a single earned mark, everything else held in ink and graphite.
+    </p>
+  </section>
+
+  <!-- DOSSIER PAGE -->
+  <section class="section">
+    <h2>Dossier page</h2>
+    <p class="hint">The unit of V3: one job per page, 560px column, wide margins, page-turn navigation instead of scrolling sections.</p>
+    <div class="dossier">
+      <div class="type-dossier-header" style="color:var(--text-muted);margin-bottom:16px;">Negotiation brief</div>
+      <div class="type-label-sm">Estimated monthly payment</div>
+      <div class="type-serif-hero" style="margin-top:6px;margin-bottom:4px;">
+        <span class="stamp-circle">$624.18</span>
+      </div>
+      <p class="type-body-sm">36 months · $0 down · money factor 0.00184</p>
+      <hr style="border:none;border-top:1px solid var(--border-default);margin:24px 0;">
+      <div class="type-dossier-header" style="color:var(--text-muted);margin-bottom:12px;">Your deal</div>
+      <table style="font-size:14px;">
+        <tbody>
+          <tr><td style="padding:8px 0;">Vehicle MSRP</td><td style="text-align:right;font-variant-numeric:tabular-nums;">$41,280.00</td></tr>
+          <tr><td style="padding:8px 0;">Residual value</td><td style="text-align:right;font-variant-numeric:tabular-nums;">$19,814.40</td></tr>
+          <tr><td style="padding:8px 0;">Dealer fee</td><td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--color-red-600);">$799.00</td></tr>
+        </tbody>
+      </table>
+      <div class="page-nav">
+        <button class="btn btn-ghost" type="button">← Back</button>
+        <span class="count">Page 2 of 4</span>
+        <button class="btn btn-primary" type="button" style="font-size:14px;">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIDENCE STAMPS -->
+  <section class="section">
+    <h2>Confidence stamps</h2>
+    <p class="hint">Precise, ruler-straight annotation marks — not decoration. Circle the lead number, bracket a comparison, tick a glossary term. Max one per screen.</p>
+    <div class="demo-row" style="margin-top:8px;">
+      <span class="stamp-circle">$127/mo</span>
+      <span class="stamp-bracket">$624 vs $751</span>
+      <span class="stamp-tick">money factor</span>
+    </div>
+  </section>
+
+  <!-- COLOR RATIONING -->
+  <section class="section">
+    <h2>Color rationing</h2>
+    <p class="hint">Sage appears once per screen — one hero element + the primary CTA. Everything else is grayscale ink / graphite / slate / fog.</p>
+    <div class="grid cols-6">
+      <div class="swatch-cell"><div class="chip" style="background:#faf9f6"></div><div class="meta"><b>Warm white</b><code>#faf9f6</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#f4f2ed"></div><div class="meta"><b>Paper</b><code>#f4f2ed</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#ede9e0"></div><div class="meta"><b>Parchment</b><code>#ede9e0</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#1a1a1a"></div><div class="meta"><b>Ink</b><code>#1a1a1a</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#3d3d3d"></div><div class="meta"><b>Graphite</b><code>#3d3d3d</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#6b7280"></div><div class="meta"><b>Slate</b><code>#6b7280</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#9ca3af"></div><div class="meta"><b>Fog</b><code>#9ca3af</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#5c7a6b"></div><div class="meta"><b>Sage 500</b><code>#5c7a6b</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#3d5a4f"></div><div class="meta"><b>Sage 700</b><code>#3d5a4f</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#1e2e28"></div><div class="meta"><b>Sage 900</b><code>#1e2e28</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#f59e0b"></div><div class="meta"><b>Amber 500</b><code>#f59e0b</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#dc2626"></div><div class="meta"><b>Red 600</b><code>#dc2626</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#16a34a"></div><div class="meta"><b>Green 600</b><code>#16a34a</code></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section">
+    <h2>Typography</h2>
+    <p class="hint">Inter for all interactive UI. Source Serif 4 for exactly two roles — the hero number and dossier section headers. Never mixed.</p>
+    <div class="type-row"><span class="name">serif · hero</span><span class="type-serif-hero" style="font-size:32px;">$624.18</span></div>
+    <div class="type-row"><span class="name">serif · header</span><span class="type-dossier-header" style="font-size:16px;">YOUR DEAL</span></div>
+    <div class="type-row"><span class="name">ui · display</span><span class="type-display-lg">Total lease cost</span></div>
+    <div class="type-row"><span class="name">ui · body-base</span><span class="type-body-base">The standard body copy sits at 16px with a 1.5 line height.</span></div>
+    <div class="type-row"><span class="name">ui · body-sm</span><span class="type-body-sm">Helper text at Light 300, graphite on paper.</span></div>
+    <div class="type-row"><span class="name">ui · label</span><span class="type-label-sm">MONTHLY PAYMENT</span></div>
+    <div class="type-row" style="border-bottom:none;"><span class="name">ui · mono</span><span class="type-mono">0.00184 · $41,280 · 1,234.56</span></div>
+  </section>
+
+  <!-- SHAPE LANGUAGE -->
+  <section class="section">
+    <h2>Shape language</h2>
+    <p class="hint">0px radius is now absolute — V2's pill-badge exception is removed. Badges become bracket annotations.</p>
+    <div class="grid cols-3">
+      <div class="swatch-cell" style="padding:16px;"><div class="type-label-sm" style="margin-bottom:12px;">Absolute 0px</div><div style="height:56px;background:var(--bg-inset);border:1px solid var(--border-strong);"></div></div>
+      <div class="swatch-cell" style="padding:16px;"><div class="type-label-sm" style="margin-bottom:12px;">No pills — bracket</div><div style="padding:16px 0;"><span class="stamp-bracket">Best deal</span></div></div>
+      <div class="swatch-cell" style="padding:16px;"><div class="type-label-sm" style="margin-bottom:12px;">Fine hairline</div><div style="padding:20px 0;"><hr style="border:none;border-top:1px solid var(--border-default);"></div></div>
+    </div>
+  </section>
+
+  <!-- BUTTONS -->
+  <section class="section">
+    <h2>Buttons</h2>
+    <p class="hint">Only the primary CTA may carry sage. Secondary buttons are graphite-line, never colored.</p>
+    <div class="demo-row" style="margin-bottom:16px;">
+      <button class="btn btn-primary">Negotiate</button>
+      <button class="btn btn-secondary">Secondary</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-destructive">Remove</button>
+    </div>
+  </section>
+
+  <!-- INPUTS -->
+  <section class="section">
+    <h2>Underline inputs</h2>
+    <p class="hint">Carried from V2. Underline only, 52px tap targets.</p>
+    <div class="grid cols-2">
+      <div class="field">
+        <label>Monthly payment</label>
+        <input class="input-underline" type="text" value="624.00">
+      </div>
+      <div class="field">
+        <label>Money factor</label>
+        <input class="input-underline" type="text" placeholder="0.00184">
+      </div>
+      <div class="field">
+        <label>Residual value (error)</label>
+        <input class="input-underline error" type="text" value="54%">
+        <div class="error-text">Residual is above the lender cap of 50%.</div>
+      </div>
+      <div class="field">
+        <label>Term (disabled)</label>
+        <input class="input-underline" type="text" value="36 months" disabled>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS -->
+  <section class="section">
+    <h2>Status</h2>
+    <p class="hint">Left-accent alerts. Sage info uses the earned color once; warning/error/success stay on their semantic hues.</p>
+    <div class="grid" style="gap:12px;">
+      <div class="alert alert-info">This lease has a below-market money factor. You're in good shape.</div>
+      <div class="alert alert-success">Term of 36 months keeps you inside the bumper-to-bumper warranty.</div>
+      <div class="alert alert-warning">The dealer fee is $300 above typical for this region.</div>
+      <div class="alert alert-error">Residual value exceeds the lender cap. This quote may be off.</div>
+    </div>
+  </section>
+
+  <p class="type-meta" style="margin-top:56px;">Lease Buddy Design System v3.0 · "The Printed Brief" · tokens by Jo · toggle flips the <code class="token">[data-theme="dark"]</code> layer.</p>
+
+</div>
+
+<script>
+  const btn = document.getElementById('themeToggle');
+  btn.addEventListener('click', () => {
+    const root = document.documentElement;
+    const dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.textContent = '🌙 Dark mode'; }
+    else { root.setAttribute('data-theme', 'dark'); btn.textContent = '☀️ Light mode'; }
+  });
+</script>
+</body>
+</html>

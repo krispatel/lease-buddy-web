@@ -1,0 +1,740 @@
+/**
+ * Lease Buddy Design Tokens V3 -- "The Printed Brief"
+ * Generated from tokens.json v3.0.0
+ * Author: Jo -- UI/UX Design Agent
+ * Date: 2026-10-04
+ *
+ * V3 CONCEPT: Paper prototyping + Kindle Paperwhite.
+ * Not a screen mimicking paper -- a single-sheet document a negotiator
+ * hands you before you walk into a deal. Confidence through restraint.
+ *
+ * V3 CHANGES FROM V2:
+ *   - Color is RATIONED: sage appears once per screen (hero element + CTA
+ *     only). Everything else renders in grayscale ink/graphite/slate/fog.
+ *   - Serif typeface (Source Serif 4) added -- reserved EXCLUSIVELY for
+ *     hero numbers and dossier section headers. Never on interactive UI.
+ *   - Page margins widened: 24px minimum, 32px preferred (was 16px in V2).
+ *   - Confidence-stamp components: circle, bracket, underscore-tick --
+ *     precise SVG/CSS annotation marks, not decorative.
+ *   - E-ink surface simulation: heavier grain + subtle diffusion blur,
+ *     no screen-glow gradients, ever.
+ *   - Page-turn motion model replaces card/panel transitions.
+ *   - border-radius: 0 is now ABSOLUTE -- even V2's pill-badge exception
+ *     is removed. Badges use bracket annotations instead.
+ *
+ * COLOR PRIMITIVES: Identical to V1/V2. No new hues introduced.
+ * DUAL-THEME: Same :root / [data-theme="dark"] architecture, carried forward.
+ *
+ * Compare with: design-system/tokens.css (V1), design-system-v2/tokens.css (V2)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;600;700&display=swap');
+
+
+/* ============================================================
+   COLOR PRIMITIVES -- mode-agnostic (identical to V1/V2)
+   ============================================================ */
+:root {
+  --color-warm-white:          #faf9f6;
+  --color-paper:               #f4f2ed;
+  --color-parchment:           #ede9e0;
+  --color-ink:                 #1a1a1a;
+  --color-graphite:            #3d3d3d;
+  --color-slate:               #6b7280;
+  --color-fog:                 #9ca3af;
+  --color-white:               #ffffff;
+
+  --color-sage-50:             #eef3f0;
+  --color-sage-100:            #d4e4dc;
+  --color-sage-300:            #8ab5a4;
+  --color-sage-500:            #5c7a6b;
+  --color-sage-700:            #3d5a4f;
+  --color-sage-900:            #1e2e28;
+
+  --color-amber-300:           #fcd34d;
+  --color-amber-500:           #f59e0b;
+  --color-red-100:             #fee2e2;
+  --color-red-400:             #f87171;
+  --color-red-600:             #dc2626;
+  --color-green-100:           #dcfce7;
+  --color-green-400:           #4ade80;
+  --color-green-600:           #16a34a;
+
+  --color-dark-base:           #0f1117;
+  --color-dark-surface:        #1a1d27;
+  --color-dark-surface-raised: #22263a;
+  --color-dark-border:         #2a2d3a;
+  --color-dark-text-primary:   #f0ede8;
+  --color-dark-text-secondary: #9ca3af;
+  --color-dark-text-muted:     #6b7280;
+}
+
+
+/* ============================================================
+   LIGHT MODE -- SEMANTIC TOKENS (PRIMARY)
+   ============================================================ */
+:root {
+  --bg-app:               var(--color-warm-white);
+  --bg-surface:           var(--color-paper);
+  --bg-inset:             var(--color-parchment);
+  --bg-overlay:           rgba(26, 26, 26, 0.48);
+
+  --text-primary:         var(--color-ink);
+  --text-secondary:       var(--color-graphite);
+  --text-muted:           var(--color-slate);
+  --text-placeholder:     var(--color-fog);
+  --text-disabled:        var(--color-fog);
+  --text-on-accent:       var(--color-white);
+
+  --border-default:       var(--color-parchment);
+  --border-strong:        var(--color-slate);
+  --border-focus:         var(--color-sage-500);
+
+  --accent:               var(--color-sage-500);
+  --accent-hover:         var(--color-sage-700);
+  --accent-pressed:       var(--color-sage-700);
+  --accent-subtle:        var(--color-sage-50);
+  --accent-muted:         var(--color-sage-100);
+  --accent-on-accent:     var(--color-white);
+
+  /* V3: the single earned sage use per screen -- confidence stamp ink */
+  --stamp-ink:            var(--color-sage-700);
+
+  --status-error-bg:      var(--color-red-100);
+  --status-error-text:    var(--color-red-600);
+  --status-error-border:  var(--color-red-400);
+  --status-warning-bg:    #fffbeb;
+  --status-warning-text:  var(--color-amber-500);
+  --status-warning-border:var(--color-amber-300);
+  --status-success-bg:    var(--color-green-100);
+  --status-success-text:  var(--color-green-600);
+  --status-success-border:var(--color-green-400);
+  --status-info-bg:       var(--color-sage-50);
+  --status-info-text:     var(--color-sage-700);
+  --status-info-border:   var(--color-sage-100);
+
+  /* V3: shadows reserved for overlay/modal scrim only -- the document
+     metaphor implies a flat sheet, not floating layers */
+  --shadow-none:          none;
+  --shadow-focus:         0 0 0 3px rgba(92, 122, 107, 0.32);
+  --shadow-focus-error:   0 0 0 3px rgba(220, 38, 38, 0.24);
+  --shadow-overlay:       0 20px 25px rgba(26, 26, 26, 0.10), 0 10px 10px rgba(26, 26, 26, 0.04);
+}
+
+
+/* ============================================================
+   DARK MODE -- SEMANTIC OVERRIDES
+   [data-theme="dark"] -- future user toggle
+   ============================================================ */
+[data-theme="dark"] {
+  --bg-app:               var(--color-dark-base);
+  --bg-surface:           var(--color-dark-surface);
+  --bg-inset:             var(--color-dark-surface-raised);
+  --bg-overlay:           rgba(0, 0, 0, 0.64);
+
+  --text-primary:         var(--color-dark-text-primary);
+  --text-secondary:       var(--color-dark-text-secondary);
+  --text-muted:           var(--color-dark-text-muted);
+  --text-placeholder:     var(--color-dark-text-muted);
+  --text-disabled:        var(--color-dark-text-muted);
+  --text-on-accent:       var(--color-dark-base);
+
+  --border-default:       var(--color-dark-border);
+  --border-strong:        var(--color-slate);
+  --border-focus:         var(--color-sage-300);
+
+  --accent:               var(--color-sage-300);
+  --accent-hover:         var(--color-sage-100);
+  --accent-pressed:       var(--color-sage-500);
+  --accent-subtle:        var(--color-sage-900);
+  --accent-muted:         rgba(92, 122, 107, 0.2);
+  --accent-on-accent:     var(--color-dark-base);
+
+  --stamp-ink:            var(--color-sage-300);
+
+  --status-error-bg:      rgba(220, 38, 38, 0.12);
+  --status-error-text:    var(--color-red-400);
+  --status-error-border:  rgba(220, 38, 38, 0.32);
+  --status-warning-bg:    rgba(245, 158, 11, 0.10);
+  --status-warning-text:  var(--color-amber-300);
+  --status-warning-border:rgba(245, 158, 11, 0.28);
+  --status-success-bg:    rgba(22, 163, 74, 0.12);
+  --status-success-text:  var(--color-green-400);
+  --status-success-border:rgba(22, 163, 74, 0.30);
+  --status-info-bg:       rgba(92, 122, 107, 0.12);
+  --status-info-text:     var(--color-sage-300);
+  --status-info-border:   rgba(92, 122, 107, 0.28);
+
+  --shadow-focus:         0 0 0 3px rgba(138, 181, 164, 0.36);
+  --shadow-focus-error:   0 0 0 3px rgba(248, 113, 113, 0.28);
+  --shadow-overlay:       0 20px 25px rgba(0, 0, 0, 0.32), 0 10px 10px rgba(0, 0, 0, 0.18);
+}
+
+
+/* ============================================================
+   TYPOGRAPHY -- V3: adds Source Serif 4 for authority moments
+   ============================================================ */
+:root {
+  --font-ui:           'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif:        'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono:         'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs:           11px;
+  --text-sm:           13px;
+  --text-base:         16px;
+  --text-md:           18px;
+  --text-lg:           20px;
+  --text-xl:           24px;
+  --text-2xl:          30px;
+  --text-3xl:          38px;
+
+  /* V3 additions -- reserved exclusively for hero numbers + dossier headers */
+  --text-hero-serif:      48px;
+  --text-dossier-header:  13px;
+
+  --weight-light:      300;
+  --weight-regular:    400;
+  --weight-medium:     500;
+  --weight-semibold:   600;
+  --weight-bold:       700;
+
+  --leading-tight:     1.2;
+  --leading-snug:      1.35;
+  --leading-normal:    1.5;
+  --leading-relaxed:   1.65;
+
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.04em;
+  --tracking-widest:   0.08em;
+}
+
+
+/* ============================================================
+   SPACING -- 4px base grid (unchanged values from V1/V2)
+   ============================================================ */
+:root {
+  --space-0:  0px;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  28px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* V3: page margins widen -- whitespace signals composed authority */
+  --page-margin-minimum:  var(--space-6);  /* 24px */
+  --page-margin-preferred: var(--space-8); /* 32px */
+}
+
+
+/* ============================================================
+   BORDER RADIUS -- V3: ABSOLUTE ZERO, no exceptions
+   ============================================================ */
+:root {
+  --radius-none:  0px;
+  --radius-sm:    0px;
+  --radius-md:    0px;
+  --radius-lg:    0px;
+  --radius-xl:    0px;
+  --radius-2xl:   0px;
+  --radius-pill:  0px;  /* V2 used 9999px for pills -- V3 removes pills entirely */
+}
+
+
+/* ============================================================
+   BORDER WIDTH
+   ============================================================ */
+:root {
+  --border-none:   0px;
+  --border-thin:   1px;
+  --border-medium: 2px;
+  --border-thick:  3px;
+}
+
+
+/* ============================================================
+   INPUT SYSTEM -- underline style (carried from V2)
+   ============================================================ */
+:root {
+  --input-border-width-default:  1.5px;
+  --input-border-width-focus:    2px;
+  --input-border-color-default:  var(--color-parchment);
+  --input-border-color-focus:    var(--color-sage-500);
+  --input-border-color-error:    var(--color-red-600);
+  --input-tap-target-height:     52px;
+  --input-bg-readonly:           var(--color-parchment);
+  --input-opacity-disabled:      0.4;
+}
+
+
+/* ============================================================
+   V3 LAYOUT -- single-page document model
+   ============================================================ */
+:root {
+  --layout-max-content-width: 560px; /* caps line length like a printed page column */
+}
+
+
+/* ============================================================
+   V3 CONFIDENCE STAMPS -- precise, ruler-straight annotation marks
+   ============================================================ */
+:root {
+  --stamp-stroke-width:     2px;
+  --stamp-circle-padding:   6px;
+  --stamp-bracket-cap:      8px;
+  --stamp-tick-length:      4px;
+  --stamp-draw-duration:    250ms;
+  --stamp-draw-easing:      cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ============================================================
+   V3 E-INK SURFACE SIMULATION -- heavier than V2's flat grain
+   ============================================================ */
+:root {
+  --texture-grain-opacity-light: 0.030;
+  --texture-grain-opacity-dark:  0.045;
+  --texture-diffusion-blur:      0.3px;
+}
+
+
+/* ============================================================
+   Z-INDEX
+   ============================================================ */
+:root {
+  --z-base:     0;
+  --z-raised:   10;
+  --z-overlay:  300;
+  --z-modal:    400;
+  --z-tooltip:  600;
+}
+
+
+/* ============================================================
+   MOTION -- V3 adds page-turn (e-ink refresh) transition
+   ============================================================ */
+:root {
+  --duration-instant:  0ms;
+  --duration-fast:     100ms;
+  --duration-normal:   150ms;
+  --duration-page-turn: 220ms;  /* V3: cross-fade + 4px vertical settle */
+  --duration-slow:     300ms;
+
+  --page-turn-settle-distance: 4px;
+
+  --ease-standard:     cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate:   cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate:   cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant:   0ms;
+    --duration-fast:      0ms;
+    --duration-normal:    0ms;
+    --duration-page-turn: 0ms;
+    --duration-slow:      0ms;
+  }
+}
+
+
+/* ============================================================
+   BASE RESETS
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+
+/* ============================================================
+   V3 E-INK GRAIN TEXTURE
+   Heavier than V2 (3.0% vs 2.5% light / 4.5% vs 4.0% dark), plus a
+   soft diffusion blur layer applied to hero text -- never a gradient
+   implying a light source. The surface should never glow.
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--texture-grain-opacity-light);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+[data-theme="dark"] body::before {
+  opacity: var(--texture-grain-opacity-dark);
+}
+
+
+/* ============================================================
+   SEMANTIC TYPE ROLE CLASSES
+   ============================================================ */
+.type-display-xl {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: var(--tracking-tight);
+}
+
+.type-display-lg {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.type-body-lg   { font-size: var(--text-md);   font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.type-body-base { font-size: var(--text-base);  font-weight: var(--weight-regular); line-height: var(--leading-normal); }
+.type-body-sm   { font-size: var(--text-sm);    font-weight: var(--weight-light);   line-height: var(--leading-normal); }
+.type-meta      { font-size: var(--text-xs);    font-weight: var(--weight-light);   line-height: var(--leading-snug); }
+
+.type-label-lg  { font-size: var(--text-base); font-weight: var(--weight-medium); line-height: var(--leading-normal); }
+.type-label-md  { font-size: var(--text-sm);   font-weight: var(--weight-medium); line-height: var(--leading-normal); }
+.type-label-sm  { font-size: var(--text-xs);   font-weight: var(--weight-medium); line-height: var(--leading-snug); }
+
+.type-mono {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ============================================================
+   V3 SERIF AUTHORITY TYPE -- EXCLUSIVE to hero numbers + dossier
+   headers. Never apply to buttons, inputs, nav, or body copy.
+   ============================================================ */
+
+/* The single biggest number on a V3 screen. One per screen, max. */
+.type-hero-serif {
+  font-family: var(--font-serif);
+  font-size: var(--text-hero-serif);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums lining-nums;
+  filter: blur(var(--texture-diffusion-blur));
+}
+
+/* Dossier section headers -- "YOUR DEAL," "NEGOTIATION BRIEF," etc. */
+.type-dossier-header {
+  font-family: var(--font-serif);
+  font-size: var(--text-dossier-header);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--text-secondary);
+  line-height: var(--leading-snug);
+}
+
+
+/* ============================================================
+   TABULAR NUMERICS UTILITY (unchanged, non-negotiable)
+   ============================================================ */
+.tabular,
+[data-value],
+.lease-value,
+.lease-calc {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+
+/* ============================================================
+   V3 PAGE LAYOUT -- single-page dossier model
+   ============================================================ */
+.page {
+  max-width: var(--layout-max-content-width);
+  margin: 0 auto;
+  padding: var(--page-margin-preferred) var(--page-margin-minimum);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: var(--border-thin) solid var(--border-default);
+  padding-bottom: var(--space-4);
+}
+
+.page-number {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-light);
+  color: var(--text-muted);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Page-turn control -- bottom nav styled as a tab, not an app tab bar */
+.page-turn-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: var(--border-thin) solid var(--border-default);
+  padding-top: var(--space-4);
+  margin-top: auto;
+}
+
+/* E-ink style page transition: cross-fade + 4px vertical settle */
+.page-turn-enter {
+  opacity: 0;
+  transform: translateY(var(--page-turn-settle-distance));
+}
+.page-turn-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--duration-page-turn) var(--ease-standard),
+    transform var(--duration-page-turn) var(--ease-standard);
+}
+
+
+/* ============================================================
+   V3 INPUT -- underline style (carried from V2, unchanged values)
+   ============================================================ */
+.input-underline {
+  display: block;
+  width: 100%;
+  min-height: var(--input-tap-target-height);
+  padding: var(--space-3) 0;
+  background: transparent;
+  border: none;
+  border-bottom: var(--input-border-width-default) solid var(--input-border-color-default);
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-weight: var(--weight-regular);
+  color: var(--text-primary);
+  outline: none;
+  transition:
+    border-color var(--duration-normal) var(--ease-standard),
+    border-width var(--duration-normal) var(--ease-standard);
+}
+
+.input-underline::placeholder {
+  color: var(--text-placeholder);
+  font-weight: var(--weight-light);
+}
+
+.input-underline:focus {
+  border-bottom-width: var(--input-border-width-focus);
+  border-bottom-color: var(--input-border-color-focus);
+}
+
+.input-underline:disabled {
+  opacity: var(--input-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.input-underline.error {
+  border-bottom-color: var(--input-border-color-error);
+}
+
+
+/* ============================================================
+   V3 CONFIDENCE STAMPS
+   Precise SVG/CSS annotation marks. At most one per screen, applied
+   to the single most important data point. Never hand-drawn/sketchy.
+   ============================================================ */
+
+/* Circle -- drawn around the one number to lead negotiation with */
+.stamp-circle {
+  position: relative;
+  display: inline-block;
+  padding: var(--stamp-circle-padding) calc(var(--stamp-circle-padding) * 1.6);
+}
+.stamp-circle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--stamp-stroke-width) solid var(--stamp-ink);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Bracket -- spans two numbers being compared */
+.stamp-bracket {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: calc(var(--stamp-bracket-cap) + var(--space-2));
+}
+.stamp-bracket::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--stamp-bracket-cap);
+  bottom: var(--stamp-bracket-cap);
+  width: var(--stamp-stroke-width);
+  background: var(--stamp-ink);
+}
+.stamp-bracket::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--stamp-bracket-cap);
+  width: var(--stamp-bracket-cap);
+  height: var(--stamp-stroke-width);
+  background: var(--stamp-ink);
+  box-shadow: 0 calc(100% - var(--stamp-bracket-cap) * 2 - var(--stamp-stroke-width)) 0 var(--stamp-ink);
+}
+
+/* Underscore-tick -- short double-tick under a glossary term */
+.stamp-tick {
+  position: relative;
+  border-bottom: none;
+  cursor: help;
+  text-decoration: none;
+}
+.stamp-tick::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: var(--stamp-stroke-width);
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--stamp-ink) 0,
+    var(--stamp-ink) var(--stamp-tick-length),
+    transparent var(--stamp-tick-length),
+    transparent calc(var(--stamp-tick-length) * 2)
+  );
+}
+
+/* First-appearance draw-in animation -- the only "drawn" motion allowed */
+@keyframes stamp-draw {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.stamp-circle, .stamp-bracket, .stamp-tick {
+  animation: stamp-draw var(--stamp-draw-duration) var(--stamp-draw-easing);
+}
+
+
+/* ============================================================
+   V3 SECTION GROUPING (carried from V2, same hairline + accent bar)
+   ============================================================ */
+.section-ruled {
+  border-top: var(--border-thin) solid var(--border-default);
+  border-bottom: var(--border-thin) solid var(--border-default);
+  padding: var(--space-4) 0;
+}
+
+.section-accent {
+  border-left: 3px solid var(--accent);
+  padding-left: var(--space-4);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+
+.divider {
+  height: var(--border-thin);
+  background: var(--border-default);
+  border: none;
+  margin: 0;
+}
+
+
+/* ============================================================
+   V3 BUTTONS -- sharp corners, grayscale by default
+   Only .btn-primary carries the earned sage use (alongside the
+   per-screen confidence stamp -- never both competing for attention).
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 48px;
+  padding: 0 var(--space-4);
+  border-radius: 0;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-on-accent);
+  border: none;
+}
+.btn-primary:hover  { background: var(--accent-hover); }
+.btn-primary:active { background: var(--accent-pressed); }
+
+/* V3: secondary/ghost buttons are grayscale -- ink, not sage */
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-strong);
+}
+.btn-secondary:hover  { background: var(--bg-inset); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+}
+.btn-ghost:hover  { background: var(--bg-inset); }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--bg-inset);
+  color: var(--text-disabled);
+  border-color: var(--border-default);
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
