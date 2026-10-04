@@ -331,6 +331,51 @@ td { padding: 14px 16px; border-bottom: var(--border-thin) solid var(--border-de
 td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums lining-nums; }
 
 code.token { font-family: var(--font-mono); font-size: 12px; background: var(--bg-surface); padding: 2px 6px; }
+
+/* risk signifiers — V3 color-rationing exception (sage/slate/amber) */
+:root {
+  --risk-low-color:       var(--color-sage-500);
+  --risk-low-bg:          var(--color-sage-50);
+  --risk-low-stroke:      1px;
+  --risk-medium-color:    var(--color-slate);
+  --risk-medium-bg:       #eceef1;
+  --risk-medium-stroke:   1.5px;
+  --risk-high-color:      var(--color-amber-500);
+  --risk-high-bg:         #fef8ec;
+  --risk-high-stroke:     2.5px;
+}
+[data-theme="dark"] {
+  --risk-low-color:       var(--color-sage-300);
+  --risk-low-bg:          rgba(92, 122, 107, 0.12);
+  --risk-medium-color:    var(--color-slate);
+  --risk-medium-bg:       rgba(107, 114, 128, 0.14);
+  --risk-high-color:      var(--color-amber-300);
+  --risk-high-bg:         rgba(245, 158, 11, 0.12);
+}
+.risk-low {
+  color: var(--risk-low-color); background: var(--risk-low-bg);
+  border-left: var(--risk-low-stroke) solid var(--risk-low-color);
+  padding: var(--space-2) var(--space-3);
+}
+.risk-medium {
+  color: var(--risk-medium-color); background: var(--risk-medium-bg);
+  border-left: var(--risk-medium-stroke) solid var(--risk-medium-color);
+  padding: var(--space-2) var(--space-3);
+}
+.risk-high {
+  color: var(--risk-high-color); background: var(--risk-high-bg);
+  border-left: var(--risk-high-stroke) solid var(--risk-high-color);
+  padding: var(--space-2) var(--space-3); font-weight: var(--weight-medium);
+}
+.risk-badge {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  font-size: var(--text-xs); font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide); text-transform: uppercase;
+  border-radius: 0; padding: 2px var(--space-2);
+}
+.risk-badge.risk-low    { border: var(--risk-low-stroke) solid var(--risk-low-color); }
+.risk-badge.risk-medium { border: var(--risk-medium-stroke) solid var(--risk-medium-color); }
+.risk-badge.risk-high   { border: var(--risk-high-stroke) solid var(--risk-high-color); }
 </style>
 </head>
 <body>
@@ -473,6 +518,22 @@ code.token { font-family: var(--font-mono); font-size: 12px; background: var(--b
         <label>Term (disabled)</label>
         <input class="input-underline" type="text" value="36 months" disabled>
       </div>
+    </div>
+  </section>
+
+  <!-- RISK SIGNIFIERS -->
+  <section class="section">
+    <h2>Risk signifiers</h2>
+    <p class="hint">The one color-rationing exception. Sage / slate / amber low-med-high, with distinct stroke widths so hierarchy holds in grayscale and print.</p>
+    <div class="demo-row" style="margin-bottom:20px;">
+      <span class="risk-badge risk-low">Low</span>
+      <span class="risk-badge risk-medium">Medium</span>
+      <span class="risk-badge risk-high">High</span>
+    </div>
+    <div class="grid" style="gap:12px;max-width:560px;">
+      <div class="risk-low">Money factor: 0.00125 — below market average</div>
+      <div class="risk-medium">Mileage allowance: 10,000/yr — standard</div>
+      <div class="risk-high">Disposition fee: $495 — above typical range</div>
     </div>
   </section>
 
