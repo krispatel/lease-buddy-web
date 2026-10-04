@@ -1,14 +1,18 @@
 /**
  * Lease Buddy Design Tokens — CSS Custom Properties
- * Generated from tokens.json v1.0.0
+ * Generated from tokens.json v1.1.0
  * Author: Jo — UI/UX Design Agent
  * Date: 2026-10-04
  *
  * Usage:
- *   - :root = Light mode (primary — warm off-white + sage)
- *   - [data-theme="dark"] = Dark mode (indigo-era palette, future use)
+ *   - :root = Light mode (PRIMARY — warm off-white + sage green)
+ *   - [data-theme="dark"] = Dark mode (user-toggleable, future phase — fully wired, activate via data-theme="dark")
  *
- * Apply dark mode: <html data-theme="dark"> or toggle via JS:
+ * Dual-theme architecture: light is default, dark is a first-class override.
+ * Light = :root (ships first)
+ * Dark  = [data-theme="dark"] (ships as user toggle in a later phase)
+ *
+ * To activate dark mode:
  *   document.documentElement.setAttribute('data-theme', 'dark')
  *   document.documentElement.removeAttribute('data-theme')
  */
