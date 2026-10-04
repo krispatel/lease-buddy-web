@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lease Buddy — Design System V2 Showcase</title>
+<style>
+/* =============================================================================
+   LEASE BUDDY — DESIGN TOKENS V2 (verbatim from tokens.css)
+   Sharp lines: 0px radius everywhere. Underline inputs. Paper grain.
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --color-warm-white:  #faf9f6;
+  --color-paper:       #f4f2ed;
+  --color-parchment:   #ede9e0;
+  --color-ink:         #1a1a1a;
+  --color-graphite:    #3d3d3d;
+  --color-slate:       #6b7280;
+  --color-fog:         #9ca3af;
+  --color-white:       #ffffff;
+
+  --color-sage-50:     #f0f4f2;
+  --color-sage-100:    #d6e4dd;
+  --color-sage-300:    #8fb5a7;
+  --color-sage-500:    #5c7a6b;
+  --color-sage-700:    #3d5a4f;
+  --color-sage-900:    #1f3028;
+
+  --color-amber-300:   #fcd34d;
+  --color-amber-500:   #f59e0b;
+  --color-red-100:     #fee2e2;
+  --color-red-400:     #f87171;
+  --color-red-600:     #dc2626;
+  --color-green-100:   #dcfce7;
+  --color-green-400:   #4ade80;
+  --color-green-600:   #16a34a;
+
+  --color-dark-base:           #121210;
+  --color-dark-surface:        #1c1c1a;
+  --color-dark-surface-raised: #252523;
+  --color-dark-border:         #2e2e2c;
+  --color-dark-text-primary:   #e8e4db;
+  --color-dark-text-secondary: #a09890;
+  --color-dark-text-muted:     #6b6560;
+
+  --color-bg:             var(--color-warm-white);
+  --color-surface:        var(--color-paper);
+  --color-surface-raised: var(--color-parchment);
+  --color-text-primary:   var(--color-ink);
+  --color-text-secondary: var(--color-graphite);
+  --color-text-muted:     var(--color-slate);
+  --color-text-disabled:  var(--color-fog);
+  --color-text-inverse:   var(--color-white);
+  --color-text-accent:    var(--color-sage-500);
+  --color-border-default: var(--color-parchment);
+  --color-border-strong:  var(--color-slate);
+  --color-border-accent:  var(--color-sage-500);
+  --color-border-error:   var(--color-red-600);
+  --color-accent:         var(--color-sage-500);
+  --color-accent-hover:   var(--color-sage-700);
+  --color-accent-subtle:  var(--color-sage-50);
+  --color-accent-muted:   var(--color-sage-100);
+  --color-warning-icon:   var(--color-amber-500);
+  --color-warning-bg:     var(--color-amber-300);
+  --color-error-icon:     var(--color-red-600);
+  --color-error-bg:       var(--color-red-100);
+  --color-success-icon:   var(--color-green-600);
+  --color-success-bg:     var(--color-green-100);
+
+  --font-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --size-xs: 11px; --size-sm: 12px; --size-md: 13px; --size-base: 16px;
+  --size-lg: 18px; --size-xl: 20px; --size-2xl: 30px; --size-3xl: 38px;
+
+  --weight-light: 300; --weight-regular: 400; --weight-medium: 500;
+  --weight-semibold: 600; --weight-bold: 700;
+
+  --leading-tight: 1.2; --leading-snug: 1.3; --leading-label: 1.4;
+  --leading-heading: 1.35; --leading-body: 1.5;
+
+  --tracking-tight: -0.02em; --tracking-normal: 0em;
+  --tracking-wide: 0.04em; --tracking-widest: 0.08em;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px;
+
+  --radius-none: 0px; --radius-full: 9999px; --radius-drag-handle: 2px;
+
+  --border-none: 0px; --border-thin: 1px; --border-medium: 1.5px; --border-thick: 2px;
+
+  --input-border-width-default: 1.5px;
+  --input-border-width-focus: 2px;
+  --input-border-color-default: var(--color-parchment);
+  --input-border-color-focus: var(--color-sage-500);
+  --input-border-color-error: var(--color-red-600);
+  --input-border-color-disabled: var(--color-parchment);
+  --input-tap-target-height: 52px;
+  --input-bg-readonly: var(--color-parchment);
+  --input-opacity-disabled: 0.4;
+
+  --section-divider-width: 1px;
+  --section-divider-color: var(--color-parchment);
+  --section-accent-bar-width: 3px;
+  --section-accent-bar-color: var(--color-sage-500);
+  --section-accent-bar-indent: 16px;
+
+  --texture-grain-opacity-light: 0.025;
+  --texture-grain-opacity-dark: 0.040;
+
+  --shadow-focus: 0 0 0 2px #faf9f6, 0 0 0 4px #5c7a6b;
+  --shadow-focus-error: 0 0 0 2px #faf9f6, 0 0 0 4px #dc2626;
+}
+
+[data-theme="dark"] {
+  --color-bg:             var(--color-dark-base);
+  --color-surface:        var(--color-dark-surface);
+  --color-surface-raised: var(--color-dark-surface-raised);
+  --color-border-default: var(--color-dark-border);
+  --color-text-primary:   var(--color-dark-text-primary);
+  --color-text-secondary: var(--color-dark-text-secondary);
+  --color-text-muted:     var(--color-dark-text-muted);
+  --color-text-disabled:  var(--color-dark-text-muted);
+  --color-text-inverse:   var(--color-ink);
+  --color-text-accent:    var(--color-sage-300);
+  --color-accent:         var(--color-sage-300);
+  --color-accent-hover:   var(--color-sage-500);
+  --color-accent-subtle:  var(--color-sage-900);
+  --color-accent-muted:   var(--color-sage-700);
+  --color-border-accent:  var(--color-sage-300);
+  --color-border-error:   var(--color-red-400);
+  --color-error-bg:       rgba(220,38,38,0.16);
+  --color-error-icon:     var(--color-red-400);
+  --color-success-bg:     rgba(22,163,74,0.16);
+  --color-success-icon:   var(--color-green-400);
+  --color-warning-bg:     rgba(245,158,11,0.16);
+  --color-warning-icon:   var(--color-amber-300);
+  --section-divider-color: var(--color-dark-border);
+  --input-border-color-default: var(--color-dark-border);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: var(--size-base); -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-base);
+  font-size: var(--size-base);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--texture-grain-opacity-light);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+[data-theme="dark"] body::before { opacity: var(--texture-grain-opacity-dark); }
+
+/* typographic roles */
+.type-display-xl { font-size: 38px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.type-display-lg { font-size: 30px; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+.type-display-md { font-size: 20px; font-weight: 600; line-height: 1.35; }
+.type-body-lg  { font-size: 18px; font-weight: 400; line-height: 1.5; }
+.type-body-base{ font-size: 16px; font-weight: 400; line-height: 1.5; }
+.type-body-sm  { font-size: 13px; font-weight: 300; line-height: 1.5; color: var(--color-text-secondary); }
+.type-label-lg { font-size: 14px; font-weight: 500; line-height: 1.4; }
+.type-label-md { font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 0.04em; color: var(--color-text-secondary); }
+.type-label-sm { font-size: 11px; font-weight: 500; line-height: 1.3; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+.type-meta     { font-size: 11px; font-weight: 300; line-height: 1.3; color: var(--color-text-muted); }
+.type-mono     { font-family: var(--font-mono); font-size: 13px; font-weight: 400; line-height: 1.5; font-variant-numeric: tabular-nums lining-nums; }
+.tabular       { font-variant-numeric: tabular-nums lining-nums; }
+
+/* components */
+.input-underline {
+  display: block; width: 100%; min-height: 52px; padding: 12px 0;
+  font-family: var(--font-base); font-size: 16px; font-weight: 400; line-height: 1.5;
+  color: var(--color-text-primary); background: transparent;
+  border: none; border-bottom: 1.5px solid var(--input-border-color-default);
+  border-radius: 0; outline: none; appearance: none; -webkit-appearance: none;
+  transition: border-color 100ms cubic-bezier(0.4,0,0.2,1);
+}
+.input-underline::placeholder { color: var(--color-text-muted); }
+.input-underline:focus { border-bottom-width: 2px; border-bottom-color: var(--input-border-color-focus); }
+.input-underline:disabled { border-bottom-color: var(--input-border-color-disabled); opacity: 0.4; cursor: not-allowed; }
+.input-underline[readonly] { border-bottom: none; background-color: var(--input-bg-readonly); padding-left: 8px; padding-right: 8px; cursor: default; }
+.input-underline.error { border-bottom-width: 2px; border-bottom-color: var(--input-border-color-error); }
+
+.section-ruled { border-top: 1px solid var(--section-divider-color); border-bottom: 1px solid var(--section-divider-color); padding-top: 16px; padding-bottom: 16px; }
+.section-accent { border-left: 3px solid var(--section-accent-bar-color); padding-left: 16px; padding-top: 12px; padding-bottom: 12px; }
+.divider { border: none; border-top: 1px solid var(--section-divider-color); margin: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; font-family: var(--font-base); font-size: 16px; font-weight: 500;
+  line-height: 1.4; text-decoration: none; cursor: pointer;
+  border-radius: 0; border: 1.5px solid transparent;
+  transition: background-color 100ms cubic-bezier(0.4,0,0.2,1), color 100ms, border-color 100ms;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.btn-primary { background-color: var(--color-sage-500); color: var(--color-white); border-color: var(--color-sage-500); }
+.btn-primary:hover:not(:disabled) { background-color: var(--color-sage-700); border-color: var(--color-sage-700); }
+.btn-secondary { background-color: transparent; color: var(--color-sage-500); border-color: var(--color-sage-500); }
+.btn-secondary:hover:not(:disabled) { background-color: var(--color-sage-50); }
+.btn-ghost { background-color: transparent; color: var(--color-text-primary); border-color: transparent; }
+.btn-ghost:hover:not(:disabled) { background-color: var(--color-parchment); }
+.btn-destructive { background-color: transparent; color: var(--color-red-600); border-color: var(--color-red-600); }
+.btn-destructive:hover:not(:disabled) { background-color: var(--color-red-100); }
+
+:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+.badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 500; }
+.badge-sage  { background: var(--color-sage-50); color: var(--color-sage-700); }
+.badge-amber { background: var(--color-warning-bg); color: #92400e; }
+.badge-red   { background: var(--color-error-bg); color: var(--color-error-icon); }
+
+.swatch { border-radius: 0; border: 1px solid var(--color-border-default); }
+
+/* showcase page layout */
+.wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 40px 24px 120px; }
+.topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--color-bg); border-bottom: 1px solid var(--section-divider-color); }
+.topbar .brand { display: flex; align-items: center; gap: 12px; }
+.logo-mark { width: 36px; height: 36px; background: var(--color-sage-500); border-radius: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 0 7px; }
+.logo-mark span { display: block; height: 1px; background: rgba(255,255,255,0.75); }
+.logo-mark span:last-child { width: 60%; }
+.section { margin-top: 56px; }
+.section h2 { font-size: 20px; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
+.section > .hint { font-size: 13px; font-weight: 300; color: var(--color-text-muted); margin-bottom: 24px; }
+.grid { display: grid; gap: 16px; }
+.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.cols-6 { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 720px) { .cols-2,.cols-3,.cols-4,.cols-6 { grid-template-columns: 1fr; } }
+
+.swatch-cell { border: 1px solid var(--section-divider-color); background: var(--color-surface); }
+.swatch-cell .chip { height: 48px; }
+.swatch-cell .meta { padding: 10px 12px; }
+.swatch-cell .meta b { display: block; font-weight: 600; font-size: 13px; }
+.swatch-cell .meta code { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono); }
+
+.type-row { display: flex; align-items: baseline; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--section-divider-color); }
+.type-row .name { width: 110px; font-size: 11px; font-weight: 300; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; flex-shrink: 0; }
+
+.demo-card { background: var(--color-surface); padding: 20px; border: none; }
+.demo-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+.alert { display: flex; gap: 10px; padding: 14px 16px; border-left: 3px solid; font-size: 14px; }
+.alert-info    { background: var(--color-sage-50); border-color: var(--color-sage-500); color: var(--color-sage-900); }
+.alert-success { background: var(--color-success-bg); border-color: var(--color-success-icon); }
+.alert-warning { background: var(--color-warning-bg); border-color: var(--color-warning-icon); }
+.alert-error   { background: var(--color-error-bg); border-color: var(--color-error-icon); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); padding: 12px 16px; border-bottom: 1px solid var(--color-border-strong); }
+td { padding: 14px 16px; border-bottom: 1px solid var(--section-divider-color); }
+td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+
+.hero-figure { font-size: 38px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; font-variant-numeric: tabular-nums lining-nums; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+.field .help { font-size: 11px; font-weight: 300; color: var(--color-text-muted); margin-top: 4px; }
+.field .error-text { font-size: 12px; color: var(--color-error-icon); margin-top: 4px; }
+
+.pill-preview { height: 24px; background: var(--color-sage-100); border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-sage-700); }
+.draghandle-preview { width: 44px; height: 4px; background: var(--color-slate); border-radius: 2px; margin: 0 auto; }
+
+.chip-soft { background: var(--color-sage-100); border-radius: 0; }
+code.token { font-family: var(--font-mono); font-size: 12px; background: var(--color-surface); padding: 2px 6px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="logo-mark"><span></span><span></span><span></span></div>
+    <div>
+      <div style="font-weight: 700; font-size: 16px; line-height: 1.2;">Lease Buddy</div>
+      <div class="type-meta">Design System V2 — Sharp Lines &amp; Paper</div>
+    </div>
+  </div>
+  <button class="btn btn-secondary" id="themeToggle" type="button">🌙 Dark mode</button>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="section" style="margin-top: 24px;">
+    <div class="type-label-sm">V2 showcase</div>
+    <h1 class="hero-figure" style="margin-top: 8px;">$624<span style="font-size:20px;font-weight:500;color:var(--color-text-muted);">/mo</span></h1>
+    <p class="type-body-lg" style="max-width: 560px; color: var(--color-text-secondary); margin-top: 8px;">
+      Sharp corners, underline inputs, ruled sections, and a paper-grain ground. Every card is a rule, every input is a line — the app reads like a document you fill in.
+    </p>
+  </section>
+
+  <!-- COLOR PALETTE -->
+  <section class="section">
+    <h2>Color system</h2>
+    <p class="hint">Identical to V1 — no color changes in V2. Sage green accent on warm paper.</p>
+    <div class="grid cols-6">
+      <div class="swatch-cell"><div class="chip" style="background:#faf9f6"></div><div class="meta"><b>Warm white</b><code>#faf9f6</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#f4f2ed"></div><div class="meta"><b>Paper</b><code>#f4f2ed</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#ede9e0"></div><div class="meta"><b>Parchment</b><code>#ede9e0</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#1a1a1a"></div><div class="meta"><b>Ink</b><code>#1a1a1a</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#3d3d3d"></div><div class="meta"><b>Graphite</b><code>#3d3d3d</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#6b7280"></div><div class="meta"><b>Slate</b><code>#6b7280</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#f0f4f2"></div><div class="meta"><b>Sage 50</b><code>#f0f4f2</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#d6e4dd"></div><div class="meta"><b>Sage 100</b><code>#d6e4dd</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#8fb5a7"></div><div class="meta"><b>Sage 300</b><code>#8fb5a7</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#5c7a6b"></div><div class="meta"><b>Sage 500</b><code>#5c7a6b</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#3d5a4f"></div><div class="meta"><b>Sage 700</b><code>#3d5a4f</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#1f3028"></div><div class="meta"><b>Sage 900</b><code>#1f3028</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#fcd34d"></div><div class="meta"><b>Amber 300</b><code>#fcd34d</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#f59e0b"></div><div class="meta"><b>Amber 500</b><code>#f59e0b</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#fee2e2"></div><div class="meta"><b>Red 100</b><code>#fee2e2</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#dc2626"></div><div class="meta"><b>Red 600</b><code>#dc2626</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#dcfce7"></div><div class="meta"><b>Green 100</b><code>#dcfce7</code></div></div>
+      <div class="swatch-cell"><div class="chip" style="background:#16a34a"></div><div class="meta"><b>Green 600</b><code>#16a34a</code></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section class="section">
+    <h2>Typography</h2>
+    <p class="hint">Inter 300–700. V2 adds Light (300) for body-sm and meta — wider hierarchy, more tension against the 700 hero.</p>
+    <div class="type-row"><span class="name">display-xl</span><span class="type-display-xl">$624<span style="font-size:14px;color:var(--color-text-muted)">/mo</span></span></div>
+    <div class="type-row"><span class="name">display-lg</span><span class="type-display-lg">Total lease cost</span></div>
+    <div class="type-row"><span class="name">display-md</span><span class="type-display-md">Money factor &amp; terms</span></div>
+    <div class="type-row"><span class="name">body-lg</span><span class="type-body-lg">You shouldn't need a spreadsheet to understand your lease.</span></div>
+    <div class="type-row"><span class="name">body-base</span><span class="type-body-base">The standard body copy sits at 16px with a 1.5 line height.</span></div>
+    <div class="type-row"><span class="name">body-sm*</span><span class="type-body-sm">Helper text now at Light 300 — was Regular 400 in V1.</span></div>
+    <div class="type-row"><span class="name">label-lg</span><span class="type-label-lg">Monthly payment</span></div>
+    <div class="type-row"><span class="name">label-md</span><span class="type-label-md">RESIDUAL VALUE</span></div>
+    <div class="type-row"><span class="name">label-sm</span><span class="type-label-sm">Section heading</span></div>
+    <div class="type-row"><span class="name">meta*</span><span class="type-meta">Updated 2m ago · New V2 role at Light 300</span></div>
+    <div class="type-row" style="border-bottom:none;"><span class="name">mono</span><span class="type-mono">0.00184 · $41,280 · 1,234.56</span></div>
+    <p class="hint" style="margin-top: 12px;">* = V2 change</p>
+  </section>
+
+  <!-- SHAPE LANGUAGE -->
+  <section class="section">
+    <h2>Shape language</h2>
+    <p class="hint">0px radius everywhere — the single biggest V2 differentiator. Only two permitted curves.</p>
+    <div class="grid cols-3">
+      <div class="demo-card"><div class="type-label-sm" style="margin-bottom:12px;">Sharp corner (0px)</div><div style="height:56px;background:var(--color-sage-500);border-radius:0;"></div></div>
+      <div class="demo-card"><div class="type-label-sm" style="margin-bottom:12px;">Pill badge (9999px)</div><div class="pill-preview">Pill badge</div></div>
+      <div class="demo-card"><div class="type-label-sm" style="margin-bottom:12px;">Drag handle (2px)</div><div style="padding:26px 0;"><div class="draghandle-preview"></div></div></div>
+    </div>
+  </section>
+
+  <!-- SECTION GROUPING -->
+  <section class="section">
+    <h2>Section grouping</h2>
+    <p class="hint">Ruled hairlines and left accent bars replace V1's full-border cards.</p>
+    <div class="grid cols-2">
+      <div>
+        <div class="type-label-sm" style="margin-bottom:10px;">Ruled section</div>
+        <div class="section-ruled">
+          <div class="type-label-lg">Payment details</div>
+          <p class="type-body-sm" style="margin-top:4px;">Hairline top &amp; bottom — no side borders.</p>
+        </div>
+      </div>
+      <div>
+        <div class="type-label-sm" style="margin-bottom:10px;">Accent section</div>
+        <div class="section-accent">
+          <div class="type-label-lg">Important callout</div>
+          <p class="type-body-sm" style="margin-top:4px;">3px sage bar on the left, content indented 16px.</p>
+        </div>
+      </div>
+    </div>
+    <hr class="divider" style="margin-top:24px;">
+  </section>
+
+  <!-- BUTTONS -->
+  <section class="section">
+    <h2>Buttons</h2>
+    <p class="hint">Sharp corners, no scale or shadow on hover — color change only.</p>
+    <div class="demo-row" style="margin-bottom:16px;">
+      <button class="btn btn-primary">Calculate</button>
+      <button class="btn btn-secondary">Secondary</button>
+      <button class="btn btn-ghost">Ghost</button>
+      <button class="btn btn-destructive">Remove</button>
+    </div>
+    <div class="demo-row">
+      <button class="btn btn-primary" disabled>Primary disabled</button>
+      <button class="btn btn-secondary" disabled>Secondary disabled</button>
+    </div>
+  </section>
+
+  <!-- INPUTS -->
+  <section class="section">
+    <h2>Underline inputs</h2>
+    <p class="hint">Underline only — no full-border box. 52px tap target. Notepad, not tax return.</p>
+    <div class="grid cols-2">
+      <div class="field">
+        <label>Monthly payment</label>
+        <input class="input-underline" type="text" value="624.00">
+      </div>
+      <div class="field">
+        <label>Money factor</label>
+        <input class="input-underline" type="text" placeholder="0.00184">
+      </div>
+      <div class="field">
+        <label>Residual value (error)</label>
+        <input class="input-underline error" type="text" value="54%">
+        <div class="error-text">Residual is above the lender cap of 50%.</div>
+      </div>
+      <div class="field">
+        <label>Term (disabled)</label>
+        <input class="input-underline" type="text" value="36 months" disabled>
+      </div>
+      <div class="field">
+        <label>Read-only field</label>
+        <input class="input-underline" type="text" value="Vehicle MSRP" readonly>
+      </div>
+      <div class="field">
+        <label>Down payment</label>
+        <input class="input-underline" type="text" placeholder="$0">
+      </div>
+    </div>
+  </section>
+
+  <!-- HERO FIGURE + DATA TABLE -->
+  <section class="section">
+    <h2>Financial surface</h2>
+    <p class="hint">Tabular numerics for every figure — and display-xl reserved for the single hero number.</p>
+    <div class="section-accent" style="margin-bottom:24px;">
+      <div class="type-label-sm">Estimated monthly payment</div>
+      <div class="hero-figure" style="margin-top:4px; color: var(--color-sage-500);">$624.18</div>
+      <div class="type-body-sm" style="margin-top:4px; color: var(--color-text-muted);">36 months · $0 down · money factor 0.00184</div>
+    </div>
+    <table>
+      <thead><tr><th>Line item</th><th>Term</th><th>Amount</th></tr></thead>
+      <tbody>
+        <tr><td>Vehicle MSRP</td><td>—</td><td class="tabular">$41,280.00</td></tr>
+        <tr><td>Residual value</td><td>48%</td><td class="tabular">$19,814.40</td></tr>
+        <tr><td>Dealer fee</td><td>—</td><td class="tabular">$799.00</td></tr>
+        <tr><td>Total lease cost</td><td>36 mo</td><td class="tabular">$22,470.48</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- STATUS ALERTS + BADGES -->
+  <section class="section">
+    <h2>Status &amp; badges</h2>
+    <p class="hint">Left-accent alerts in Jo's user-advocacy voice.</p>
+    <div class="grid" style="gap:12px;">
+      <div class="alert alert-info">This lease has a below-market money factor. You're in good shape.</div>
+      <div class="alert alert-success">Term of 36 months keeps you inside the bumper-to-bumper warranty.</div>
+      <div class="alert alert-warning">The dealer fee is $300 above typical for this region.</div>
+      <div class="alert alert-error">Residual value exceeds the lender cap. This quote may be off.</div>
+    </div>
+    <div class="demo-row" style="margin-top:16px;">
+      <span class="badge badge-sage">Best deal</span>
+      <span class="badge badge-amber">Review</span>
+      <span class="badge badge-red">Over cap</span>
+    </div>
+  </section>
+
+  <p class="type-meta" style="margin-top:56px;">Lease Buddy Design System v2.0 · sharp lines + paper treatment · tokens by Jo · toggle flips the full <code class="token">[data-theme="dark"]</code> layer.</p>
+
+</div>
+
+<script>
+  const btn = document.getElementById('themeToggle');
+  btn.addEventListener('click', () => {
+    const root = document.documentElement;
+    const dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.textContent = '🌙 Dark mode'; }
+    else { root.setAttribute('data-theme', 'dark'); btn.textContent = '☀️ Light mode'; }
+  });
+</script>
+</body>
+</html>
