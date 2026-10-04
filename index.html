@@ -841,14 +841,13 @@ const fmt={
 };
 
 let detectedState=null;
-const GEO_AUTHKEY = ''; // TODO: wire via serverless proxy — do NOT commit raw key client-side (see LB-010 brief note #4)
-const GEO_BASE_URL = 'https://api.usgeocoder.com/api/get_info.php';
+// LB-010: geocode goes through the same-origin proxy /api/geocode — no key in client code.
+const GEO_PROXY_URL = '/api/geocode';
 const geoRateCache = {}; // per-ZIP cache for this session — avoid repeat API hits
 
 async function geoFetchTaxRate(zip){
   if(geoRateCache[zip] !== undefined) return geoRateCache[zip];
-  if(!GEO_AUTHKEY){ geoRateCache[zip] = null; return null; }
-  const url = GEO_BASE_URL+'?'+new URLSearchParams({zipcode:zip, authkey:GEO_AUTHKEY, format:'json'});
+  const url = GEO_PROXY_URL+'?'+new URLSearchParams({zipcode:zip});
   let resp;
   try { resp = await fetch(url); }
   catch(e){ console.warn('[Geo] Network error:', e.message); geoRateCache[zip]=null; return null; }
