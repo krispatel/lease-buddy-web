@@ -100,6 +100,19 @@
   /* V3: the single earned sage use per screen -- confidence stamp ink */
   --stamp-ink:            var(--color-sage-700);
 
+  /* V3 risk-level signifier: sage (low) -> slate (med) -> amber (high).
+     Replaces red/yellow/green -- colorblind-safe, reads as intensity
+     not good/bad, survives grayscale printing via stroke-width pairing. */
+  --risk-low-color:       var(--color-sage-500);
+  --risk-low-bg:          var(--color-sage-50);
+  --risk-low-stroke:      1px;
+  --risk-medium-color:    var(--color-slate);
+  --risk-medium-bg:       #eceef1;
+  --risk-medium-stroke:   1.5px;
+  --risk-high-color:      var(--color-amber-500);
+  --risk-high-bg:         #fef8ec;
+  --risk-high-stroke:     2.5px;
+
   --status-error-bg:      var(--color-red-100);
   --status-error-text:    var(--color-red-600);
   --status-error-border:  var(--color-red-400);
@@ -151,6 +164,13 @@
   --accent-on-accent:     var(--color-dark-base);
 
   --stamp-ink:            var(--color-sage-300);
+
+  --risk-low-color:       var(--color-sage-300);
+  --risk-low-bg:          rgba(92, 122, 107, 0.12);
+  --risk-medium-color:    var(--color-slate);
+  --risk-medium-bg:       rgba(107, 114, 128, 0.14);
+  --risk-high-color:      var(--color-amber-300);
+  --risk-high-bg:         rgba(245, 158, 11, 0.12);
 
   --status-error-bg:      rgba(220, 38, 38, 0.12);
   --status-error-text:    var(--color-red-400);
@@ -650,6 +670,56 @@ body::before {
 .stamp-circle, .stamp-bracket, .stamp-tick {
   animation: stamp-draw var(--stamp-draw-duration) var(--stamp-draw-easing);
 }
+
+
+/* ============================================================
+   V3 RISK LEVEL -- low / medium / high signifier
+   Replaces red/yellow/green: sage (low) -> slate (medium) -> amber
+   (high). Colorblind-safe (not hue-dependent alone -- each level also
+   carries a distinct stroke-width so the hierarchy survives grayscale
+   printing with zero color at all). This is the ONLY place amber is
+   used as a semantic signal in V3; it does not count against the
+   'one sage use per screen' rationing rule -- risk indicators are a
+   distinct, bounded component family.
+   ============================================================ */
+.risk-low {
+  color: var(--risk-low-color);
+  background: var(--risk-low-bg);
+  border-left: var(--risk-low-stroke) solid var(--risk-low-color);
+  padding: var(--space-2) var(--space-3);
+}
+
+.risk-medium {
+  color: var(--risk-medium-color);
+  background: var(--risk-medium-bg);
+  border-left: var(--risk-medium-stroke) solid var(--risk-medium-color);
+  padding: var(--space-2) var(--space-3);
+}
+
+.risk-high {
+  color: var(--risk-high-color);
+  background: var(--risk-high-bg);
+  border-left: var(--risk-high-stroke) solid var(--risk-high-color);
+  padding: var(--space-2) var(--space-3);
+  font-weight: var(--weight-medium);
+}
+
+/* Inline badge variant -- for use next to a label rather than as a block */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  border-radius: 0;
+  padding: 2px var(--space-2);
+}
+.risk-badge.risk-low    { border: var(--risk-low-stroke) solid var(--risk-low-color); }
+.risk-badge.risk-medium { border: var(--risk-medium-stroke) solid var(--risk-medium-color); }
+.risk-badge.risk-high   { border: var(--risk-high-stroke) solid var(--risk-high-color); }
+
 
 
 /* ============================================================
