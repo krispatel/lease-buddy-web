@@ -52,7 +52,7 @@
     .mode-tab{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.5rem .5rem 0 0;padding:.5rem 1rem;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;border-bottom:none;}
     .mode-tab.active{background:#1a1d27;color:#f1f5f9;border-color:#6366f1;}
     .mode-panel.hidden{display:none;}
-    .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:4px;flex-shrink:0;vertical-align:middle;}
+    .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:8px;flex-shrink:0;vertical-align:middle;}
     .lever-badge.high{background:rgba(34,197,94,.15);}
     .lever-badge.medium{background:rgba(245,158,11,.15);}
     .lever-badge.nonneg{background:rgba(239,68,68,.15);}
@@ -1474,7 +1474,7 @@ function injectLeverBadges(){
     whyBox.className = 'lever-why-box';
     whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why + (lev.extra === 'mf-credit-tiers' ? MF_CREDIT_TIERS_HTML : '');
     wrapper.appendChild(whyBox);
-    badge.addEventListener('click', ()=> whyBox.classList.toggle('open'));
+    badge.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); closeTooltip(); whyBox.classList.toggle('open'); });
   });
 
   // Term is a button group, not an input — handle separately
@@ -1490,7 +1490,7 @@ function injectLeverBadges(){
     whyBox.className = 'lever-why-box';
     whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why;
     termLabel.closest('div').appendChild(whyBox);
-    badge.addEventListener('click', ()=> whyBox.classList.toggle('open'));
+    badge.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); closeTooltip(); whyBox.classList.toggle('open'); });
   }
 }
 
