@@ -38,7 +38,8 @@
     .hero-payment{font-size:clamp(3rem,8vw,5rem);font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;}
     @keyframes pulse-once{0%,100%{opacity:1;}50%{opacity:.5;}}
     .pulse{animation:pulse-once .3s ease;}
-    .tip-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid #2a2d3a;color:#64748b;font-size:10px;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:border-color .15s,color .15s;font-weight:600;}
+    .tip-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid #2a2d3a;color:#64748b;font-size:10px;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:border-color .15s,color .15s;font-weight:600;line-height:1;padding:0;}
+    label.flex.items-center{gap:10px;}
     .tip-btn:hover{border-color:#6366f1;color:#6366f1;}
     .tooltip-box{position:absolute;z-index:50;background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;padding:.75rem 1rem;max-width:280px;min-width:200px;font-size:.78rem;line-height:1.5;color:#f1f5f9;box-shadow:0 4px 24px rgba(0,0,0,.5);}
     .zip-status{font-size:.75rem;margin-top:.25rem;min-height:1rem;}
@@ -52,7 +53,7 @@
     .mode-tab{background:#0f1117;border:1px solid #2a2d3a;color:#64748b;border-radius:.5rem .5rem 0 0;padding:.5rem 1rem;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;border-bottom:none;}
     .mode-tab.active{background:#1a1d27;color:#f1f5f9;border-color:#6366f1;}
     .mode-panel.hidden{display:none;}
-    .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:12px;flex-shrink:0;vertical-align:middle;}
+    .lever-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;flex-shrink:0;vertical-align:middle;line-height:1;padding:0;box-sizing:border-box;}
     .lever-badge.high{background:rgba(34,197,94,.15);}
     .lever-badge.medium{background:rgba(245,158,11,.15);}
     .lever-badge.nonneg{background:rgba(239,68,68,.15);}
@@ -1507,40 +1508,50 @@ function snapshotDealTarget(){
 // ── Mode 3: Negotiate ────────────────────────────────────────────────────
 const NEGOTIATION_SECTIONS = [
   {
-    title: 'Section 1 — Mindset Briefing',
+    title: 'The Walk-Away Power',
     html: `
-      <p><strong>Your willingness to walk away is your single greatest bargaining chip.</strong></p>
-      <p>Dealerships operate on sales quotas — monthly, sometimes weekly — and salespeople/sales managers are often measured and paid on units moved in a period, not on maximizing each individual deal. A dealer facing end-of-month or end-of-quarter pressure, with inventory sitting on a floor plan (meaning they're paying interest on unsold cars every day), has urgency that works in your favor — but only if you're genuinely willing to leave.</p>
-      <div class="tactic"><strong>Practical application:</strong> Never negotiate as if this is the only car or dealer available. Get at least 2–3 comparable quotes before engaging seriously with any one dealer. State plainly, early: "I'm comparing a few dealers, and I'll go with whoever gives me the best deal." This signals competition without being adversarial.</div>
-      <p style="margin-top:.75rem;"><strong>The tell:</strong> If a salesperson needs to "check with my manager" multiple times, or the energy shifts when you stand up to leave — that's confirmation your walk-away leverage is working.</p>
+      <p><strong>Your greatest bargaining chip is your willingness to leave.</strong></p>
+      <p><strong>The Dealer's Pressure:</strong> Salespeople work on monthly quotas. If a car is sitting unsold, they are paying interest on it. Their urgency is your advantage.</p>
+      <p><strong>The Play:</strong> Never act like this is the only car available. Get 2–3 competing quotes first.</p>
+      <div class="tactic"><strong>What to Say:</strong> "I'm comparing a few offers today. I'll be moving forward with whoever gives me the best deal."</div>
+      <p style="margin-top:.75rem;"><strong>The Tell:</strong> If they keep "checking with the manager" or scramble when you stand up, your leverage is working.</p>
     `
   },
   {
-    title: 'Section 2 — Trade-In First',
+    title: 'Trade-In Isolation',
     html: `
-      <p><strong>Negotiate your trade-in value as a completely separate, standalone transaction — before discussing anything about the new lease.</strong></p>
-      <p>Dealers are skilled at blending trade-in value into the new deal to obscure both numbers at once. If your trade is undervalued by $1,000 but your "discount" on the new car looks great, you've lost money you can't see. Separating the two forces transparency on both sides.</p>
-      <div class="tactic"><strong>Tactic:</strong> Get your trade-in appraised and get a firm number — ideally in writing, or from competing offers (CarMax, Carvana, other dealers) — before you start talking about the new lease. Walk in already knowing what your trade is worth elsewhere.</div>
+      <p><strong>Negotiate your trade-in as a separate deal.</strong></p>
+      <p><strong>The Trap:</strong> Dealers love to "blend" numbers to hide low trade-in values behind high discounts.</p>
+      <p><strong>The Play:</strong> Lock in your trade-in value before you even mention the new lease.</p>
+      <div class="tactic"><strong>The Tactic:</strong> Get a firm, written quote from CarMax or Carvana first. Walk in knowing exactly what your current car is worth elsewhere.</div>
     `
   },
   {
-    title: "Section 3 — Don't Reveal Future Intent",
+    title: 'Guard Your Intent',
     html: `
-      <p><strong>Never tell the dealer upfront whether you plan to lease or finance, or whether you're buying another car from them down the road — until your numbers are locked.</strong></p>
-      <p>This question is a probe, not small talk. Revealing future intent (e.g., "I always lease a new one every 3 years") only gives the dealer information that helps them, never you.</p>
-      <div class="tactic"><strong>Tactic:</strong> If asked "are you looking to lease or finance?" or similar — keep it neutral: "I'm deciding based on the numbers you give me." Lock in price, money factor, and fees first. Only discuss future plans, if at all, after deal terms are set.</div>
+      <p><strong>Don't reveal how you're paying until the price is locked.</strong></p>
+      <p><strong>The Trap:</strong> If you say "I always lease every 3 years," you're giving away data the dealer will use to manipulate the monthly payment.</p>
+      <p><strong>The Play:</strong> Keep your cards close. If they ask if you're leasing or financing, say: "I'm deciding based on the final numbers you give me."</p>
+      <div class="tactic"><strong>The Tactic:</strong> Lock in the vehicle price and fees first. Discuss the "how" only after the "how much" is set.</div>
     `
   },
   {
-    title: 'Section 4 — Negotiation Order: Start Here',
+    title: 'The Negotiation Order',
     html: `
-      <p>(Trade-in removed from this list since it's handled separately in Section 2 above.)</p>
+      <p><strong>Focus on these points in this specific order:</strong></p>
       <ol style="list-style:decimal;padding-left:1.25rem;color:#cbd5e1;font-size:.9rem;line-height:1.8;">
-        <li><strong>Vehicle Price (Negotiated Price vs. MSRP)</strong> — most normalized, expected negotiation point. Anchor low based on research/comparable quotes, not MSRP.</li>
-        <li><strong>Manufacturer Rebates/Incentives</strong> — confirm explicitly these are applied. Ask: "what manufacturer incentives are available on this VIN this month?"</li>
-        <li><strong>Money Factor</strong> — ask what credit tier you qualify for, then ask if the quoted MF matches the buy rate for that tier or includes a markup.</li>
-        <li><strong>Fees (Doc, Acquisition markup)</strong> — ask what's bank-mandated vs. dealer-added. Expect partial wins, not full waivers.</li>
+        <li><strong>Vehicle Price:</strong> Ignore MSRP. Anchor low based on your research.</li>
+        <li><strong>Rebates:</strong> Ask: "Which manufacturer incentives apply to this specific VIN this month?"</li>
+        <li><strong>Money Factor:</strong> Ask for the "buy rate" for your credit tier to ensure they aren't marking up the interest.</li>
+        <li><strong>Fees:</strong> Ask which are bank-mandated and which are "dealer-added." Fight to waive the latter.</li>
       </ol>
+    `
+  },
+  {
+    title: 'Your Target',
+    html: `
+      <p><strong>Ready to set a goal?</strong></p>
+      <p>Go to <strong>Calculate &amp; Educate</strong>, build your ideal deal, and tap <strong>"Set as Negotiation Target"</strong> to track your progress.</p>
     `
   },
 ];
