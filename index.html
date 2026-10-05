@@ -64,6 +64,9 @@
     .neg-section h3{color:#6366f1;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;}
     .neg-section p{color:#cbd5e1;font-size:.9rem;line-height:1.6;margin-bottom:.75rem;}
     .neg-section .tactic{background:#0f1117;border-left:3px solid #6366f1;padding:.6rem .75rem;border-radius:0 .375rem .375rem 0;font-size:.85rem;color:#94a3b8;}
+    .toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(1rem);background:#1a1d27;border:1px solid #6366f1;border-radius:.5rem;padding:.65rem 1rem;color:#f1f5f9;font-size:.85rem;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.5);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;max-width:90vw;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast.error{border-color:#ef4444;background:#1f1419;}
   </style>
 </head>
 <body class="min-h-screen">
@@ -437,7 +440,7 @@
     </div>
 
     <div class="card p-5">
-      <button id="set-target-btn" class="term-btn w-full" style="background:#6366f1;border-color:#6366f1;color:#fff;">Set as Negotiation Target →</button>
+      <button id="set-target-btn" class="term-btn w-full" style="background:#6366f1;border-color:#6366f1;color:#fff;">Set Target &amp; Start Negotiation →</button>
       <p class="text-xs text-[#64748b] mt-2 text-center">Saves this deal so you can compare it against a dealer's offer in Mode 3.</p>
     </div>
 
@@ -1497,12 +1500,30 @@ function injectLeverBadges(){
 function snapshotDealTarget(){
   const inputs = readInputs();
   if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0) {
-    alert('Enter a complete deal in the calculator before setting it as your negotiation target.');
+    showToast('Enter a complete deal in the calculator first.', true);
     return;
   }
   const b = LeaseCalc.calculate(inputs);
   AppState.dealTarget = { inputs, calculated: b, vehicle: AppState.vehicle };
-  alert('Target deal saved! Head to the Negotiate tab to use it.');
+  showToast('Target set. Starting negotiation…');
+  setTimeout(()=> showMode('negotiate'), 650);
+}
+
+// ── In-app toast (replaces browser alert) ───────────────────────────────
+let toastTimer=null;
+function showToast(msg, isError){
+  let t = document.getElementById('app-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'app-toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  requestAnimationFrame(()=> t.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
 }
 
 // ── Mode 3: Negotiate ────────────────────────────────────────────────────
@@ -1551,7 +1572,7 @@ const NEGOTIATION_SECTIONS = [
     title: 'Your Target',
     html: `
       <p><strong>Ready to set a goal?</strong></p>
-      <p>Go to <strong>Calculate &amp; Educate</strong>, build your ideal deal, and tap <strong>"Set as Negotiation Target"</strong> to track your progress.</p>
+      <p>Go to <strong>Calculate &amp; Educate</strong>, build your ideal deal, and tap <strong>"Set Target &amp; Start Negotiation"</strong> to track your progress.</p>
     `
   },
 ];
@@ -1579,7 +1600,7 @@ function renderMode3(){
 function renderMode3Section5(){
   const el = document.getElementById('m3-section5');
   if(!AppState.dealTarget){
-    el.innerHTML = `<p class="text-sm text-[#64748b]">No negotiation target set yet. Go to <strong>Calculate &amp; Educate</strong>, build your deal, and click &ldquo;Set as Negotiation Target.&rdquo;</p>`;
+    el.innerHTML = `<p class="text-sm text-[#64748b]">No negotiation target set yet. Go to <strong>Calculate &amp; Educate</strong>, build your deal, and click &ldquo;Set Target &amp; Start Negotiation.&rdquo;</p>`;
     return;
   }
   const target = AppState.dealTarget;
