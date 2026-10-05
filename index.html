@@ -1238,6 +1238,7 @@ function showMode(name){
   document.getElementById('mode-'+name).classList.remove('hidden');
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === name));
   if(name === 'negotiate') renderMode3(); // build/refresh Mode 3 content each time it's shown
+  scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function wireModeNav(){
