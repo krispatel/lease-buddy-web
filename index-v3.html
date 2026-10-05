@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lease Buddy — Know the math before you sign.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-warm-white: #faf9f6; --color-paper: #f4f2ed; --color-parchment: #ede9e0;
+      --color-ink: #1a1a1a; --color-graphite: #3d3d3d; --color-slate: #6b7280; --color-fog: #9ca3af; --color-white: #ffffff;
+      --color-sage-50: #eef3f0; --color-sage-100: #d4e4dc; --color-sage-300: #8ab5a4; --color-sage-500: #5c7a6b; --color-sage-700: #3d5a4f; --color-sage-900: #1e2e28;
+      --color-amber-300: #fcd34d; --color-amber-500: #f59e0b;
+      --color-red-100: #fee2e2; --color-red-400: #f87171; --color-red-600: #dc2626;
+      --color-green-100: #dcfce7; --color-green-400: #4ade80; --color-green-600: #16a34a;
+      --color-dark-base: #0f1117; --color-dark-surface: #1a1d27; --color-dark-surface-raised: #22263a; --color-dark-border: #2a2d3a;
+      --color-dark-text-primary: #f0ede8; --color-dark-text-secondary: #9ca3af; --color-dark-text-muted: #6b7280;
+    }
+    :root {
+      --bg-app: var(--color-warm-white); --bg-surface: var(--color-paper); --bg-inset: var(--color-parchment); --bg-overlay: rgba(26,26,26,.48);
+      --text-primary: var(--color-ink); --text-secondary: var(--color-graphite); --text-muted: var(--color-slate);
+      --text-placeholder: var(--color-fog); --text-disabled: var(--color-fog); --text-on-accent: var(--color-white);
+      --border-default: var(--color-parchment); --border-strong: var(--color-slate); --border-focus: var(--color-sage-500);
+      --accent: var(--color-sage-500); --accent-hover: var(--color-sage-700); --accent-pressed: var(--color-sage-700);
+      --accent-subtle: var(--color-sage-50); --accent-muted: var(--color-sage-100); --accent-on-accent: var(--color-white);
+      --stamp-ink: var(--color-sage-700);
+      --risk-low-color: var(--color-sage-500); --risk-low-bg: var(--color-sage-50); --risk-low-stroke: 1px;
+      --risk-medium-color: var(--color-slate); --risk-medium-bg: #eceef1; --risk-medium-stroke: 1.5px;
+      --risk-high-color: var(--color-amber-500); --risk-high-bg: #fef8ec; --risk-high-stroke: 2.5px;
+      --status-error-bg: var(--color-parchment); --status-error-text: var(--color-ink); --status-error-border: var(--color-ink); --status-error-border-width: 3px;
+      --status-warning-bg: #fef8ec; --status-warning-text: var(--color-amber-500); --status-warning-border: var(--color-amber-500);
+      --status-success-bg: var(--color-sage-50); --status-success-text: var(--color-sage-700); --status-success-border: var(--color-sage-500);
+      --status-info-bg: #eceef1; --status-info-text: var(--color-slate); --status-info-border: var(--color-slate);
+      --shadow-none: none; --shadow-focus: 0 0 0 3px rgba(92,122,107,.32); --shadow-focus-error: 0 0 0 3px rgba(220,38,38,.24);
+      --shadow-overlay: 0 20px 25px rgba(26,26,26,.10), 0 10px 10px rgba(26,26,26,.04);
+    }
+    :root {
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --text-xs: 11px; --text-sm: 13px; --text-base: 16px; --text-md: 18px; --text-lg: 20px; --text-xl: 24px; --text-2xl: 30px; --text-3xl: 38px;
+      --text-hero-serif: 48px; --text-dossier-header: 13px;
+      --weight-light: 300; --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700;
+      --leading-tight: 1.2; --leading-snug: 1.35; --leading-normal: 1.5; --leading-relaxed: 1.65;
+      --tracking-tight: -0.02em; --tracking-normal: 0em; --tracking-wide: 0.04em; --tracking-widest: 0.08em;
+    }
+    :root {
+      --space-0:0px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-7:28px;--space-8:32px;--space-10:40px;--space-12:48px;--space-14:56px;--space-16:64px;--space-20:80px;--space-24:96px;
+      --page-margin-minimum: var(--space-6); --page-margin-preferred: var(--space-8);
+    }
+    :root { --radius-none:0px;--radius-sm:0px;--radius-md:0px;--radius-lg:0px;--radius-xl:0px;--radius-2xl:0px;--radius-pill:0px; }
+    :root { --border-none:0px;--border-thin:1px;--border-medium:2px;--border-thick:3px; }
+    :root {
+      --input-border-width-default: 1.5px; --input-border-width-focus: 2px;
+      --input-border-color-default: var(--color-parchment); --input-border-color-focus: var(--color-sage-500); --input-border-color-error: var(--color-red-600);
+      --input-tap-target-height: 52px; --input-bg-readonly: var(--color-parchment); --input-opacity-disabled: 0.4;
+    }
+    :root { --layout-max-content-width: 560px; }
+    :root { --stamp-stroke-width:2px;--stamp-circle-padding:6px;--stamp-bracket-cap:8px;--stamp-tick-length:4px;--stamp-draw-duration:250ms;--stamp-draw-easing:cubic-bezier(.4,0,.2,1); }
+    :root { --texture-grain-opacity-light:.030;--texture-grain-opacity-dark:.045;--texture-diffusion-blur:.3px; }
+    :root { --z-base:0;--z-raised:10;--z-overlay:300;--z-modal:400;--z-tooltip:600; }
+    :root {
+      --duration-instant:0ms;--duration-fast:100ms;--duration-normal:150ms;--duration-page-turn:220ms;--duration-slow:300ms;
+      --page-turn-settle-distance:4px;
+      --ease-standard:cubic-bezier(.4,0,.2,1);--ease-decelerate:cubic-bezier(0,0,.2,1);--ease-accelerate:cubic-bezier(.4,0,1,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html{font-size:16px;-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+    body{font-family:var(--font-ui);font-size:var(--text-base);font-weight:var(--weight-regular);line-height:var(--leading-normal);color:var(--text-primary);background-color:var(--bg-app);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative;margin:0;}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:var(--texture-grain-opacity-light);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");background-repeat:repeat;}
+    header,nav,main,footer{position:relative;z-index:1;}
+    .type-hero-serif{font-family:var(--font-serif);font-size:var(--text-hero-serif);font-weight:var(--weight-semibold);line-height:var(--leading-tight);letter-spacing:var(--tracking-tight);color:var(--text-primary);font-variant-numeric:tabular-nums lining-nums;filter:blur(var(--texture-diffusion-blur));}
+    .type-dossier-header{font-family:var(--font-serif);font-size:var(--text-dossier-header);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:var(--tracking-widest);color:var(--text-secondary);line-height:var(--leading-snug);}
+    .tabular,[data-value],.lease-value,.lease-calc{font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;}
+    .stamp-circle{position:relative;display:inline-block;padding:var(--stamp-circle-padding) calc(var(--stamp-circle-padding)*1.6);}
+    .stamp-circle::after{content:'';position:absolute;inset:0;border:var(--stamp-stroke-width) solid var(--stamp-ink);border-radius:50%;pointer-events:none;}
+    .stamp-bracket{position:relative;display:flex;flex-direction:column;gap:var(--space-2);padding-left:calc(var(--stamp-bracket-cap) + var(--space-2));}
+    .stamp-bracket::before{content:'';position:absolute;left:0;top:var(--stamp-bracket-cap);bottom:var(--stamp-bracket-cap);width:var(--stamp-stroke-width);background:var(--stamp-ink);}
+    .stamp-bracket::after{content:'';position:absolute;left:0;top:var(--stamp-bracket-cap);width:var(--stamp-bracket-cap);height:var(--stamp-stroke-width);background:var(--stamp-ink);box-shadow:0 calc(100% - var(--stamp-bracket-cap)*2 - var(--stamp-stroke-width)) 0 var(--stamp-ink);}
+    @keyframes stamp-draw{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+    .stamp-circle,.stamp-bracket{animation:stamp-draw var(--stamp-draw-duration) var(--stamp-draw-easing);}
+    .risk-badge{display:inline-flex;align-items:center;gap:var(--space-1);font-size:var(--text-xs);font-weight:var(--weight-medium);letter-spacing:var(--tracking-wide);text-transform:uppercase;border-radius:0;padding:2px var(--space-2);cursor:pointer;}
+    .risk-badge.risk-low{border:var(--risk-low-stroke) solid var(--risk-low-color);color:var(--risk-low-color);}
+    .risk-badge.risk-medium{border:var(--risk-medium-stroke) solid var(--risk-medium-color);color:var(--risk-medium-color);}
+    .risk-badge.risk-high{border:var(--risk-high-stroke) solid var(--risk-high-color);color:var(--risk-high-color);}
+    .risk-why-box{background:var(--bg-inset);border-left:var(--border-thick) solid var(--border-strong);padding:var(--space-3);font-size:var(--text-sm);color:var(--text-secondary);line-height:var(--leading-normal);margin-top:var(--space-2);display:none;}
+    .risk-why-box.open{display:block;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);height:48px;padding:0 var(--space-4);border-radius:0;font-family:var(--font-ui);font-size:var(--text-sm);font-weight:var(--weight-medium);line-height:1;cursor:pointer;text-decoration:none;white-space:nowrap;user-select:none;transition:background var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard);}
+    .btn-primary{background:var(--accent);color:var(--accent-on-accent);border:none;}
+    .btn-primary:hover{background:var(--accent-hover);}
+    .btn-primary:active{background:var(--accent-pressed);}
+    .btn-secondary{background:transparent;color:var(--text-primary);border:1.5px solid var(--border-strong);}
+    .btn-secondary:hover{background:var(--bg-inset);}
+    .btn-ghost{background:transparent;color:var(--text-secondary);border:none;}
+    .btn-ghost:hover{background:var(--bg-inset);}
+    .btn:disabled,.btn[aria-disabled="true"]{background:var(--bg-inset);color:var(--text-disabled);border-color:var(--border-default);cursor:not-allowed;}
+    :focus-visible{outline:none;box-shadow:var(--shadow-focus);}
+    .card{background:var(--bg-surface);border:var(--border-thin) solid var(--border-default);border-radius:var(--radius-none);}
+    input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:0;background:var(--border-default);outline:none;cursor:pointer;}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-app);}
+    input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg-app);}
+    input[type=range]:focus::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(92,122,107,.3);}
+    .num-input{background:var(--bg-app);border:var(--input-border-width-default) solid var(--input-border-color-default);border-radius:var(--radius-none);color:var(--text-primary);padding:.375rem .5rem;font-size:.875rem;width:100%;font-family:var(--font-ui);}
+    .num-input:focus{outline:none;border-color:var(--input-border-color-focus);box-shadow:0 0 0 2px rgba(92,122,107,.2);}
+    .num-input:read-only{opacity:.6;cursor:not-allowed;border-color:var(--border-default);background:var(--input-bg-readonly);}
+    .cascade-select{background:var(--bg-app);border:var(--input-border-width-default) solid var(--input-border-color-default);border-radius:var(--radius-none);color:var(--text-primary);padding:.375rem .5rem;font-size:.875rem;width:100%;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;min-height:2.25rem;}
+    .cascade-select:focus{outline:none;border-color:var(--input-border-color-focus);box-shadow:0 0 0 2px rgba(92,122,107,.2);}
+    .cascade-select:disabled{opacity:.35;cursor:not-allowed;}
+    .term-btn{background:var(--bg-app);border:var(--border-thin) solid var(--border-strong);color:var(--text-muted);border-radius:var(--radius-none);padding:.375rem .75rem;cursor:pointer;font-size:.875rem;transition:all .15s;}
+    .term-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-on-accent);}
+    .seg-btn{background:var(--bg-app);border:var(--border-thin) solid var(--border-strong);color:var(--text-muted);border-radius:var(--radius-none);padding:.3rem .5rem;cursor:pointer;font-size:.78rem;transition:all .15s;flex:1;text-align:center;}
+    .seg-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-on-accent);}
+    .worksheet-line{font-family:var(--font-mono);font-size:.8rem;color:var(--text-secondary);line-height:1.7;}
+    .worksheet-line.result{color:var(--text-primary);font-weight:600;}
+    .worksheet-line.section{color:var(--text-secondary);font-family:var(--font-serif);font-weight:600;margin-top:.75rem;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;}
+    .worksheet-line.warn{color:var(--color-amber-500);font-style:italic;}
+    details>summary{cursor:pointer;list-style:none;}
+    details>summary::-webkit-details-marker{display:none;}
+    .hero-payment{font-family:var(--font-serif);font-size:clamp(2.75rem,8vw,var(--text-hero-serif));font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;color:var(--text-primary);}
+    @keyframes pulse-once{0%,100%{opacity:1;}50%{opacity:.5;}}
+    .pulse{animation:pulse-once .3s ease;}
+    .tip-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:transparent;border:1px solid var(--border-strong);color:var(--text-muted);font-size:10px;cursor:pointer;flex-shrink:0;vertical-align:middle;margin-left:4px;transition:border-color .15s,color .15s;font-weight:600;line-height:1;padding:0;}
+    label.flex.items-center{gap:10px;}
+    .tip-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .tooltip-box{position:absolute;z-index:50;background:var(--bg-surface);border:var(--border-thin) solid var(--accent);border-radius:var(--radius-none);padding:.75rem 1rem;max-width:280px;min-width:200px;font-size:.78rem;line-height:1.5;color:var(--text-primary);box-shadow:var(--shadow-overlay);}
+    .zip-status{font-size:.75rem;margin-top:.25rem;min-height:1rem;}
+    .lock-badge{display:inline-flex;align-items:center;gap:.25rem;background:var(--risk-low-bg);border:1px solid var(--risk-low-color);color:var(--risk-low-color);border-radius:var(--radius-none);padding:.2rem .5rem;font-size:.7rem;font-weight:600;letter-spacing:.02em;}
+    .lock-badge.fallback{background:var(--risk-medium-bg);border-color:var(--risk-medium-color);color:var(--risk-medium-color);}
+    .slider-lock-overlay{position:absolute;inset:0;cursor:not-allowed;z-index:10;border-radius:0;}
+    @keyframes field-loading{0%,100%{opacity:.35;}50%{opacity:.7;}}
+    .field-loading{animation:field-loading .9s ease-in-out infinite;pointer-events:none;}
+    .oem-comparison{font-size:.75rem;color:var(--text-muted);margin-top:.5rem;display:none;}
+    .oem-comparison .oem-val{color:var(--text-secondary);font-family:var(--font-mono);}
+    .mode-tab{background:var(--bg-app);border:var(--border-thin) solid var(--border-default);color:var(--text-muted);border-radius:var(--radius-none);padding:.5rem 1rem;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;border-bottom:none;}
+    .mode-tab.active{background:var(--bg-surface);color:var(--text-primary);border-color:var(--accent);border-bottom:2px solid var(--bg-surface);margin-bottom:-1px;}
+    .mode-panel.hidden{display:none;}
+    .lever-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:0;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;flex-shrink:0;vertical-align:middle;line-height:1;box-sizing:border-box;border:1.5px solid transparent;}
+    .lever-badge.high{background:var(--risk-low-bg);color:var(--risk-low-color);border-color:var(--risk-low-color);}
+    .lever-badge.medium{background:var(--risk-medium-bg);color:var(--risk-medium-color);border-color:var(--risk-medium-color);}
+    .lever-badge.nonneg{background:var(--risk-high-bg);color:var(--risk-high-color);border-color:var(--risk-high-color);}
+    .lever-why-box{background:var(--bg-inset);border:none;border-left:var(--border-thick) solid var(--border-strong);border-radius:0;padding:.75rem;font-size:.78rem;color:var(--text-secondary);line-height:1.5;margin-top:.5rem;display:none;}
+    .lever-why-box.open{display:block;}
+    .compare-card{background:var(--bg-app);border:var(--border-thin) solid var(--border-default);border-radius:var(--radius-none);padding:.75rem;font-size:.8rem;}
+    .neg-section{background:var(--bg-surface);border:var(--border-thin) solid var(--border-default);border-radius:var(--radius-none);padding:1.25rem;}
+    .neg-section h3{font-family:var(--font-serif);color:var(--text-secondary);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;}
+    .neg-section p{color:var(--text-primary);font-size:.9rem;line-height:1.6;margin-bottom:.75rem;}
+    .neg-section .tactic{background:var(--bg-inset);border-left:3px solid var(--accent);padding:.6rem .75rem;border-radius:0;font-size:.85rem;color:var(--text-secondary);}
+    .toast{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(1rem);background:var(--color-ink);border:var(--border-thin) solid var(--color-ink);border-radius:var(--radius-none);padding:.65rem 1rem;color:var(--color-warm-white);font-size:.85rem;font-weight:600;box-shadow:var(--shadow-overlay);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;max-width:90vw;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast.error{border-color:var(--color-amber-500);background:#3a2a0f;}
+    header.lb-header{border-bottom:var(--border-thin) solid var(--border-default);}
+    .lb-shell{max-width:72rem;margin:0 auto;}
+    .lb-title{font-family:var(--font-serif);font-weight:600;color:var(--text-primary);letter-spacing:-.01em;}
+    .lb-subtitle{color:var(--text-muted);}
+    .lb-meta{color:var(--text-muted);}
+    .lb-divider{border-top:var(--border-thin) solid var(--border-default);}
+    .lb-divider-label{color:var(--text-secondary);font-family:var(--font-serif);letter-spacing:.08em;text-transform:uppercase;font-size:.72rem;}
+    .lb-card-header{color:var(--text-secondary);font-family:var(--font-serif);letter-spacing:.08em;text-transform:uppercase;}
+    .lb-field-label{color:var(--text-primary);}
+    .lb-field-sublabel{color:var(--text-muted);}
+    .lb-link{color:var(--accent);}
+    .lb-link:hover{color:var(--accent-hover);}
+    .lb-warn-text{color:var(--color-amber-500);}
+    .lb-footer{color:var(--text-muted);border-top:var(--border-thin) solid var(--border-default);}
+    .lb-inset-block{background:var(--bg-inset);border-radius:var(--radius-none);}
+    .lb-swatch{border-radius:0;}
+  </style>
+</head>
+<body class="min-h-screen">
+<div id="tooltip-portal"></div>
+
+<header class="lb-header px-6 py-4">
+  <div class="lb-shell flex items-center justify-between">
+    <div>
+      <h1 class="text-xl lb-title">Lease Buddy</h1>
+      <p class="text-xs lb-subtitle mt-0.5">Know the math before you sign.</p>
+    </div>
+    <div class="text-xs lb-meta text-right hidden sm:block">All calculations run locally.<br/>No data is sent anywhere.</div>
+  </div>
+</header>
+
+<nav class="lb-shell px-4 pt-4 flex gap-2" id="mode-nav">
+  <button class="mode-tab active" data-mode="explore">1. Explore &amp; Compare</button>
+  <button class="mode-tab active" data-mode="calculate">2. Calculate &amp; Educate</button>
+  <button class="mode-tab" data-mode="negotiate">3. Negotiate</button>
+</nav>
+
+<div id="mode-explore" class="mode-panel hidden">
+<main class="lb-shell px-4 py-6">
+  <div class="card p-5 space-y-5 mb-4">
+    <h2 class="text-sm lb-card-header">Find a Vehicle</h2>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div><label class="text-xs lb-field-sublabel mb-1 block">Year</label><select id="m1-sel-year" class="cascade-select"><option value="">Select year…</option></select></div>
+      <div><label class="text-xs lb-field-sublabel mb-1 block">Make</label><select id="m1-sel-make" class="cascade-select" disabled><option value="">Loading…</option></select></div>
+      <div><label class="text-xs lb-field-sublabel mb-1 block">Model</label><select id="m1-sel-model" class="cascade-select" disabled><option value="">Select make first</option></select></div>
+      <div><label class="text-xs lb-field-sublabel mb-1 block">Trim</label><select id="m1-sel-trim" class="cascade-select" disabled><option value="">Select model first</option></select></div>
+    </div>
+    <p id="m1-status" class="text-xs lb-field-sublabel mt-1"></p>
+  </div>
+
+  <div id="m1-preview-card" class="card p-5 space-y-3 mb-4 hidden">
+    <h2 class="text-sm lb-card-header">Quick Preview</h2>
+    <div id="m1-preview-content" class="text-sm lb-field-label space-y-1"></div>
+    <div class="flex gap-2 pt-2">
+      <button id="m1-save-btn" class="term-btn">+ Save to Compare</button>
+      <button id="m1-use-btn" class="term-btn btn-primary" style="border:none;">Use in Calculator →</button>
+    </div>
+  </div>
+
+  <div class="card p-5 space-y-3">
+    <h2 class="text-sm lb-card-header">Comparing (<span id="m1-compare-count">0</span>/3)</h2>
+    <div id="m1-compare-table" class="text-sm lb-field-sublabel">No vehicles saved yet — find one above and click &ldquo;Save to Compare.&rdquo;</div>
+  </div>
+</main>
+</div>
+
+<div id="mode-calculate" class="mode-panel">
+<main class="lb-shell px-4 py-6 lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6">
+  <section class="space-y-4">
+    <div class="card p-5 space-y-5">
+      <h2 class="text-sm lb-card-header">Vehicle &amp; Market Data</h2>
+      <div>
+        <label class="text-sm font-medium lb-field-label flex items-center mb-2">Select Vehicle<button class="tip-btn" data-tip="vehicleSelect">i</button></label>
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <div><label class="text-xs lb-field-sublabel mb-1 block">Year</label><select id="sel-year" class="cascade-select"><option value="">Select year…</option></select></div>
+          <div><label class="text-xs lb-field-sublabel mb-1 block">Make</label><select id="sel-make" class="cascade-select" disabled><option value="">Loading…</option></select></div>
+          <div><label class="text-xs lb-field-sublabel mb-1 block">Model</label><select id="sel-model" class="cascade-select" disabled><option value="">Select make first</option></select></div>
+          <div><label class="text-xs lb-field-sublabel mb-1 block">Trim</label><select id="sel-trim" class="cascade-select" disabled><option value="">Select model first</option></select></div>
+        </div>
+        <div id="vehicle-lock-row" class="hidden mt-2 flex items-center justify-between">
+          <span class="lock-badge">&#x1F512; Live OEM Data</span>
+          <button id="unlock-btn" class="text-xs lb-link underline bg-transparent border-none cursor-pointer">Clear / Edit Manually</button>
+        </div>
+        <p id="vehicle-status" class="text-xs lb-field-sublabel mt-1"></p>
+      </div>
+      <div class="space-y-2">
+        <label class="text-sm font-medium lb-field-label block">ZIP Code</label>
+        <div class="flex items-center gap-2">
+          <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" class="num-input w-28" style="letter-spacing:.1em;" />
+          <button id="zip-lookup-btn" class="btn-secondary" style="border-radius:0;padding:.375rem .75rem;cursor:pointer;font-size:.8rem;white-space:nowrap;">Look up</button>
+        </div>
+        <p class="zip-status lb-field-sublabel" id="zip-status">Enter ZIP to auto-detect state tax rate</p>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium lb-field-label">MSRP</label>
+          <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="msrp" value="45000" min="10000" max="200000" step="500" class="num-input w-28 text-right" /></div>
+        </div>
+        <div class="relative"><input type="range" id="msrp-slider" min="10000" max="200000" step="500" value="45000" class="w-full" /><div id="msrp-slider-lock" class="slider-lock-overlay" style="display:none;"></div></div>
+        <div class="flex justify-between text-xs lb-field-sublabel mt-1"><span>$10k</span><span>$200k</span></div>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium lb-field-label flex items-center">Residual % <button class="tip-btn" data-tip="residualPct">i</button></label>
+          <div class="flex items-center gap-1"><input type="number" id="residualPct" value="55" min="20" max="80" step="0.5" class="num-input w-20 text-right" /><span class="text-xs lb-field-sublabel">%</span></div>
+        </div>
+        <div class="relative"><input type="range" id="residualPct-slider" min="20" max="80" step="0.5" value="55" class="w-full" /><div id="residualPct-slider-lock" class="slider-lock-overlay" style="display:none;"></div></div>
+        <p class="text-xs lb-field-sublabel mt-1" id="residual-dollars">Set by lender — higher is better for you</p>
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium lb-field-label flex items-center">Money Factor <button class="tip-btn" data-tip="moneyFactor">i</button></label>
+          <div class="flex items-center gap-1"><input type="number" id="moneyFactor" value="0.00125" min="0.00001" max="0.005" step="0.00001" class="num-input w-24 text-right font-mono" /></div>
+        </div>
+        <input type="range" id="moneyFactor-slider" min="1" max="500" step="1" value="125" class="w-full" />
+        <p class="text-xs lb-field-sublabel mt-1">&#x2248; <span id="mf-apr-val">3.00</span>% APR &mdash; ask your dealer for the buy-rate MF</p>
+        <div class="flex justify-between text-xs lb-field-sublabel"><span>0.00001</span><span>0.00500</span></div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 px-1"><div class="flex-1 lb-divider"></div><span class="text-xs lb-divider-label">Your Deal</span><div class="flex-1 lb-divider"></div></div>
+
+    <div class="card p-5 space-y-5">
+      <h2 class="text-sm lb-card-header">Negotiation</h2>
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="text-sm font-medium lb-field-label flex items-center">Negotiated Price <button class="tip-btn" data-tip="capCost">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="capCost" value="" min="5000" max="200000" step="100" class="num-input w-28 text-right" placeholder="0" /></div>
+        </div>
+        <input type="range" id="capCost-slider" min="5000" max="200000" step="100" value="45000" class="w-full" />
+        <p class="text-xs lb-field-sublabel mt-1" id="cap-cost-pct">Negotiating from MSRP</p>
+      </div>
+      <div>
+        <label class="text-sm font-medium lb-field-label flex items-center mb-2">Term <button class="tip-btn" data-tip="term">i</button></label>
+        <div class="flex gap-2" id="term-btns">
+          <button class="term-btn" data-term="24">24 mo</button>
+          <button class="term-btn active" data-term="36">36 mo</button>
+          <button class="term-btn" data-term="39">39 mo</button>
+          <button class="term-btn" data-term="48">48 mo</button>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-center">
+          <label class="text-sm font-medium lb-field-label">Mileage Per Year</label>
+          <div class="flex items-center gap-1"><input type="number" id="mileagePerYear" value="10000" min="7500" max="20000" step="2500" class="num-input w-24 text-right font-mono" /><span class="text-xs lb-field-sublabel">mi</span></div>
+        </div>
+        <input type="range" id="mileagePerYear-slider" min="7500" max="20000" step="2500" value="10000" class="w-full mt-2" />
+        <div class="flex justify-between text-xs lb-field-sublabel mt-1"><span>7,500</span><span>20,000</span></div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 px-1"><div class="flex-1 lb-divider"></div><span class="text-xs lb-divider-label">Discounts, Cash &amp; Fees</span><div class="flex-1 lb-divider"></div></div>
+
+    <div class="card p-5 space-y-4">
+      <h2 class="text-sm lb-card-header">Discounts, Cash &amp; Fees</h2>
+      <div class="flex justify-between items-center">
+        <label class="text-sm lb-field-label">Trade-in Value</label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="tradeIn" value="0" min="0" max="100000" step="100" class="num-input w-24 text-right" /></div>
+      </div>
+      <div class="flex justify-between items-center">
+        <label class="text-sm lb-field-label flex items-center">Down Payment <button class="tip-btn" data-tip="downPayment">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="downPayment" value="0" min="0" max="50000" step="100" class="num-input w-24 text-right" /></div>
+      </div>
+      <p class="text-xs lb-warn-text">&#x26a0; Down payment is NOT covered by GAP insurance in a total loss.</p>
+      <div>
+        <div class="flex justify-between items-center">
+          <label class="text-sm lb-field-label flex items-center">Manufacturer Rebates <button class="tip-btn" data-tip="rebates">i</button></label>
+          <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="rebates" value="0" min="0" max="20000" step="100" class="num-input w-24 text-right" /></div>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
+          <input type="checkbox" id="rebateTaxable" class="w-4 h-4 cursor-pointer" style="accent-color:var(--accent);" />
+          <label for="rebateTaxable" class="text-xs lb-field-sublabel cursor-pointer">Taxable rebate &mdash; some states tax manufacturer rebates. Check your state&rsquo;s rules.</label>
+        </div>
+      </div>
+      <div class="flex justify-between items-center">
+        <label class="text-sm lb-field-label flex items-center">Acquisition Fee <button class="tip-btn" data-tip="acqFee">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="acqFee" value="695" min="0" max="2000" step="5" class="num-input w-24 text-right" /></div>
+      </div>
+      <div class="flex justify-between items-center">
+        <label class="text-sm lb-field-label">Doc Fee</label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="docFee" value="0" min="0" max="1000" step="5" class="num-input w-24 text-right" /></div>
+      </div>
+      <div class="flex justify-between items-center">
+        <label class="text-sm lb-field-label flex items-center">Disposition Fee <button class="tip-btn" data-tip="dispFee">i</button></label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="dispFee" value="350" min="0" max="1000" step="25" class="num-input w-24 text-right" /></div>
+      </div>
+      <details>
+        <summary class="flex justify-between items-center cursor-pointer">
+          <span class="text-sm font-medium lb-field-label">Tax &amp; Advanced</span><span class="text-xs lb-link">tap to expand</span>
+        </summary>
+        <div class="mt-4 space-y-4">
+          <div class="flex justify-between items-center"><label class="text-sm lb-field-label">Capitalize Acq. Fee?</label><input type="checkbox" id="capitalizeAcq" checked class="w-5 h-5 cursor-pointer" style="accent-color:var(--accent);" /></div>
+          <div class="space-y-3 pt-2" style="border-top:var(--border-thin) solid var(--border-default);">
+            <div class="flex justify-between items-center">
+              <label class="text-sm font-medium lb-field-label">Sales Tax Rate</label>
+              <div class="flex items-center gap-1"><input type="number" id="taxRate" value="8.75" min="0" max="15" step="0.25" class="num-input w-20 text-right" /><span class="text-xs lb-field-sublabel">%</span></div>
+            </div>
+            <input type="range" id="taxRate-slider" min="0" max="15" step="0.25" value="8.75" class="w-full" />
+            <div>
+              <label class="text-xs lb-field-sublabel uppercase tracking-wider mb-1 block">Tax Method</label>
+              <div class="flex gap-1">
+                <button class="seg-btn active" data-tax-method="monthly">Monthly</button>
+                <button class="seg-btn" data-tax-method="fullsale">Full Sale Price</button>
+                <button class="seg-btn" data-tax-method="upfront">Upfront Total</button>
+              </div>
+              <p class="text-xs lb-field-sublabel mt-1" id="tax-method-hint">Tax applied to each monthly payment (most states)</p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="space-y-4 mt-4 lg:mt-0">
+    <div class="card p-6 text-center">
+      <p class="text-xs lb-card-header mb-2">Monthly Payment</p>
+      <div class="hero-payment" id="hero-payment">$&mdash;</div>
+      <p class="text-xs lb-field-sublabel mt-2">pre-tax: <span id="hero-pretax" class="font-mono">&mdash;</span> &nbsp;|&nbsp; due at signing: <span id="hero-signing" class="font-mono lb-warn-text">&mdash;</span></p>
+      <p class="text-sm lb-field-sublabel mt-3">Total cost of lease: <span id="hero-total" class="font-semibold lb-field-label font-mono">&mdash;</span></p>
+      <p class="oem-comparison" id="oem-comparison">OEM advertises <span class="oem-val" id="oem-monthly">&mdash;</span>/mo &mdash; your calculated payment: <span class="oem-val" id="oem-calc">&mdash;</span>/mo</p>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-sm lb-card-header mb-4">Budget-to-Deal</h2>
+      <p class="text-xs lb-field-sublabel mb-3">Set a target payment &mdash; see the max cap cost you should accept.</p>
+      <div class="flex justify-between items-center mb-2">
+        <label class="text-sm font-medium lb-field-label">Target Payment</label>
+        <div class="flex items-center gap-1"><span class="text-xs lb-field-sublabel">$</span><input type="number" id="targetPayment" value="600" min="100" max="2000" step="10" class="num-input w-24 text-right font-mono" /><span class="text-xs lb-field-sublabel">/mo</span></div>
+      </div>
+      <input type="range" id="targetPayment-slider" min="100" max="2000" step="10" value="600" class="w-full mb-4" />
+      <div class="lb-inset-block p-4 space-y-2">
+        <div class="flex justify-between"><span class="text-sm lb-field-sublabel">Max cap cost</span><span class="font-mono font-semibold" style="color:var(--accent);" id="bs-maxcap">&mdash;</span></div>
+        <div class="flex justify-between"><span class="text-sm lb-field-sublabel">Discount from MSRP</span><span class="font-mono text-sm lb-field-label" id="bs-discount">&mdash;</span></div>
+        <div class="flex justify-between"><span class="text-sm lb-field-sublabel">Verified payment</span><span class="font-mono text-sm lb-field-label" id="bs-verified">&mdash;</span></div>
+        <div class="pt-2" style="border-top:var(--border-thin) solid var(--border-default);"><p class="text-xs lb-field-sublabel" id="bs-walkaway">&mdash;</p></div>
+      </div>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-sm lb-card-header mb-4">Cost Driver Breakdown</h2>
+      <div class="relative h-8 overflow-hidden flex mb-4" style="border:var(--border-thin) solid var(--border-default);">
+        <div id="bar-dep" class="h-full transition-all duration-300" style="background:var(--text-primary);width:80%"></div>
+        <div id="bar-fin" class="h-full transition-all duration-300" style="background:var(--color-amber-500);width:14%"></div>
+        <div id="bar-tax" class="h-full transition-all duration-300" style="background:var(--text-muted);width:6%"></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="lb-inset-block p-3 text-center"><div class="w-3 h-3 lb-swatch mx-auto mb-1" style="background:var(--text-primary);"></div><p class="text-xs lb-field-sublabel">Depreciation</p><p class="font-mono font-semibold lb-field-label text-sm" id="dep-dollars">&mdash;</p><p class="text-xs lb-field-sublabel" id="dep-pct">&mdash;</p></div>
+        <div class="lb-inset-block p-3 text-center"><div class="w-3 h-3 lb-swatch mx-auto mb-1" style="background:var(--color-amber-500);"></div><p class="text-xs lb-field-sublabel">Finance Fee</p><p class="font-mono font-semibold lb-field-label text-sm" id="fin-dollars">&mdash;</p><p class="text-xs lb-field-sublabel" id="fin-pct">&mdash;</p></div>
+        <div class="lb-inset-block p-3 text-center"><div class="w-3 h-3 lb-swatch mx-auto mb-1" style="background:var(--text-muted);"></div><p class="text-xs lb-field-sublabel">Tax</p><p class="font-mono font-semibold lb-field-label text-sm" id="tax-dollars">&mdash;</p><p class="text-xs lb-field-sublabel" id="tax-pct">&mdash;</p></div>
+      </div>
+      <p class="text-xs lb-field-sublabel" id="cost-insight">&mdash;</p>
+    </div>
+
+    <div class="card p-5">
+      <button id="set-target-btn" class="term-btn btn-primary w-full" style="border:none;">Set Target &amp; Start Negotiation →</button>
+      <p class="text-xs lb-field-sublabel mt-2 text-center">Saves this deal so you can compare it against a dealer's offer in Mode 3.</p>
+    </div>
+
+    <details class="card p-5">
+      <summary class="flex justify-between items-center"><h2 class="text-sm lb-card-header">Verification Worksheet</h2><span class="text-xs lb-link">tap to expand</span></summary>
+      <div class="mt-4 space-y-1" id="worksheet-content"></div>
+    </details>
+
+    <details class="card p-5">
+      <summary class="flex justify-between items-center"><h2 class="text-sm lb-card-header">Tax Audit</h2><span class="text-xs lb-link">tap to expand</span></summary>
+      <div class="mt-4 space-y-1" id="tax-audit-content"></div>
+    </details>
+  </section>
+</main>
+
+<footer class="text-center text-xs lb-footer py-6 mt-4">
+  Lease Buddy &mdash; for informational purposes only. Always verify numbers with your lender.
+</footer>
+</div>
+
+<div id="mode-negotiate" class="mode-panel hidden">
+<main class="lb-shell px-4 py-6">
+  <div id="m3-content" class="space-y-4"></div>
+</main>
+</div>
+
+<script>
+"use strict";
+
+const MC_API_KEY = 'mc_live_nWsMnHd2UBpMneMVY9Hww8Lx61tcqYtJ';
+const MC_BASE_URL = 'https://api.marketcheck.com/v2/search/car/incentive/oem';
+
+async function mcFetchOffers({make, model, year}){
+  const p = new URLSearchParams({api_key: MC_API_KEY, make, model, year, rows:10});
+  const url = MC_BASE_URL+'?'+p.toString();
+  let resp;
+  try { resp = await fetch(url); }
+  catch(e){ console.warn('[MC] Network error:', e.message); return []; }
+  if(!resp.ok){ console.warn('[MC] API error', resp.status); return []; }
+  let data;
+  try { data = await resp.json(); } catch(e){ return []; }
+  console.log('[MC] num_found:', data.num_found, '| listings:', data.listings?.length);
+  const listings = data.listings ?? [];
+  const leaseListings = listings.filter(l => l.offer && l.offer.offer_type === 'lease');
+  const source = leaseListings.length ? leaseListings : listings.filter(l => l.offer);
+  return source.map(l => mcNormalize(l.id, l.offer)).filter(o => o !== null);
+}
+
+function mcNormalize(listingId, offer){
+  const msrp     = offer.msrp ?? null;
+  const residual = offer.lease_end_purchase_price ?? null;
+  const amt      = offer.amounts?.[0] ?? {};
+  const monthly  = amt.monthly ?? null;
+  const term     = amt.term    ?? null;
+  const trim     = offer.vehicles?.[0]?.trim ?? null;
+  if(!msrp || !residual || !monthly || !term) return null;
+  const residualPct = parseFloat(((residual / msrp) * 100).toFixed(2));
+  const depPerMo  = (msrp - residual) / term;
+  const mf        = parseFloat(((monthly - depPerMo) / (msrp + residual)).toFixed(6));
+  return {
+    trim, msrp, residual_value: residual, residual_percent: residualPct,
+    money_factor: mf > 0 ? mf : null, monthly_payment: monthly, term,
+    mileage_limit: offer.mileage_limit ?? null, overage_per_mile: offer.over_mileage_fee ?? null,
+    down_payment: offer.down_payment ?? null, due_at_signing: offer.due_at_signing ?? null,
+    acquisition_fee: offer.acquisition_fee ?? null, net_cap_cost: offer.net_cap_cost ?? null,
+    valid_through: offer.valid_through ?? null, _id: listingId,
+  };
+}
+
+function toTitleCase(str){ return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
+
+const MAKES = [
+  "Acura","Alfa Romeo","Audi","BMW","Buick","Cadillac","Chevrolet",
+  "Chrysler","Dodge","Fiat","Ford","Genesis","GMC","Honda","Hyundai",
+  "Infiniti","Jaguar","Jeep","Kia","Land Rover","Lexus","Lincoln",
+  "Lucid","Maserati","Mazda","Mercedes-Benz","Mini","Mitsubishi",
+  "Nissan","Polestar","Porsche","Ram","Rivian","Subaru","Tesla",
+  "Toyota","Volkswagen","Volvo"
+];
+
+const MODELS_BY_MAKE = {
+  "Acura":["ILX","Integra","MDX","RDX","TLX","ZDX"],
+  "Alfa Romeo":["Giulia","Stelvio","Tonale"],
+  "Audi":["A3","A4","A5","A6","A7","A8","e-tron","e-tron GT","e-tron S","Q3","Q4 e-tron","Q5","Q7","Q8","Q8 e-tron","RS5","RS6","S3","S4","S5"],
+  "BMW":["2 Series","3 Series","4 Series","5 Series","7 Series","8 Series","i4","i5","i7","iX","M2","M3","M4","M5","X1","X2","X3","X4","X5","X6","X7","XM","Z4"],
+  "Buick":["Enclave","Encore GX","Envista"],
+  "Cadillac":["CT4","CT5","Escalade","Escalade ESV","LYRIQ","OPTIQ","VISTIQ"],
+  "Chevrolet":["Blazer","Blazer EV","Camaro","Colorado","Corvette","Equinox","Equinox EV","Malibu","Silverado 1500","Silverado 2500HD","Suburban","Tahoe","Trailblazer","Traverse","Trax"],
+  "Chrysler":["300","Pacifica","Voyager"],
+  "Dodge":["Challenger","Charger","Durango","Hornet"],
+  "Fiat":["500X"],
+  "Ford":["Bronco","Bronco Sport","Edge","Escape","Expedition","Explorer","F-150","F-150 Lightning","Maverick","Mustang","Mustang Mach-E","Ranger","Territory"],
+  "Genesis":["G70","G80","G90","GV70","GV80","GV80 Coupe"],
+  "GMC":["Acadia","Canyon","Envoy XL","Sierra 1500","Sierra 2500HD","Terrain","Yukon","Yukon XL"],
+  "Honda":["Accord","Civic","CR-V","HR-V","Odyssey","Passport","Pilot","Prologue","Ridgeline"],
+  "Hyundai":["Elantra","IONIQ 5","IONIQ 6","Kona","Kona Electric","Palisade","Santa Cruz","Santa Fe","Sonata","Tucson","Venue"],
+  "Infiniti":["Q50","Q60","QX50","QX55","QX60","QX80"],
+  "Jaguar":["E-PACE","F-PACE","F-TYPE","I-PACE","XF"],
+  "Jeep":["Cherokee","Compass","Gladiator","Grand Cherokee","Grand Cherokee 4xe","Grand Wagoneer","Renegade","Wagoneer","Wrangler","Wrangler 4xe"],
+  "Kia":["Carnival","EV6","EV9","K5","Niro","Niro EV","Seltos","Sorento","Soul","Sportage","Stinger","Telluride"],
+  "Land Rover":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Evoque","Range Rover Sport","Range Rover Velar"],
+  "Lexus":["ES","GX","IS","LC","LS","LX","NX","RC","RX","TX","UX"],
+  "Lincoln":["Aviator","Corsair","Nautilus","Navigator"],
+  "Lucid":["Air","Gravity"],
+  "Maserati":["Ghibli","GranTurismo","Grecale","Levante","Quattroporte"],
+  "Mazda":["CX-30","CX-5","CX-50","CX-70","CX-90","Mazda3","Mazda6","MX-5 Miata","MX-30"],
+  "Mercedes-Benz":["A-Class","C-Class","CLA","CLE","E-Class","EQB","EQE","EQE SUV","EQS","EQS SUV","G-Class","GLA","GLB","GLC","GLE","GLS","S-Class","SL"],
+  "Mini":["Clubman","Convertible","Cooper","Countryman","Hardtop","Paceman"],
+  "Mitsubishi":["Eclipse Cross","Outlander","Outlander PHEV","Outlander Sport"],
+  "Nissan":["Altima","Ariya","Armada","Frontier","Kicks","Leaf","Murano","Pathfinder","Rogue","Rogue Sport","Sentra","Titan","Versa"],
+  "Polestar":["2","3","4"],
+  "Porsche":["718 Boxster","718 Cayman","911","Cayenne","Macan","Panamera","Taycan"],
+  "Ram":["1500","1500 Classic","2500","3500","ProMaster"],
+  "Rivian":["R1S","R1T","R2"],
+  "Subaru":["Ascent","BRZ","Crosstrek","Forester","Impreza","Legacy","Outback","Solterra","WRX"],
+  "Tesla":["Model 3","Model S","Model X","Model Y","Cybertruck"],
+  "Toyota":["4Runner","bZ4X","Camry","Corolla","Corolla Cross","Crown","GR86","GR Corolla","GR Supra","Highlander","Land Cruiser","Prius","Prius Prime","RAV4","RAV4 Prime","Sequoia","Sienna","Tacoma","Tundra","Venza"],
+  "Volkswagen":["Atlas","Atlas Cross Sport","Golf","GTI","ID.4","ID.Buzz","Jetta","Passat","Taos","Tiguan"],
+  "Volvo":["C40 Recharge","EX30","EX40","EX90","S60","S90","V60","V90","XC40","XC60","XC90"],
+};
+
+function nhtsaGetMakes(){ return Promise.resolve(MAKES); }
+function nhtsaGetModels(make){ const models = MODELS_BY_MAKE[make] ?? []; return Promise.resolve([...models].sort()); }
+
+let cachedOffers = [], vehicleLocked = false;
+let currentMake = '', currentModel = '', currentYear = new Date().getFullYear(), currentTrim = '';
+
+function setLoadingState(isLoading){
+  ['msrp','residualPct','moneyFactor'].forEach(id => document.getElementById(id).classList.toggle('field-loading', isLoading));
+}
+
+function showOemComparison(oemMonthly){
+  if(!oemMonthly) return;
+  window._oemAdvertisedMonthly = oemMonthly;
+  document.getElementById('oem-monthly').textContent = '$'+oemMonthly.toFixed(0);
+  document.getElementById('oem-comparison').style.display = 'block';
+}
+
+function hideOemComparison(){
+  window._oemAdvertisedMonthly = null;
+  document.getElementById('oem-comparison').style.display = 'none';
+}
+
+function lockFields(lock, variant){
+  vehicleLocked = lock;
+  const ids = ['msrp','residualPct','moneyFactor'];
+  const msrpLock  = document.getElementById('msrp-slider-lock');
+  const resLock   = document.getElementById('residualPct-slider-lock');
+  const lockRow   = document.getElementById('vehicle-lock-row');
+  const badge     = lockRow.querySelector('.lock-badge');
+  ids.forEach(id => { document.getElementById(id).readOnly = lock; });
+  msrpLock.style.display  = lock ? 'block' : 'none';
+  resLock.style.display   = lock ? 'block' : 'none';
+  if(lock){
+    lockRow.classList.remove('hidden');
+    if(badge){
+      badge.classList.remove('fallback');
+      if(variant === 'live')         { badge.innerHTML = '&#x1F7E2; Live OEM Data'; }
+      else if(variant === 'fallback'){ badge.innerHTML = 'Using cached data'; badge.classList.add('fallback'); }
+      else if(variant === 'loading') { badge.innerHTML = '&#x23F3; Loading&hellip;'; badge.classList.add('fallback'); }
+      else                           { badge.innerHTML = '&#x1F512; Live OEM Data'; }
+    }
+  } else {
+    lockRow.classList.add('hidden');
+    ids.forEach(id => { document.getElementById(id).readOnly = false; });
+    if(badge){ badge.innerHTML='&#x1F7E2; Live OEM Data'; badge.classList.remove('fallback'); }
+  }
+}
+
+function applyOffer(offer){
+  if(!offer) return;
+  const msrpEl   = document.getElementById('msrp');
+  const resEl    = document.getElementById('residualPct');
+  const mfEl     = document.getElementById('moneyFactor');
+  const acqEl    = document.getElementById('acqFee');
+  const ccSlider = document.getElementById('capCost-slider');
+  const ccNum    = document.getElementById('capCost');
+  msrpEl.value = offer.msrp;
+  document.getElementById('msrp-slider').value = offer.msrp;
+  resEl.value = offer.residual_percent;
+  document.getElementById('residualPct-slider').value = offer.residual_percent;
+  if(offer.money_factor !== null){
+    mfEl.value = offer.money_factor.toFixed(5);
+    document.getElementById('moneyFactor-slider').value = Math.round(offer.money_factor * 100000);
+  }
+  if(offer.acquisition_fee !== null){ acqEl.value = offer.acquisition_fee; }
+  if(offer.down_payment !== null){ document.getElementById('downPayment').value = offer.down_payment; }
+  ccNum.value = offer.msrp;
+  ccSlider.max = offer.msrp;
+  ccSlider.value = offer.msrp;
+  showOemComparison(offer.monthly_payment);
+}
+
+async function initCascade(){
+  const makeEl   = document.getElementById('sel-make');
+  const statusEl = document.getElementById('vehicle-status');
+  currentYear = parseInt(document.getElementById('sel-year').value, 10) || new Date().getFullYear();
+  statusEl.textContent = 'Loading makes…';
+  const makes = await nhtsaGetMakes();
+  if(!makes.length){
+    makeEl.innerHTML = '<option value="">Failed to load — try reloading</option>';
+    statusEl.textContent = 'Could not load makes. Check connection.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  makeEl.innerHTML = '<option value="">Select make…</option>' + makes.map(m => `<option value="${m}">${m}</option>`).join('');
+  makeEl.disabled = false;
+  statusEl.textContent = '';
+}
+
+async function onMakeOrYearChange(){
+  const makeEl   = document.getElementById('sel-make');
+  const modelEl  = document.getElementById('sel-model');
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const make = makeEl.value;
+  const year = parseInt(document.getElementById('sel-year').value, 10);
+  modelEl.innerHTML = '<option value="">Loading models…</option>';
+  modelEl.disabled = true;
+  trimEl.innerHTML = '<option value="">Select model first</option>';
+  trimEl.disabled = true;
+  cachedOffers = []; currentMake = make; currentYear = year; currentModel = ''; currentTrim = '';
+  if(!make){ modelEl.innerHTML = '<option value="">Select make first</option>'; return; }
+  statusEl.textContent = 'Loading models…'; statusEl.style.color = '#64748b';
+  const models = await nhtsaGetModels(make, year);
+  if(!models.length){
+    modelEl.innerHTML = '<option value="">No models found</option>';
+    statusEl.textContent = 'No models found for '+make+' '+year+'.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  modelEl.innerHTML = '<option value="">Select model…</option>' + models.map(m => `<option value="${m}">${m}</option>`).join('');
+  modelEl.disabled = false;
+  statusEl.textContent = '';
+}
+
+async function onModelChange(){
+  const modelEl  = document.getElementById('sel-model');
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const make  = document.getElementById('sel-make').value;
+  const model = modelEl.value;
+  const year  = parseInt(document.getElementById('sel-year').value, 10);
+  currentModel = model; currentTrim = ''; cachedOffers = [];
+  trimEl.innerHTML = '<option value="">Loading trims…</option>';
+  trimEl.disabled = true;
+  lockFields(false); hideOemComparison();
+  if(!model) return;
+  statusEl.textContent = 'Fetching live OEM lease data…'; statusEl.style.color = '#64748b';
+  lockFields(true, 'loading'); setLoadingState(true); update();
+  const offers = await mcFetchOffers({make, model, year});
+  setLoadingState(false);
+  if(!offers.length){
+    lockFields(false);
+    trimEl.innerHTML = '<option value="">No OEM lease data</option>';
+    trimEl.disabled = true;
+    statusEl.textContent = 'No active OEM lease offers found — enter values manually.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  cachedOffers = offers;
+  const seen = new Set();
+  const uniqueTrims = offers.filter(o => { if(!o.trim || seen.has(o.trim)) return false; seen.add(o.trim); return true; }).map(o => o.trim);
+  trimEl.innerHTML = '<option value="">Select trim…</option>' + uniqueTrims.map(t => `<option value="${t}">${t}</option>`).join('');
+  trimEl.disabled = false;
+  const firstOffer = offers[0];
+  applyOffer(firstOffer);
+  if(uniqueTrims.length === 1){ trimEl.value = uniqueTrims[0]; currentTrim = uniqueTrims[0]; }
+  lockFields(true, 'live');
+  const validThrough = firstOffer.valid_through ? ` (valid through ${firstOffer.valid_through})` : '';
+  statusEl.textContent = uniqueTrims.length + ' trim' + (uniqueTrims.length !== 1 ? 's' : '') + ' with active OEM lease offers' + validThrough;
+  statusEl.style.color = '#22c55e';
+  update();
+}
+
+function onTrimSelect(){
+  const trimEl   = document.getElementById('sel-trim');
+  const statusEl = document.getElementById('vehicle-status');
+  const trim     = trimEl.value;
+  if(!trim) return;
+  currentTrim = trim;
+  const offer = cachedOffers.find(o => o.trim === trim) ?? null;
+  if(!offer){ statusEl.textContent = 'No data for this trim — check manually.'; statusEl.style.color = '#f59e0b'; return; }
+  applyOffer(offer);
+  lockFields(true, 'live');
+  const validThrough = offer.valid_through ? ` (valid through ${offer.valid_through})` : '';
+  statusEl.textContent = trim + ' — live OEM data' + validThrough;
+  statusEl.style.color = '#22c55e';
+  update();
+}
+
+function clearVehicleSelection(){
+  document.getElementById('sel-model').innerHTML = '<option value="">Select make first</option>';
+  document.getElementById('sel-model').disabled = true;
+  document.getElementById('sel-trim').innerHTML = '<option value="">Select model first</option>';
+  document.getElementById('sel-trim').disabled = true;
+  cachedOffers = []; currentMake = ''; currentModel = ''; currentTrim = '';
+  lockFields(false); hideOemComparison();
+  document.getElementById('capCost-slider').max = 200000;
+  const statusEl = document.getElementById('vehicle-status');
+  statusEl.textContent = 'Selection cleared — fields unlocked for manual editing.';
+  statusEl.style.color = '#64748b';
+  update();
+}
+
+function wireVehicleSelector(){
+  document.getElementById('sel-year').addEventListener('change', onMakeOrYearChange);
+  document.getElementById('sel-make').addEventListener('change', onMakeOrYearChange);
+  document.getElementById('sel-model').addEventListener('change', onModelChange);
+  document.getElementById('sel-trim').addEventListener('change', onTrimSelect);
+  document.getElementById('unlock-btn').addEventListener('click', clearVehicleSelection);
+}
+
+const STATE_TAX = {
+  AL:4.0,AK:0.0,AZ:5.6,AR:6.5,CA:7.25,CO:2.9,CT:6.35,DE:0.0,
+  FL:6.0,GA:4.0,HI:4.0,ID:6.0,IL:6.25,IN:7.0,IA:6.0,KS:6.5,
+  KY:6.0,LA:5.0,ME:5.5,MD:6.0,MA:6.25,MI:6.0,MN:6.875,MS:7.0,
+  MO:4.225,MT:0.0,NE:5.5,NV:6.85,NH:0.0,NJ:6.625,NM:5.0,NY:4.0,
+  NC:4.75,ND:5.0,OH:5.75,OK:4.5,OR:0.0,PA:6.0,RI:7.0,SC:6.0,
+  SD:4.2,TN:7.0,TX:6.25,UT:4.85,VT:6.0,VA:5.3,WA:6.5,WV:6.0,
+  WI:5.0,WY:4.0,DC:6.0
+};
+const STATE_NAMES = {
+  AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",
+  CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",
+  HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",
+  KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",
+  MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",
+  NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",
+  NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",
+  OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",
+  SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",
+  VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",
+  DC:"Washington D.C."
+};
+
+const TIPS = {
+  vehicleSelect:"Select Year, Make, Model, and Trim. MSRP, residual %, and money factor are auto-filled from live OEM lease data and locked for accurate calculations.",
+  moneyFactor:"The interest rate in disguise. Multiply by 2,400 to get the APR. Dealers mark this up \u2014 always ask for the \u2018buy rate\u2019 from the lender.",
+  residualPct:"Set by the manufacturer, not the dealer. Non-negotiable. Higher residual = lower payment. Compare residuals across trim levels before choosing.",
+  capCost:"This is your selling price. Negotiate it like a purchase \u2014 the lower this number, the lower every payment. Don\u2019t let the dealer anchor to MSRP.",
+  acqFee:"Charged by the lender, not the dealer. Often $600\u2013$900. Ask if it can be waived or reduced \u2014 some lenders allow it.",
+  downPayment:"In a lease, this is called a \u2018cap cost reduction.\u2019 Warning: if the car is totaled, you lose this money. GAP insurance does NOT cover it. Consider $0 down.",
+  dispFee:"Charged at lease end if you don\u2019t buy or re-lease. Often $300\u2013$400. Some manufacturers waive it for loyal customers \u2014 ask before signing.",
+  rebates:"Manufacturer cash, not dealer discount. Make sure the dealer shows it as a separate line \u2014 never let them claim it as part of their negotiation.",
+  term:"Shorter terms = higher monthly, lower total interest. 36 months is the sweet spot for most \u2014 residuals drop sharply at 48+.",
+};
+
+let activeTip=null;
+function showTooltip(btn,key){
+  if(activeTip&&activeTip.key===key){closeTooltip();return;}
+  closeTooltip();
+  const text=TIPS[key];if(!text)return;
+  const box=document.createElement("div");box.className="tooltip-box";box.textContent=text;
+  document.getElementById("tooltip-portal").appendChild(box);
+  const rect=btn.getBoundingClientRect();
+  const sy=window.scrollY||document.documentElement.scrollTop;
+  box.style.top=(rect.bottom+sy+8)+"px";
+  box.style.left=Math.max(8,Math.min(rect.left+(window.scrollX||0),window.innerWidth-296))+"px";
+  activeTip={key,box};
+}
+function closeTooltip(){if(activeTip){activeTip.box.remove();activeTip=null;}}
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("tip-btn")){e.stopPropagation();showTooltip(e.target,e.target.dataset.tip);return;}
+  if(activeTip&&!activeTip.box.contains(e.target))closeTooltip();
+});
+
+const LeaseCalc={
+  calculate(inputs){
+    const{msrp,capCost,residualPct,moneyFactor,termMonths,acqFee,capitalizeAcq,downPayment,tradeIn,rebates,taxRate,docFee,dispFee,taxMethod,rebateTaxable}=inputs;
+    const nonRebateReductions=downPayment+tradeIn;
+    const totalReductions=nonRebateReductions+rebates;
+    const adjCapCost=capCost-totalReductions+docFee+(capitalizeAcq?acqFee:0);
+    const residualValue=msrp*(residualPct/100);
+    const depFee=(adjCapCost-residualValue)/termMonths;
+    const finFee=(adjCapCost+residualValue)*moneyFactor;
+    const basePayment=depFee+finFee;
+    const rate=taxRate/100;
+    let monthlyTax=0,upfrontTax=0,taxBase="",taxDesc="";
+    if(taxMethod==="monthly"){
+      const taxable=rebateTaxable?basePayment+(rebates/termMonths):basePayment;
+      monthlyTax=taxable*rate;
+      taxBase=rebateTaxable?"base payment + rebate spread":"base payment ($"+basePayment.toFixed(2)+")";
+      taxDesc="Tax applied to each monthly payment";
+    }else if(taxMethod==="fullsale"){
+      const taxable=rebateTaxable?capCost:capCost-rebates;
+      upfrontTax=taxable*rate;
+      taxBase=rebateTaxable?"full cap cost":"cap cost less rebates";
+      taxDesc="Tax on full sale price, collected upfront";
+    }else if(taxMethod==="upfront"){
+      const totalLease=basePayment*termMonths;
+      const taxable=rebateTaxable?totalLease+rebates:totalLease;
+      upfrontTax=taxable*rate;
+      taxBase=rebateTaxable?"total payments + rebates":"total payments";
+      taxDesc="Tax on total lease payments, collected upfront";
+    }
+    const monthlyPayment=basePayment+monthlyTax;
+    const upfrontAcq=capitalizeAcq?0:acqFee;
+    const dueAtSigning=monthlyPayment+upfrontAcq+downPayment+upfrontTax;
+    const totalPayments=monthlyPayment*termMonths;
+    const totalCost=totalPayments+downPayment+upfrontAcq+dispFee+upfrontTax;
+    const depPct=(depFee/monthlyPayment)*100;
+    const finPct=(finFee/monthlyPayment)*100;
+    const taxPct=(monthlyTax/monthlyPayment)*100;
+    return{adjCapCost,residualValue,nonRebateReductions,totalReductions,rebates,depFee,finFee,basePayment,monthlyTax,upfrontTax,monthlyPayment,dueAtSigning,totalPayments,totalCost,depPct,finPct,taxPct,upfrontAcq,acqFee,capitalizeAcq,taxMethod,taxBase,taxDesc,taxRate,rebateTaxable,msrp,capCost,residualPct,moneyFactor,termMonths,docFee,dispFee,downPayment,tradeIn};
+  },
+  backsolve(targetPayment,inputs){
+    const{msrp,residualPct,moneyFactor,termMonths,acqFee,capitalizeAcq,downPayment,tradeIn,rebates,taxRate,docFee,taxMethod}=inputs;
+    const residualValue=msrp*(residualPct/100);
+    const mf=moneyFactor,term=termMonths,rate=taxRate/100;
+    const taxMult=taxMethod==="monthly"?1+rate:1;
+    const preTax=targetPayment/taxMult;
+    const num=preTax-residualValue*(mf-1/term);
+    const den=1/term+mf;
+    const targetAdj=num/den;
+    const feeLoad=docFee+(capitalizeAcq?acqFee:0);
+    const reductions=downPayment+tradeIn+rebates;
+    const maxCap=targetAdj+reductions-feeLoad;
+    if(maxCap<=0)return null;
+    const verified=this.calculate({...inputs,capCost:maxCap});
+    return{maxCapCost:maxCap,discountDollars:msrp-maxCap,discountPct:((msrp-maxCap)/msrp)*100,verifiedPayment:verified.monthlyPayment};
+  },
+};
+
+const fmt={
+  money:n=>n==null?"\u2014":"$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}),
+  pct:  n=>n==null?"\u2014":n.toFixed(2)+"%",
+  mf:   n=>n.toFixed(5),
+};
+
+let detectedState=null;
+const GEO_PROXY_URL = '/api/geocode';
+const geoRateCache = {};
+
+async function geoFetchTaxRate(zip){
+  if(geoRateCache[zip] !== undefined) return geoRateCache[zip];
+  const url = GEO_PROXY_URL+'?'+new URLSearchParams({zipcode:zip});
+  let resp;
+  try { resp = await fetch(url); }
+  catch(e){ console.warn('[Geo] Network error:', e.message); geoRateCache[zip]=null; return null; }
+  if(!resp.ok){ console.warn('[Geo] API error', resp.status); geoRateCache[zip]=null; return null; }
+  let data;
+  try { data = await resp.json(); } catch(e){ geoRateCache[zip]=null; return null; }
+  const summary = data?.usgeocoder?.totalcollection_tax_summary;
+  if(!summary || summary.t_tax_summary_status !== 'Match Found'){ geoRateCache[zip]=null; return null; }
+  const parsePct = v => v ? parseFloat(String(v).replace('%','')) : 0;
+  const result = {
+    total:  parsePct(summary.t_tax_total_tax),
+    state:  { name: summary.t_tax_state_jurisction_name || '', rate: parsePct(summary.t_tax_state_tax) },
+    county: { name: summary.t_tax_county_jurisdiction_name || '', rate: parsePct(summary.t_tax_county_tax) },
+    city:   { name: summary.t_tax_city_jurisdiction_name || '', rate: parsePct(summary.t_tax_city_tax) },
+  };
+  geoRateCache[zip] = result;
+  return result;
+}
+
+async function lookupZip(zip){
+  const st=document.getElementById("zip-status");
+  if(!/^\d{5}$/.test(zip)){st.textContent="Enter a valid 5-digit ZIP";st.style.color="#f59e0b";return;}
+  st.textContent="Looking up\u2026";st.style.color="#64748b";
+  let abbr=null, name=null;
+  try {
+    const r=await fetch("https://api.zippopotam.us/us/"+zip);
+    if(!r.ok) throw new Error();
+    const d=await r.json();
+    abbr=d.places[0]["state abbreviation"];
+    name=STATE_NAMES[abbr]||abbr;
+  } catch(e){ }
+  const geo = await geoFetchTaxRate(zip);
+  if(geo){
+    detectedState={abbr:abbr||geo.state.name, name:name||geo.state.name, rate:geo.state.rate, geo};
+    document.getElementById("taxRate").value=geo.total;
+    document.getElementById("taxRate-slider").value=geo.total;
+    st.textContent=(name||geo.state.name)+" \u2014 "+geo.total+"% combined rate (live, auto-filled)";
+    st.style.color="#22c55e";
+    update();
+    return;
+  }
+  if(abbr && STATE_TAX[abbr] !== undefined){
+    const rate=STATE_TAX[abbr];
+    detectedState={abbr,name,rate,geo:null};
+    document.getElementById("taxRate").value=rate;
+    document.getElementById("taxRate-slider").value=rate;
+    st.textContent=name+" \u2014 "+rate+"% state rate only \u2014 ZIP-level lookup unavailable, using estimated state rate";
+    st.style.color="#f59e0b";
+    update();
+    return;
+  }
+  st.textContent="Could not detect state \u2014 enter rate manually";
+  st.style.color="#f59e0b";
+  detectedState=null;
+}
+
+function readInputs(){
+  return{
+    msrp:parseFloat(document.getElementById("msrp").value)||0,
+    capCost:parseFloat(document.getElementById("capCost").value)||0,
+    residualPct:parseFloat(document.getElementById("residualPct").value)||0,
+    moneyFactor:parseFloat(document.getElementById("moneyFactor").value)||0,
+    termMonths:parseInt(document.querySelector(".term-btn.active").dataset.term)||36,
+    taxRate:parseFloat(document.getElementById("taxRate").value)||0,
+    taxMethod:document.querySelector(".seg-btn.active[data-tax-method]")?.dataset.taxMethod||"monthly",
+    rebateTaxable:document.getElementById("rebateTaxable").checked,
+    acqFee:parseFloat(document.getElementById("acqFee").value)||0,
+    downPayment:parseFloat(document.getElementById("downPayment").value)||0,
+    tradeIn:parseFloat(document.getElementById("tradeIn").value)||0,
+    rebates:parseFloat(document.getElementById("rebates").value)||0,
+    docFee:parseFloat(document.getElementById("docFee").value)||0,
+    dispFee:parseFloat(document.getElementById("dispFee").value)||0,
+    capitalizeAcq:document.getElementById("capitalizeAcq").checked,
+    targetPayment:parseFloat(document.getElementById("targetPayment").value)||0,
+  };
+}
+
+function updateHero(b){
+  const el=document.getElementById("hero-payment");
+  el.textContent=fmt.money(b.monthlyPayment);
+  el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
+  document.getElementById("hero-pretax").textContent=fmt.money(b.basePayment);
+  document.getElementById("hero-signing").textContent=fmt.money(b.dueAtSigning);
+  document.getElementById("hero-total").textContent=fmt.money(b.totalCost);
+  if(window._oemAdvertisedMonthly){
+    document.getElementById("oem-calc").textContent="$"+b.monthlyPayment.toFixed(0);
+  }
+  const off=b.msrp-b.capCost;
+  document.getElementById("cap-cost-pct").textContent=
+    off>=0?"$"+off.toLocaleString()+" off MSRP ("+((off/b.msrp)*100).toFixed(1)+"% discount)":
+           "$"+Math.abs(off).toLocaleString()+" above MSRP";
+  document.getElementById("residual-dollars").textContent="Residual value: "+fmt.money(b.residualValue)+" \u2014 set by lender";
+}
+
+function updateBacksolve(inputs){
+  const r=LeaseCalc.backsolve(inputs.targetPayment,inputs);
+  if(!r){
+    document.getElementById("bs-maxcap").textContent="Not achievable";
+    ["bs-discount","bs-verified"].forEach(id=>document.getElementById(id).textContent="\u2014");
+    document.getElementById("bs-walkaway").textContent="Target payment is too low for these lease terms.";
+    return;
+  }
+  document.getElementById("bs-maxcap").textContent=fmt.money(r.maxCapCost);
+  document.getElementById("bs-discount").textContent=fmt.pct(r.discountPct)+" off MSRP ("+fmt.money(r.discountDollars)+" off)";
+  document.getElementById("bs-verified").textContent=fmt.money(r.verifiedPayment)+"/mo";
+  document.getElementById("bs-walkaway").textContent="Walk away from any offer above "+fmt.money(r.maxCapCost)+".";
+}
+
+function updateCostBar(b){
+  document.getElementById("bar-dep").style.width=b.depPct.toFixed(2)+"%";
+  document.getElementById("bar-fin").style.width=b.finPct.toFixed(2)+"%";
+  document.getElementById("bar-tax").style.width=b.taxPct.toFixed(2)+"%";
+  document.getElementById("dep-dollars").textContent=fmt.money(b.depFee);
+  document.getElementById("fin-dollars").textContent=fmt.money(b.finFee);
+  document.getElementById("tax-dollars").textContent=fmt.money(b.monthlyTax||0);
+  document.getElementById("dep-pct").textContent=fmt.pct(b.depPct)+" of payment";
+  document.getElementById("fin-pct").textContent=fmt.pct(b.finPct)+" of payment";
+  document.getElementById("tax-pct").textContent=b.monthlyTax>0?fmt.pct(b.taxPct)+" of payment":"collected upfront";
+  document.getElementById("cost-insight").textContent=
+    b.depPct>70?"Depreciation dominates \u2014 negotiate the cap cost down.":
+    b.finPct>20?"Finance fee is high \u2014 ask for a lower money factor.":
+    b.taxPct>15?"Tax is significant \u2014 consider low-tax states.":
+    "Well-balanced deal structure.";
+}
+
+function updateWorksheet(b){
+  const mfApr=(b.moneyFactor*2400).toFixed(2);
+  const vehicleLine=(currentMake && currentModel)
+    ?{cls:"section",text:"\uD83D\uDD12 VEHICLE: "+currentYear+" "+currentMake+" "+currentModel+(currentTrim?" "+currentTrim:"")+" | Live OEM Data"}
+    :null;
+  const lines=[
+    vehicleLine,
+    {cls:"section",text:"INPUTS"},
+    {text:"MSRP                         "+fmt.money(b.msrp)},
+    {text:"Negotiated Cap Cost           "+fmt.money(b.capCost)},
+    b.rebates>0?{text:"Manufacturer Rebates          -"+fmt.money(b.rebates).replace("$","")+"   \u2190 applied after negotiation"}:{text:"Manufacturer Rebates          $0.00"},
+    b.rebates>0?{cls:"warn",text:"  \u26a0 Do not let dealer fold rebates into their discount \u2014 this is manufacturer money."}:null,
+    b.nonRebateReductions>0?{text:"Down + Trade-in               -"+fmt.money(b.nonRebateReductions).replace("$","")}:null,
+    b.acqFee>0&&b.capitalizeAcq?{text:"Acquisition Fee               +"+fmt.money(b.acqFee).replace("$","")+"   (capitalized)"}:b.acqFee>0?{text:"Acquisition Fee               "+fmt.money(b.acqFee)+"   (due at signing)"}:null,
+    b.docFee>0?{text:"Doc Fee                       +"+fmt.money(b.docFee).replace("$","")}:null,
+    {cls:"result",text:"Adjusted Cap Cost             "+fmt.money(b.adjCapCost)},
+    {cls:"result",text:"Residual Value ("+b.residualPct+"% of MSRP)   "+fmt.money(b.residualValue)},
+    {text:"Money Factor                  "+fmt.mf(b.moneyFactor)+"  (~"+mfApr+"% APR)"},
+    {text:"Term                          "+b.termMonths+" months"},
+    {text:"Tax Rate                      "+b.taxRate+"%  ["+b.taxMethod+"]"},
+    {cls:"section",text:"STEP 1 \u2014 DEPRECIATION FEE"},
+    {text:"(Adj Cap Cost - Residual) \u00f7 Term"},
+    {text:"("+fmt.money(b.adjCapCost)+" - "+fmt.money(b.residualValue)+") \u00f7 "+b.termMonths},
+    {cls:"result",text:"= "+fmt.money(b.depFee)+" /mo"},
+    {cls:"section",text:"STEP 2 \u2014 FINANCE FEE (RENT CHARGE)"},
+    {text:"(Adj Cap Cost + Residual) \u00d7 Money Factor"},
+    {text:"("+fmt.money(b.adjCapCost)+" + "+fmt.money(b.residualValue)+") \u00d7 "+fmt.mf(b.moneyFactor)},
+    {cls:"result",text:"= "+fmt.money(b.finFee)+" /mo"},
+    {cls:"section",text:"STEP 3 \u2014 BASE PAYMENT (PRE-TAX)"},
+    {text:fmt.money(b.depFee)+" + "+fmt.money(b.finFee)},
+    {cls:"result",text:"= "+fmt.money(b.basePayment)+" /mo"},
+    {cls:"section",text:"STEP 4 \u2014 TAX  ["+b.taxMethod+"]"},
+    b.monthlyTax>0?{text:fmt.money(b.basePayment)+" \u00d7 "+b.taxRate+"% = "+fmt.money(b.monthlyTax)+" /mo"}:{text:fmt.money(b.upfrontTax)+" collected upfront (see Tax Audit)"},
+    {cls:"result",text:"Monthly tax: "+fmt.money(b.monthlyTax)},
+    {cls:"section",text:"MONTHLY PAYMENT"},
+    {cls:"result",text:fmt.money(b.basePayment)+" + "+fmt.money(b.monthlyTax)+" = "+fmt.money(b.monthlyPayment)+" /mo"},
+    {cls:"section",text:"DUE AT SIGNING"},
+    {text:"First Month                  "+fmt.money(b.monthlyPayment)},
+    b.upfrontAcq>0?{text:"Acq Fee (upfront)            "+fmt.money(b.acqFee)}:null,
+    b.downPayment>0?{text:"Down Payment                 "+fmt.money(b.downPayment)}:null,
+    b.upfrontTax>0?{cls:"warn",text:"Tax (upfront)                "+fmt.money(b.upfrontTax)}:null,
+    {cls:"result",text:"Total Due at Signing         "+fmt.money(b.dueAtSigning)},
+    {cls:"section",text:"TOTAL COST OF LEASE"},
+    {text:"Monthly \u00d7 "+b.termMonths+" months        "+fmt.money(b.totalPayments)},
+    b.dispFee>0?{text:"Disposition Fee              "+fmt.money(b.dispFee)}:null,
+    {cls:"result",text:"Total Cost                   "+fmt.money(b.totalCost)},
+  ].filter(Boolean);
+  document.getElementById("worksheet-content").innerHTML=lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+}
+
+function updateTaxAudit(b){
+  const hasLiveGeo = detectedState && detectedState.geo;
+  const stateLine=detectedState?"State: "+detectedState.name+(hasLiveGeo?"":" ("+detectedState.rate+"% state-level rate)"):"State: not detected \u2014 manual rate "+b.taxRate+"%";
+  const totalTax=b.monthlyTax>0?b.monthlyTax*b.termMonths:b.upfrontTax;
+  const jurisdictionLines = hasLiveGeo ? [
+    {cls:"section",text:"JURISDICTION BREAKDOWN (live, ZIP-level)"},
+    {text:"State ("+detectedState.geo.state.name+"): "+detectedState.geo.state.rate.toFixed(4)+"%"},
+    detectedState.geo.county.name?{text:"County ("+detectedState.geo.county.name+"): "+detectedState.geo.county.rate.toFixed(4)+"%"}:null,
+    detectedState.geo.city.name?{text:"City ("+detectedState.geo.city.name+"): "+detectedState.geo.city.rate.toFixed(4)+"%"}:null,
+    {cls:"result",text:"Combined rate: "+detectedState.geo.total.toFixed(4)+"%"},
+  ].filter(Boolean) : (detectedState && !hasLiveGeo ? [
+    {cls:"section",text:"JURISDICTION BREAKDOWN"},
+    {cls:"warn",text:"\u26a0 Using estimated state rate \u2014 ZIP-level lookup unavailable"},
+  ] : []);
+  const lines=[
+    {cls:"section",text:"TAX METHOD"},
+    {cls:"result",text:b.taxDesc},
+    {text:stateLine},
+    {text:"Tax rate: "+b.taxRate+"%"},
+    ...jurisdictionLines,
+    {cls:"section",text:"TAX CALCULATION"},
+    {text:"Taxable base: "+b.taxBase},
+    b.monthlyTax>0?{text:"Tax per month: "+fmt.money(b.monthlyTax)}:{text:"Upfront tax: "+fmt.money(b.upfrontTax)},
+    {cls:"result",text:"Total tax over lease: "+fmt.money(totalTax)},
+    {cls:"section",text:"REBATE TAX STATUS"},
+    {text:b.rebateTaxable?"Rebates: included in taxable base (taxable rebate ON)":"Rebates: excluded from taxable base (taxable rebate OFF)"},
+    b.rebates>0&&!b.rebateTaxable?{text:"Rebate of "+fmt.money(b.rebates)+" reduces cap cost before tax"}:b.rebates>0&&b.rebateTaxable?{cls:"warn",text:"\u26a0 Rebate of "+fmt.money(b.rebates)+" is in taxable base \u2014 verify for your state"}:{text:"No rebates entered"},
+  ];
+  document.getElementById("tax-audit-content").innerHTML=lines.map(l=>"<p class=\"worksheet-line"+(l.cls?" "+l.cls:"")+"\">"+l.text+"</p>").join("");
+}
+
+function update(){
+  const inputs=readInputs();
+  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0||inputs.termMonths<=0)return;
+  if(inputs.residualPct<=0||inputs.residualPct>=100)return;
+  const b=LeaseCalc.calculate(inputs);
+  updateHero(b);updateBacksolve(inputs);updateCostBar(b);updateWorksheet(b);updateTaxAudit(b);
+  document.getElementById("mf-apr-val").textContent=(inputs.moneyFactor*2400).toFixed(2);
+}
+
+const TAX_HINTS={
+  monthly:"Tax applied to each monthly payment (most states)",
+  fullsale:"Tax on full cap cost, collected upfront at signing (TX, MN, IL style)",
+  upfront:"Tax on total of all lease payments, collected upfront at signing",
+};
+
+function syncSlider(sid,nid){
+  const s=document.getElementById(sid),n=document.getElementById(nid);
+  s.addEventListener("input",()=>{if(!n.readOnly){n.value=s.value;update();}});
+  n.addEventListener("input",()=>{if(!n.readOnly){s.value=n.value;update();}});
+}
+function syncMF(){
+  const s=document.getElementById("moneyFactor-slider"),n=document.getElementById("moneyFactor");
+  s.addEventListener("input",()=>{n.value=(parseInt(s.value)/100000).toFixed(5);update();});
+  n.addEventListener("input",()=>{s.value=Math.round(parseFloat(n.value)*100000);update();});
+}
+function syncTP(){
+  const s=document.getElementById("targetPayment-slider"),n=document.getElementById("targetPayment");
+  s.addEventListener("input",()=>{n.value=s.value;update();});
+  n.addEventListener("input",()=>{s.value=n.value;update();});
+}
+
+function wireInputs(){
+  syncSlider("msrp-slider","msrp");
+  syncSlider("capCost-slider","capCost");
+  syncSlider("residualPct-slider","residualPct");
+  syncSlider("taxRate-slider","taxRate");
+  syncSlider("mileagePerYear-slider","mileagePerYear");
+  syncMF();syncTP();
+  ["acqFee","downPayment","tradeIn","rebates","docFee","dispFee"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",update);
+  });
+  document.getElementById("capitalizeAcq").addEventListener("change",update);
+  document.getElementById("rebateTaxable").addEventListener("change",update);
+  document.querySelectorAll(".term-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".term-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");update();
+    });
+  });
+  document.querySelectorAll(".seg-btn[data-tax-method]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".seg-btn[data-tax-method]").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tax-method-hint").textContent=TAX_HINTS[btn.dataset.taxMethod]||"";
+      update();
+    });
+  });
+  document.getElementById("zip-lookup-btn").addEventListener("click",()=>{lookupZip(document.getElementById("zipCode").value.trim());});
+  document.getElementById("zipCode").addEventListener("keydown",e=>{if(e.key==="Enter")lookupZip(document.getElementById("zipCode").value.trim());});
+}
+
+function buildYearSelect(){
+  const yr = new Date().getFullYear();
+  const sel = document.getElementById('sel-year');
+  sel.innerHTML = [yr, yr-1].map(y => `<option value="${y}"${y===yr?' selected':''}>${y}</option>`).join('');
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  buildYearSelect();
+  wireVehicleSelector();
+  wireInputs();
+  update();
+  initCascade();
+  wireModeNav();
+  wireMode1();
+  m1InitCascade();
+  injectLeverBadges();
+  document.getElementById('set-target-btn').addEventListener('click', snapshotDealTarget);
+});
+
+const AppState = {
+  vehicle: null,
+  savedVehicles: [],
+  dealTarget: null,
+};
+
+function showMode(name){
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('mode-'+name).classList.remove('hidden');
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === name));
+  if(name === 'negotiate') renderMode3();
+  scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function wireModeNav(){
+  document.querySelectorAll('.mode-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=> showMode(btn.dataset.mode));
+  });
+}
+
+let m1Offers = [], m1CurrentPreview = null;
+
+async function m1InitCascade(){
+  const yr = new Date().getFullYear();
+  document.getElementById('m1-sel-year').innerHTML = [yr, yr-1].map(y => `<option value="${y}"${y===yr?' selected':''}>${y}</option>`).join('');
+  const makeEl = document.getElementById('m1-sel-make');
+  const makes = await nhtsaGetMakes();
+  makeEl.innerHTML = '<option value="">Select make…</option>' + makes.map(m => `<option value="${m}">${m}</option>`).join('');
+  makeEl.disabled = false;
+}
+
+async function m1OnMakeOrYearChange(){
+  const modelEl = document.getElementById('m1-sel-model');
+  const trimEl  = document.getElementById('m1-sel-trim');
+  const make = document.getElementById('m1-sel-make').value;
+  modelEl.innerHTML = '<option value="">Loading models…</option>';
+  modelEl.disabled = true;
+  trimEl.innerHTML = '<option value="">Select model first</option>';
+  trimEl.disabled = true;
+  document.getElementById('m1-preview-card').classList.add('hidden');
+  if(!make){ modelEl.innerHTML = '<option value="">Select make first</option>'; return; }
+  const models = await nhtsaGetModels(make);
+  modelEl.innerHTML = '<option value="">Select model…</option>' + models.map(m => `<option value="${m}">${m}</option>`).join('');
+  modelEl.disabled = false;
+}
+
+async function m1OnModelChange(){
+  const statusEl = document.getElementById('m1-status');
+  const trimEl   = document.getElementById('m1-sel-trim');
+  const make  = document.getElementById('m1-sel-make').value;
+  const model = document.getElementById('m1-sel-model').value;
+  const year  = parseInt(document.getElementById('m1-sel-year').value, 10);
+  document.getElementById('m1-preview-card').classList.add('hidden');
+  trimEl.innerHTML = '<option value="">Loading…</option>'; trimEl.disabled = true;
+  if(!model) return;
+  statusEl.textContent = 'Fetching live OEM lease data…'; statusEl.style.color = '#64748b';
+  const offers = await mcFetchOffers({make, model, year});
+  if(!offers.length){
+    trimEl.innerHTML = '<option value="">No OEM lease data</option>';
+    statusEl.textContent = 'No active OEM lease offers found for this vehicle.';
+    statusEl.style.color = '#f59e0b';
+    return;
+  }
+  m1Offers = offers;
+  const seen = new Set();
+  const uniqueTrims = offers.filter(o => { if(!o.trim || seen.has(o.trim)) return false; seen.add(o.trim); return true; }).map(o => o.trim);
+  trimEl.innerHTML = '<option value="">Select trim…</option>' + uniqueTrims.map(t => `<option value="${t}">${t}</option>`).join('');
+  trimEl.disabled = false;
+  statusEl.textContent = uniqueTrims.length + ' trim(s) available.'; statusEl.style.color = '#22c55e';
+  m1ShowPreview(offers[0], make, model, year);
+}
+
+function m1OnTrimChange(){
+  const trim = document.getElementById('m1-sel-trim').value;
+  if(!trim) return;
+  const offer = m1Offers.find(o => o.trim === trim);
+  if(!offer) return;
+  const make  = document.getElementById('m1-sel-make').value;
+  const model = document.getElementById('m1-sel-model').value;
+  const year  = parseInt(document.getElementById('m1-sel-year').value, 10);
+  m1ShowPreview(offer, make, model, year);
+}
+
+function m1ShowPreview(offer, make, model, year){
+  m1CurrentPreview = { make, model, year, trim: offer.trim, offer };
+  const card = document.getElementById('m1-preview-card');
+  const content = document.getElementById('m1-preview-content');
+  content.innerHTML = `
+    <p><strong>${year} ${make} ${model}${offer.trim ? ' '+offer.trim : ''}</strong></p>
+    <p>MSRP: $${offer.msrp.toLocaleString()}</p>
+    <p>OEM Advertised Monthly: $${offer.monthly_payment ? offer.monthly_payment.toFixed(0) : '—'}/mo</p>
+    <p>Term: ${offer.term || '—'} months</p>
+  `;
+  card.classList.remove('hidden');
+}
+
+function m1SaveToCompare(){
+  if(!m1CurrentPreview) return;
+  if(AppState.savedVehicles.length >= 3){
+    alert('Compare list is full (3 max). Remove one first.');
+    return;
+  }
+  AppState.savedVehicles.push(m1CurrentPreview);
+  m1RenderCompareTable();
+}
+
+function m1RenderCompareTable(){
+  document.getElementById('m1-compare-count').textContent = AppState.savedVehicles.length;
+  const el = document.getElementById('m1-compare-table');
+  if(!AppState.savedVehicles.length){
+    el.innerHTML = 'No vehicles saved yet — find one above and click &ldquo;Save to Compare.&rdquo;';
+    return;
+  }
+  el.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-3 gap-3">' +
+    AppState.savedVehicles.map((v, i) => `
+      <div class="compare-card">
+        <p class="font-semibold lb-field-label">${v.year} ${v.make} ${v.model}${v.trim ? ' '+v.trim : ''}</p>
+        <p class="lb-field-sublabel mt-1">MSRP: $${v.offer.msrp.toLocaleString()}</p>
+        <p class="lb-field-sublabel">Est. monthly: $${v.offer.monthly_payment ? v.offer.monthly_payment.toFixed(0) : '—'}/mo</p>
+        <button class="text-xs lb-link underline bg-transparent border-none cursor-pointer mt-2" onclick="m1RemoveFromCompare(${i})">Remove</button>
+      </div>
+    `).join('') + '</div>';
+}
+
+function m1RemoveFromCompare(idx){
+  AppState.savedVehicles.splice(idx, 1);
+  m1RenderCompareTable();
+}
+
+function m1UseInCalculator(){
+  if(!m1CurrentPreview) return;
+  AppState.vehicle = m1CurrentPreview;
+  document.getElementById('sel-year').value = m1CurrentPreview.year;
+  onMakeOrYearChange().then(()=>{
+    document.getElementById('sel-make').value = m1CurrentPreview.make;
+    return onMakeOrYearChange();
+  }).then(()=>{
+    document.getElementById('sel-model').value = m1CurrentPreview.model;
+    return onModelChange();
+  }).then(()=>{
+    if(m1CurrentPreview.trim){
+      document.getElementById('sel-trim').value = m1CurrentPreview.trim;
+      onTrimSelect();
+    }
+    showMode('calculate');
+  });
+}
+
+function wireMode1(){
+  document.getElementById('m1-sel-year').addEventListener('change', m1OnMakeOrYearChange);
+  document.getElementById('m1-sel-make').addEventListener('change', m1OnMakeOrYearChange);
+  document.getElementById('m1-sel-model').addEventListener('change', m1OnModelChange);
+  document.getElementById('m1-sel-trim').addEventListener('change', m1OnTrimChange);
+  document.getElementById('m1-save-btn').addEventListener('click', m1SaveToCompare);
+  document.getElementById('m1-use-btn').addEventListener('click', m1UseInCalculator);
+}
+
+// V3 mapping: high (negotiable/opportunity) -> sage ("push here, this is where you win")
+//             medium (somewhat negotiable)   -> slate (neutral, situational)
+//             nonneg (fixed/dead end)        -> amber ("don't waste energy, move on")
+const LEVER_EDUCATION = {
+  capCost: { level: 'high', label: 'Negotiated Price (Cap Cost)', why: "This is effectively the car's sale price. Dealers have real margin built into MSRP — this is the most normalized, expected negotiation point." },
+  moneyFactor: { level: 'medium', label: 'Money Factor', why: "Money factor is based on a wholesale \"buy rate\" from the captive lender. Dealers can mark it up as pure profit. Know your credit tier, then ask if you're getting the buy rate or a marked-up rate.", extra: 'mf-credit-tiers' },
+  rebates: { level: 'medium', label: 'Manufacturer Rebates/Incentives', why: "Not negotiable with the dealer directly (set by manufacturer), but often not automatically applied — must be requested explicitly." },
+  acqFee: { level: 'medium', label: 'Acquisition Fee', why: "Bank-set fee, generally fixed at the bank level — but dealers sometimes add their own markup on top. Ask if this is the bank's fee or if there's an add-on." },
+  docFee: { level: 'medium', label: 'Doc Fee', why: "Largely dealer profit in most states; some states cap it by law. Always worth asking, rarely fully waived." },
+  dispFee: { level: 'nonneg', label: 'Disposition Fee', why: "Charged at lease-end, set by the bank. Essentially fixed — some loyalty programs waive it on a repeat lease with the same brand. Fixed by contract — not worth spending negotiation energy here; this is a future lever, not a negotiation-day lever." },
+  residualPct: { level: 'nonneg', label: 'Residual %', why: "Set by manufacturer/bank residual tables — not negotiable. Fixed by contract — not worth negotiating. Matters for choosing the right car (higher residual = lower payment), not for negotiating a specific deal." },
+  term: { level: 'nonneg', label: 'Term Length', why: "Pure math — shorter term = higher payment, longer = lower payment but more depreciation exposure. A personal choice, not a negotiation point — don't spend energy here." },
+  mileagePerYear: { level: 'high', label: 'Mileage Allowance', why: "Trades off directly against payment. Dealers often default to low mileage (10k/yr) to show a lower advertised payment, then hit consumers with overage fees later." },
+  downPayment: { level: 'nonneg', label: 'Down Payment', why: "Reduces monthly payment but is NOT covered by GAP insurance in a total loss. A choice, not a negotiation — nothing to win by pushing here." },
+  tradeIn: { level: 'high', label: 'Trade-In Value', why: "A separate negotiation from the lease — see Mode 3, Section 2. Should never be blended into the new-car numbers." },
+};
+
+const MF_CREDIT_TIERS_HTML = `
+  <table style="width:100%;font-size:.75rem;border-collapse:collapse;margin-top:.5rem;">
+    <tr style="color:var(--text-secondary);text-align:left;font-family:var(--font-serif);letter-spacing:.04em;"><th style="padding:.25rem 0;">Tier</th><th>Score</th><th>Guidance</th></tr>
+    <tr><td style="padding:.25rem 0;">Tier 1 (Super Prime)</td><td>740+</td><td>Expect the best rate. Any markup is pure profit — push hardest.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 2 (Prime)</td><td>700–739</td><td>Ask what score unlocks Tier 1 pricing — sometimes a small gap.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 3 (Non-Prime)</td><td>650–699</td><td>More room for hidden markup. Ask for the buy rate explicitly.</td></tr>
+    <tr><td style="padding:.25rem 0;">Tier 4 (Subprime)</td><td>Below 650</td><td>Less MF leverage — focus on price instead of rate.</td></tr>
+  </table>
+  <p style="margin-top:.5rem;font-style:italic;color:var(--text-muted);">Note: exact MF decimals vary by lender and shift with rates — not shown here to avoid stale numbers. Ask which tier you qualify for.</p>
+`;
+
+const LEVER_BADGE_TEXT  = { high: 'NEGOTIABLE', medium: 'ASK', nonneg: 'FIXED' };
+const LEVER_RISK_CLASS  = { high: 'risk-low', medium: 'risk-medium', nonneg: 'risk-high' };
+
+function injectLeverBadges(){
+  Object.keys(LEVER_EDUCATION).forEach(inputId=>{
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    const wrapper = input.closest('div');
+    if(!wrapper) return;
+    const label = wrapper.parentElement?.querySelector('label') || wrapper.querySelector('label');
+    if(!label || label.querySelector('.lever-badge')) return;
+    const lev = LEVER_EDUCATION[inputId];
+    const badge = document.createElement('span');
+    badge.className = 'lever-badge ' + lev.level;
+    badge.textContent = LEVER_BADGE_TEXT[lev.level];
+    badge.title = lev.level === 'nonneg' ? 'Fixed by contract — not worth negotiating' : (lev.level === 'high' ? 'Negotiable — push here' : 'Sometimes negotiable — worth asking');
+    badge.style.cursor = 'pointer';
+    label.appendChild(badge);
+    const whyBox = document.createElement('div');
+    whyBox.className = 'lever-why-box';
+    whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why + (lev.extra === 'mf-credit-tiers' ? MF_CREDIT_TIERS_HTML : '');
+    wrapper.appendChild(whyBox);
+    badge.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); closeTooltip(); whyBox.classList.toggle('open'); });
+  });
+
+  const termLabel = document.querySelector('label[for="term-btns"], .term-btn')?.closest('div')?.querySelector('label');
+  if(termLabel && !termLabel.querySelector('.lever-badge')){
+    const lev = LEVER_EDUCATION.term;
+    const badge = document.createElement('span');
+    badge.className = 'lever-badge ' + lev.level;
+    badge.textContent = LEVER_BADGE_TEXT[lev.level];
+    badge.title = 'Fixed by contract — not worth negotiating';
+    badge.style.cursor = 'pointer';
+    termLabel.appendChild(badge);
+    const whyBox = document.createElement('div');
+    whyBox.className = 'lever-why-box';
+    whyBox.innerHTML = '<strong>' + lev.label + ':</strong> ' + lev.why;
+    termLabel.closest('div').appendChild(whyBox);
+    badge.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); closeTooltip(); whyBox.classList.toggle('open'); });
+  }
+}
+
+function snapshotDealTarget(){
+  const inputs = readInputs();
+  if(inputs.msrp<=0||inputs.capCost<=0||inputs.moneyFactor<=0) {
+    showToast('Enter a complete deal in the calculator first.', true);
+    return;
+  }
+  const b = LeaseCalc.calculate(inputs);
+  AppState.dealTarget = { inputs, calculated: b, vehicle: AppState.vehicle };
+  showToast('Target set. Starting negotiation…');
+  setTimeout(()=> showMode('negotiate'), 650);
+}
+
+let toastTimer=null;
+function showToast(msg, isError){
+  let t = document.getElementById('app-toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'app-toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  requestAnimationFrame(()=> t.classList.add('show'));
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+const NEGOTIATION_SECTIONS = [
+  { title: 'The Walk-Away Power', html: `
+      <p><strong>Your greatest bargaining chip is your willingness to leave.</strong></p>
+      <p><strong>The Dealer's Pressure:</strong> Salespeople work on monthly quotas. If a car is sitting unsold, they are paying interest on it. Their urgency is your advantage.</p>
+      <p><strong>The Play:</strong> Never act like this is the only car available. Get 2–3 competing quotes first.</p>
+      <div class="tactic"><strong>What to Say:</strong> "I'm comparing a few offers today. I'll be moving forward with whoever gives me the best deal."</div>
+      <p style="margin-top:.75rem;"><strong>The Tell:</strong> If they keep "checking with the manager" or scramble when you stand up, your leverage is working.</p>
+  `},
+  { title: 'Trade-In Isolation', html: `
+      <p><strong>Negotiate your trade-in as a separate deal.</strong></p>
+      <p><strong>The Trap:</strong> Dealers love to "blend" numbers to hide low trade-in values behind high discounts.</p>
+      <p><strong>The Play:</strong> Lock in your trade-in value before you even mention the new lease.</p>
+      <div class="tactic"><strong>The Tactic:</strong> Get a firm, written quote from CarMax or Carvana first. Walk in knowing exactly what your current car is worth elsewhere.</div>
+  `},
+  { title: 'Guard Your Intent', html: `
+      <p><strong>Don't reveal how you're paying until the price is locked.</strong></p>
+      <p><strong>The Trap:</strong> If you say "I always lease every 3 years," you're giving away data the dealer will use to manipulate the monthly payment.</p>
+      <p><strong>The Play:</strong> Keep your cards close. If they ask if you're leasing or financing, say: "I'm deciding based on the final numbers you give me."</p>
+      <div class="tactic"><strong>The Tactic:</strong> Lock in the vehicle price and fees first. Discuss the "how" only after the "how much" is set.</div>
+  `},
+  { title: 'The Negotiation Order', html: `
+      <p><strong>Focus on these points in this specific order:</strong></p>
+      <ol style="list-style:decimal;padding-left:1.25rem;color:var(--text-primary);font-size:.9rem;line-height:1.8;">
+        <li><strong>Vehicle Price:</strong> Ignore MSRP. Anchor low based on your research.</li>
+        <li><strong>Rebates:</strong> Ask: "Which manufacturer incentives apply to this specific VIN this month?"</li>
+        <li><strong>Money Factor:</strong> Ask for the "buy rate" for your credit tier to ensure they aren't marking up the interest.</li>
+        <li><strong>Fees:</strong> Ask which are bank-mandated and which are "dealer-added." Fight to waive the latter.</li>
+      </ol>
+  `},
+  { title: 'Your Target', html: `
+      <p><strong>Ready to set a goal?</strong></p>
+      <p>Go to <strong>Calculate &amp; Educate</strong>, build your ideal deal, and tap <strong>"Set Target &amp; Start Negotiation"</strong> to track your progress.</p>
+  `},
+];
+
+function renderMode3(){
+  const container = document.getElementById('m3-content');
+  let html = NEGOTIATION_SECTIONS.map(s => `
+    <details class="neg-section" open>
+      <summary style="cursor:pointer;"><h3 class="type-dossier-header" style="display:inline;">${s.title}</h3></summary>
+      <div style="margin-top:.75rem;">${s.html}</div>
+    </details>
+  `).join('');
+
+  html += `
+    <details class="neg-section" open>
+      <summary style="cursor:pointer;"><h3 class="type-dossier-header" style="display:inline;">Section 5 — Your Target vs. Dealer's Offer</h3></summary>
+      <div style="margin-top:.75rem;" id="m3-section5"></div>
+    </details>
+  `;
+
+  container.innerHTML = html;
+  renderMode3Section5();
+}
+
+function renderMode3Section5(){
+  const el = document.getElementById('m3-section5');
+  if(!AppState.dealTarget){
+    el.innerHTML = `<p class="text-sm lb-field-sublabel">No negotiation target set yet. Go to <strong>Calculate &amp; Educate</strong>, build your deal, and click &ldquo;Set Target &amp; Start Negotiation.&rdquo;</p>`;
+    return;
+  }
+  const target = AppState.dealTarget;
+  el.innerHTML = `
+    <p class="text-sm lb-field-label mb-3">Enter the numbers from the dealer's actual offer below to see exactly where the gap is.</p>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div><label class="text-xs lb-field-sublabel block mb-1">Dealer's Negotiated Price ($)</label><input type="number" id="m3-offer-capcost" class="num-input" value="${target.inputs.capCost}" /></div>
+      <div><label class="text-xs lb-field-sublabel block mb-1">Dealer's Money Factor</label><input type="number" id="m3-offer-mf" step="0.00001" class="num-input" value="${target.inputs.moneyFactor}" /></div>
+      <div><label class="text-xs lb-field-sublabel block mb-1">Dealer's Acq. Fee ($)</label><input type="number" id="m3-offer-acqfee" class="num-input" value="${target.inputs.acqFee}" /></div>
+      <div><label class="text-xs lb-field-sublabel block mb-1">Dealer's Doc Fee ($)</label><input type="number" id="m3-offer-docfee" class="num-input" value="${target.inputs.docFee}" /></div>
+    </div>
+    <button id="m3-compare-btn" class="term-btn btn-primary" style="border:none;">Compare →</button>
+    <div id="m3-compare-result" class="mt-4"></div>
+  `;
+  document.getElementById('m3-compare-btn').addEventListener('click', ()=>{
+    const dealerInputs = {
+      ...target.inputs,
+      capCost:    parseFloat(document.getElementById('m3-offer-capcost').value) || target.inputs.capCost,
+      moneyFactor:parseFloat(document.getElementById('m3-offer-mf').value) || target.inputs.moneyFactor,
+      acqFee:     parseFloat(document.getElementById('m3-offer-acqfee').value) || target.inputs.acqFee,
+      docFee:     parseFloat(document.getElementById('m3-offer-docfee').value) || target.inputs.docFee,
+    };
+    const dealerCalc = LeaseCalc.calculate(dealerInputs);
+    const yourCalc = target.calculated;
+    const deltaPayment = dealerCalc.monthlyPayment - yourCalc.monthlyPayment;
+    const priceDelta = dealerInputs.capCost - target.inputs.capCost;
+    const mfDelta = dealerInputs.moneyFactor - target.inputs.moneyFactor;
+    const priceInflection = LeaseCalc.calculate({...target.inputs, capCost: target.inputs.capCost + 500}).monthlyPayment - yourCalc.monthlyPayment;
+    const mfInflection = LeaseCalc.calculate({...target.inputs, moneyFactor: target.inputs.moneyFactor + 0.0001}).monthlyPayment - yourCalc.monthlyPayment;
+
+    document.getElementById('m3-compare-result').innerHTML = `
+      <div class="stamp-bracket mb-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div class="compare-card">
+            <p class="text-xs lb-card-header mb-1">Your Target</p>
+            <p class="type-hero-serif" style="font-size:1.75rem;">${fmt.money(yourCalc.monthlyPayment)}/mo</p>
+          </div>
+          <div class="compare-card">
+            <p class="text-xs lb-card-header mb-1">Dealer's Offer</p>
+            <p class="type-hero-serif" style="font-size:1.75rem;color:${deltaPayment > 0 ? 'var(--color-amber-500)' : 'var(--accent)'};">${fmt.money(dealerCalc.monthlyPayment)}/mo</p>
+          </div>
+        </div>
+      </div>
+      <p class="text-sm mb-3" style="color:${deltaPayment > 0 ? 'var(--color-amber-500)' : 'var(--accent)'};">
+        ${deltaPayment > 0 ? 'Dealer is $'+deltaPayment.toFixed(2)+'/mo above your target.' : deltaPayment < 0 ? 'Dealer is $'+Math.abs(deltaPayment).toFixed(2)+'/mo below your target — great deal!' : 'Dealer matches your target exactly.'}
+      </p>
+      <div class="worksheet-line section">LEVER-BY-LEVER GAP</div>
+      <p class="worksheet-line">Negotiated Price: ${fmt.money(target.inputs.capCost)} → ${fmt.money(dealerInputs.capCost)} (${priceDelta >= 0 ? '+' : ''}${fmt.money(priceDelta)})</p>
+      <p class="worksheet-line">Money Factor: ${fmt.mf(target.inputs.moneyFactor)} → ${fmt.mf(dealerInputs.moneyFactor)} (${mfDelta >= 0 ? '+' : ''}${mfDelta.toFixed(5)})</p>
+      <p class="worksheet-line">Acquisition Fee: ${fmt.money(target.inputs.acqFee)} → ${fmt.money(dealerInputs.acqFee)}</p>
+      <p class="worksheet-line">Doc Fee: ${fmt.money(target.inputs.docFee)} → ${fmt.money(dealerInputs.docFee)}</p>
+      <div class="worksheet-line section" style="margin-top:.75rem;">INFLECTION POINTS (from your target)</div>
+      <p class="worksheet-line">Every $500 reduction in negotiated price ≈ ${fmt.money(Math.abs(priceInflection))}/mo</p>
+      <p class="worksheet-line">Every 0.0001 reduction in money factor ≈ ${fmt.money(Math.abs(mfInflection))}/mo</p>
+    `;
+  });
+}
+</script>
+</body>
+</html>
