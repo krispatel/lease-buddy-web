@@ -40,7 +40,12 @@ def call(path: str, payload: dict) -> dict:
         f"{CONTROLLER_URL}{path}",
         data=data,
         method="POST",
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            # A normal browser-ish User-Agent avoids Cloudflare Bot Fight Mode
+            # issuing a 1010 JS challenge to the runner's bare urllib client.
+            "User-Agent": "Mozilla/5.0 (compatible; GitHub-Actions/1.0; +https://github.com/features/actions)",
+        },
     )
     if TOKEN:
         req.add_header("Authorization", f"Bearer {TOKEN}")
