@@ -1,0 +1,71 @@
+name: Preview Pipeline
+
+# Auto-provision a preview on PR open/push; auto-teardown on PR close/merge.
+# Runs over the tailnet via the preview controller on the host.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine action + PR number
+        id: ctx
+        run: |
+          if [ "${{ github.event.action }}" = "closed" ]; then
+            echo "ACTION=teardown" >> "$GITHUB_OUTPUT"
+          else
+            echo "ACTION=provision" >> "$GITHUB_OUTPUT"
+          fi
+          echo "PR_NUM=${{ github.event.pull_request.number || github.event.number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Provision preview
+        if: steps.ctx.outputs.ACTION == 'provision'
+        env:
+          PREVIEW_CONTROLLER_TOKEN: ${{ secrets.PREVIEW_CONTROLLER_TOKEN }}
+          PREVIEW_CONTROLLER_URL: ${{ vars.PREVIEW_CONTROLLER_URL }}
+        run: |
+          python3 .github/scripts/preview_hook.py provision \
+            --project leasebuddy \
+            --pr "${{ steps.ctx.outputs.PR_NUM }}"
+
+      - name: Teardown preview
+        if: steps.ctx.outputs.ACTION == 'teardown'
+        env:
+          PREVIEW_CONTROLLER_TOKEN: ${{ secrets.PREVIEW_CONTROLLER_TOKEN }}
+          PREVIEW_CONTROLLER_URL: ${{ vars.PREVIEW_CONTROLLER_URL }}
+        run: |
+          python3 .github/scripts/preview_hook.py teardown \
+            --project leasebuddy \
+            --pr "${{ steps.ctx.outputs.PR_NUM }}"
+
+  staging:
+    # Keep staging refreshed whenever the default branch changes.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh staging
+        env:
+          PREVIEW_CONTROLLER_TOKEN: ${{ secrets.PREVIEW_CONTROLLER_TOKEN }}
+          PREVIEW_CONTROLLER_URL: ${{ vars.PREVIEW_CONTROLLER_URL }}
+        run: |
+          python3 .github/scripts/preview_hook.py provision-staging \
+            --project leasebuddy
